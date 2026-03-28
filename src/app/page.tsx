@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Loader2,
@@ -432,7 +432,7 @@ export default function Home() {
             <p className="text-[#6E6E73] text-lg leading-relaxed mb-24 max-w-2xl mx-auto">Lumia is currently in MVP phase. Join the waitlist as a Founding Member to secure your place in the cockpit.</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-32">
               {[{ icon: Crown, color: "bg-brand-purple", tag: "Priority Beta Access", desc: "Be the first to pilot Lumia. Shape the final infrastructure and experience." }, { icon: Tag, color: "bg-brand-orange", tag: "$99 Lifetime Deal", desc: "Secure exclusive founding pricing. (instead of $19/month, save >$200/year)." }, { icon: Timer, color: "bg-brand-blue", tag: "Only 200 Spots", desc: "Act fast. Claim your place among the founding architects." }].map((card, i) => (
-                <motion.div key={i} whileHover={{ y: -8, shadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
+                <motion.div key={i} whileHover={{ y: -8 }}
                   className="bg-white/80 backdrop-blur-md p-10 rounded-[2.5rem] shadow-xl border border-gray-50 text-left flex flex-col gap-6 transition-all duration-300">
                   <div className={`w-14 h-14 rounded-2xl ${card.color}/10 flex items-center justify-center`}><card.icon className="w-7 h-7 text-brand-purple" /></div>
                   <div><h3 className="text-xs font-bold tracking-[0.2em] text-[#1C1C1E] uppercase mb-3">{card.tag}</h3><p className="text-[#6E6E73] text-[15px] leading-relaxed">{card.desc}</p></div>
