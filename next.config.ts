@@ -9,7 +9,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  outputFileTracingRoot: "/Users/maurelmvondo/Downloads/lumia 2/nextjs",
 };
 
 export default nextConfig;
