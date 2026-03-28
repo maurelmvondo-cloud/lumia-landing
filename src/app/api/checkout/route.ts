@@ -4,7 +4,8 @@ import Stripe from "stripe";
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) throw new Error("STRIPE_SECRET_KEY is not configured");
-  return new Stripe(key, { apiVersion: "2025-04-30.basil" });
+  // Let Stripe use its default API version based on the SDK
+  return new Stripe(key);
 }
 
 export async function POST(request: NextRequest) {
@@ -13,10 +14,7 @@ export async function POST(request: NextRequest) {
 
   if (!priceId || !priceId.startsWith("price_")) {
     return NextResponse.json(
-      {
-        error:
-          "Configuration Error: STRIPE_PRICE_ID must be a valid Price ID starting with 'price_'.",
-      },
+      { error: "Configuration Error: STRIPE_PRICE_ID must be a valid Price ID starting with 'price_'." },
       { status: 400 }
     );
   }
@@ -33,7 +31,6 @@ export async function POST(request: NextRequest) {
       success_url: `${appUrl}/?success=true`,
       cancel_url: `${appUrl}/`,
     });
-
     return NextResponse.json({ url: session.url });
   } catch (error: any) {
     console.error("Stripe session error:", error);
