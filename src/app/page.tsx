@@ -90,9 +90,6 @@ function WaitlistForm({ variant = "hero" }: { variant?: "hero" | "footer" }) {
 
 export default function Home() {
   const [isSuccess, setIsSuccess] = useState(false);
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.search.includes("success=true")) {
@@ -103,12 +100,6 @@ export default function Home() {
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const handlePaid = () => {
-    if (!email || !email.includes("@")) { setError(true); setTimeout(() => setError(false), 1800); return; }
-    setSubmitted(true);
-    setTimeout(() => { window.location.href = `https://buy.stripe.com/YOUR_LINK?prefilled_email=${encodeURIComponent(email)}`; }, 800);
   };
 
   if (isSuccess) {
@@ -183,15 +174,8 @@ export default function Home() {
             Share a rough idea by voice or text — it pulls your context and writes the perfect prompt for you.
           </motion.p>
 
-          <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.7,delay:0.2}}
-            className="flex flex-col sm:flex-row gap-2 max-w-sm sm:max-w-md mx-auto mb-4">
-            <input type="email" placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)}
-              className={`flex-1 bg-white border-2 border-gray-200 rounded-full px-5 py-3.5 text-sm text-[#1C1C1E] placeholder:text-[#A1A1A6] font-medium outline-none transition-all ${error ? "border-rose-400" : "focus:border-[#567EFC]"}`}
-            />
-            <button onClick={handlePaid}
-              className="px-6 py-3.5 bg-[#1C1C1E] text-white text-sm font-bold rounded-full hover:opacity-90 transition-all whitespace-nowrap">
-              {submitted ? "✓ You're on the list" : "Join for free →"}
-            </button>
+          <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.7,delay:0.2}} className="max-w-sm sm:max-w-md mx-auto mb-4">
+            <WaitlistForm variant="hero" />
           </motion.div>
           <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{duration:0.6,delay:0.3}} className="text-xs text-[#A1A1A6]">
             Free waitlist · or <button onClick={() => scrollTo("pricing")} className="text-[#567EFC] font-semibold no-underline">get founding access for $99</button> · Mac at launch
@@ -384,13 +368,7 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <input type="email" placeholder="your@email.com" value={email} onChange={(e)=>setEmail(e.target.value)}
-                  className={`w-full bg-white border-2 border-gray-200 rounded-full px-4 py-3 text-sm text-[#1C1C1E] placeholder:text-[#A1A1A6] font-medium outline-none transition-all mb-3 ${error?"border-rose-400":"focus:border-[#567EFC]"}`}
-                />
-                <button onClick={handlePaid}
-                  className="w-full py-3.5 bg-[#1C1C1E] text-white rounded-full font-bold text-sm hover:opacity-90 transition-all relative overflow-hidden">
-                  {submitted ? "✓ Redirecting..." : "Become a founding member →"}
-                </button>
+                <WaitlistForm variant="footer" />
               </div>
             </div>
           </div>
