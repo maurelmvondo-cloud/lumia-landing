@@ -89,6 +89,77 @@ function WaitlistForm({ variant = "hero" }: { variant?: "hero" | "footer" }) {
   );
 }
 
+function PricingPaidForm() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setStatus("loading");
+    setErrorMessage("");
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || "Failed to create checkout session");
+      }
+    } catch (err: any) {
+      setStatus("error");
+      setErrorMessage(err.message || "Something went wrong.");
+    }
+  };
+
+  if (status === "success") {
+    return (
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+        className="flex items-center justify-center gap-2 text-emerald-600 font-medium py-3">
+        <CheckCircle2 className="w-5 h-5 shrink-0" /><span>Redirecting...</span>
+      </motion.div>
+    );
+  }
+
+  return (
+    <div className="w-full">
+      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2">
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="your@email.com"
+          className="w-full bg-white border-2 border-gray-200 rounded-full px-4 py-3 text-sm text-[#1C1C1E] placeholder:text-[#A1A1A6] font-medium outline-none transition-all focus:border-[#567EFC]"
+        />
+        <button
+          type="submit"
+          disabled={status === "loading"}
+          className="w-full py-3.5 rounded-full text-white text-sm font-bold transition-all flex items-center justify-center gap-2"
+          style={{ background: "linear-gradient(135deg, #567EFC 0%, #C2AED4 50%, #FF7769 100%)" }}
+        >
+          {status === "loading" ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <>Become a founding member → <ArrowRight className="w-4 h-4" /></>
+          )}
+        </button>
+      </form>
+      {status === "error" && (
+        <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2 text-rose-500 text-sm font-medium mt-3 px-4">
+          <AlertCircle className="w-4 h-4" /><span>{errorMessage}</span>
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -369,7 +440,7 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <WaitlistForm variant="footer" />
+                <PricingPaidForm />
               </div>
             </div>
           </div>
