@@ -59,8 +59,8 @@ function WaitlistForm({ variant = "hero" }: { variant?: "hero" | "footer" }) {
   if (status === "success") {
     return (
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-        className="flex items-center gap-2 text-emerald-600 font-medium py-3">
-        <CheckCircle2 className="w-5 h-5" /><span>You are on the list.</span>
+        className={`flex items-center gap-2 text-emerald-600 font-medium py-3 ${variant === "hero" ? "justify-center text-center w-full" : ""}`}>
+        <CheckCircle2 className="w-5 h-5 shrink-0" /><span>You are on the list.</span>
       </motion.div>
     );
   }
@@ -73,7 +73,8 @@ function WaitlistForm({ variant = "hero" }: { variant?: "hero" | "footer" }) {
           placeholder="your@email.com"
           className="flex-1 bg-transparent border-none outline-none px-5 py-3 text-[#1C1C1E] placeholder:text-[#A1A1A6] font-medium w-full" />
         <button disabled={status === "loading"}
-          className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#1C1C1E] text-white text-sm font-bold rounded-full hover:opacity-90 transition-all whitespace-nowrap w-full sm:w-auto">
+          className={`flex items-center justify-center gap-2 px-6 py-3.5 text-white text-sm font-bold rounded-full transition-all whitespace-nowrap w-full sm:w-auto ${variant === "hero" ? "bg-[#1C1C1E] hover:opacity-90" : "bg-[#1C1C1E] hover:opacity-90"}`}
+          style={variant === "footer" ? { background: "linear-gradient(135deg, #567EFC 0%, #C2AED4 50%, #FF7769 100%)" } : {}}>
           {status === "loading" ? <Loader2 className="w-4 h-4 animate-spin" /> :
             <>{variant === "hero" ? "Join for free →" : "Become a founding member →"}<ArrowRight className="w-4 h-4" /></>}
         </button>
@@ -356,15 +357,15 @@ export default function Home() {
                 <p className="text-sm text-[#6E6E73] leading-relaxed mb-6">Skip the queue. Get priority beta access, help shape the product, and lock in lifetime pricing before it&apos;s gone. Only 50 spots total — very few remaining.</p>
                 <ul className="space-y-2.5 mb-6 list-none">
                   {[
-                    {text:<><strong>Priority beta access</strong> — skip the queue</>,colored:true},
-                    {text:<><strong>Lifetime price</strong> — never pay monthly</>,colored:true},
-                    {text:<><strong>Shape the product</strong> — direct founder access</>,colored:true},
-                    {text:"All features, forever",colored:true},
-                    {text:"⚡ Limited spots — filling up fast",colored:false},
-                  ].map((item) => (
-                    <li key={item.text.toString()} className="flex items-start gap-2.5 text-sm text-[#6E6E73]">
+                    {text:<><strong>Priority beta access</strong> — skip the queue</>},
+                    {text:<><strong>Lifetime price</strong> — never pay monthly</>},
+                    {text:<><strong>Shape the product</strong> — direct founder access</>},
+                    {text:<>All features, forever</>},
+                    {text:<>⚡ Limited spots — filling up fast</>},
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-start gap-2.5 text-sm text-[#6E6E73]">
                       <div className="w-4 h-4 rounded-full bg-gradient-to-br from-[#567EFC] to-[#FF7769] flex items-center justify-center text-[10px] text-white shrink-0 mt-0.5">✓</div>
-                      <span dangerouslySetInnerHTML={{__html:item.text.toString()}}/>
+                      <span>{item.text}</span>
                     </li>
                   ))}
                 </ul>
