@@ -1,5 +1,26 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import localFont from "next/font/local";
+
+const bricolage = localFont({
+  src: [
+    { path: "./fonts/Bricolage_Grotesque/BricolageGrotesque_24pt-ExtraBold.ttf", weight: "800", style: "normal" },
+    { path: "./fonts/Bricolage_Grotesque/BricolageGrotesque-Bold.ttf", weight: "700", style: "normal" },
+    { path: "./fonts/Bricolage_Grotesque/BricolageGrotesque-SemiBold.ttf", weight: "600", style: "normal" },
+    { path: "./fonts/Bricolage_Grotesque/BricolageGrotesque-Regular.ttf", weight: "400", style: "normal" },
+  ],
+  variable: "--font-bricolage",
+  display: "swap",
+});
+
+const instrument = localFont({
+  src: [
+    { path: "./fonts/Instrument_Sans/InstrumentSans-Medium.ttf", weight: "500", style: "normal" },
+    { path: "./fonts/Instrument_Sans/InstrumentSans-Regular.ttf", weight: "400", style: "normal" },
+  ],
+  variable: "--font-instrument",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Lumia – The Zero-Prompt AI Experience",
@@ -12,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${bricolage.variable} ${instrument.variable}`}>
       <body>{children}</body>
     </html>
   );

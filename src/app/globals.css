@@ -1,59 +1,14 @@
 @import "tailwindcss";
 
-/* ── Bricolage Grotesque ── */
-@font-face {
-  font-family: 'Bricolage Grotesque';
-  src: url('/fonts/Bricolage_Grotesque/BricolageGrotesque_24pt-ExtraBold.ttf') format('truetype');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Bricolage Grotesque';
-  src: url('/fonts/Bricolage_Grotesque/BricolageGrotesque-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Bricolage Grotesque';
-  src: url('/fonts/Bricolage_Grotesque/BricolageGrotesque-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Bricolage Grotesque';
-  src: url('/fonts/Bricolage_Grotesque/BricolageGrotesque-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* ── Instrument Sans ── */
-@font-face {
-  font-family: 'Instrument Sans';
-  src: url('/fonts/Instrument_Sans/InstrumentSans-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Instrument Sans';
-  src: url('/fonts/Instrument_Sans/InstrumentSans-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
-  --font-display: 'Bricolage Grotesque', sans-serif;
-  --font-body: 'Instrument Sans', sans-serif;
+  /* next/font variables injected by layout.tsx */
+  --font-display: var(--font-bricolage), 'Bricolage Grotesque', sans-serif;
+  --font-body: var(--font-instrument), 'Instrument Sans', sans-serif;
 }
 
 @theme {
-  --font-display: "Bricolage Grotesque", sans-serif;
-  --font-body: "Instrument Sans", sans-serif;
+  --font-display: var(--font-bricolage), 'Bricolage Grotesque', sans-serif;
+  --font-body: var(--font-instrument), 'Instrument Sans', sans-serif;
   --color-brand-blue: #58a9fc;
   --color-brand-indigo: #6987fb;
   --color-brand-purple: #b3a6ef;
