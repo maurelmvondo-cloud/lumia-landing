@@ -449,7 +449,6 @@ export default function Home() {
         </a>
         <div className="flex items-center gap-6 flex-wrap">
           <a href="https://x.com/_r0sly_" target="_blank" rel="noopener noreferrer" className="text-sm text-[#A1A1A6] hover:text-[#1C1C1E] transition-colors no-underline">Building in public on X ↗</a>
-          <a href="mailto:maurel.mvondo@icloud.com" className="text-sm text-[#A1A1A6] hover:text-[#1C1C1E] transition-colors no-underline">maurel.mvondo@icloud.com</a>
           <p className="text-sm text-[#A1A1A6]">© 2026 Lumia</p>
         </div>
       </footer>
