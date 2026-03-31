@@ -4,10 +4,10 @@ import localFont from "next/font/local";
 
 const bricolage = localFont({
   src: [
-    { path: "./fonts/Bricolage_Grotesque/BricolageGrotesque_24pt-ExtraBold.ttf", weight: "800", style: "normal" },
-    { path: "./fonts/Bricolage_Grotesque/BricolageGrotesque-Bold.ttf", weight: "700", style: "normal" },
-    { path: "./fonts/Bricolage_Grotesque/BricolageGrotesque-SemiBold.ttf", weight: "600", style: "normal" },
-    { path: "./fonts/Bricolage_Grotesque/BricolageGrotesque-Regular.ttf", weight: "400", style: "normal" },
+    { path: "./fonts/Bricolage_Grotesque/BricolageGrotesque_24pt_SemiCondensed-ExtraBold.ttf", weight: "800", style: "normal" },
+    { path: "./fonts/Bricolage_Grotesque/BricolageGrotesque_24pt_SemiCondensed-Bold.ttf", weight: "700", style: "normal" },
+    { path: "./fonts/Bricolage_Grotesque/BricolageGrotesque_24pt_SemiCondensed-SemiBold.ttf", weight: "600", style: "normal" },
+    { path: "./fonts/Bricolage_Grotesque/BricolageGrotesque_24pt_SemiCondensed-Regular.ttf", weight: "400", style: "normal" },
   ],
   variable: "--font-bricolage",
   display: "swap",
@@ -15,8 +15,8 @@ const bricolage = localFont({
 
 const instrument = localFont({
   src: [
-    { path: "./fonts/Instrument_Sans/InstrumentSans-Medium.ttf", weight: "500", style: "normal" },
-    { path: "./fonts/Instrument_Sans/InstrumentSans-Regular.ttf", weight: "400", style: "normal" },
+    { path: "./fonts/Instrument_Sans/InstrumentSans_SemiCondensed-Medium.ttf", weight: "500", style: "normal" },
+    { path: "./fonts/Instrument_Sans/InstrumentSans_SemiCondensed-Regular.ttf", weight: "400", style: "normal" },
   ],
   variable: "--font-instrument",
   display: "swap",
