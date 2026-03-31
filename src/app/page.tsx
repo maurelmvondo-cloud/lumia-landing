@@ -194,14 +194,7 @@ export default function Home() {
       {/* NAV */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 md:px-12 py-4 bg-white/90 backdrop-blur-xl border-b border-gray-100">
         <a href="/" className="flex items-center gap-2.5 no-underline">
-          <svg className="w-7 h-7" viewBox="0 0 100 100" fill="none">
-            <defs><linearGradient id="lm" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#567EFC"/><stop offset="48%" stopColor="#C2AED4"/><stop offset="100%" stopColor="#FF7769"/>
-            </linearGradient></defs>
-            <rect x="42" y="6" width="16" height="88" rx="8" fill="url(#lm)"/>
-            <rect x="42" y="6" width="16" height="88" rx="8" fill="url(#lm)" transform="rotate(60 50 50)"/>
-            <rect x="42" y="6" width="16" height="88" rx="8" fill="url(#lm)" transform="rotate(120 50 50)"/>
-          </svg>
+          <img src="/logo.png" alt="Lumia" className="w-7 h-7 object-contain" />
           <span className="font-bold text-xl tracking-tight text-[#1C1C1E]">Lumia</span>
         </a>
         <div className="flex items-center gap-8">
@@ -451,14 +444,7 @@ export default function Home() {
       {/* FOOTER */}
       <footer className="bg-[#F6F7FB] border-t border-gray-100 py-8 px-12 flex items-center justify-between flex-wrap gap-4">
         <a href="/" className="flex items-center gap-2.5 no-underline">
-          <svg className="w-7 h-7" viewBox="0 0 100 100" fill="none">
-            <defs><linearGradient id="lm2" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#567EFC"/><stop offset="48%" stopColor="#C2AED4"/><stop offset="100%" stopColor="#FF7769"/>
-            </linearGradient></defs>
-            <rect x="42" y="6" width="16" height="88" rx="8" fill="url(#lm2)"/>
-            <rect x="42" y="6" width="16" height="88" rx="8" fill="url(#lm2)" transform="rotate(60 50 50)"/>
-            <rect x="42" y="6" width="16" height="88" rx="8" fill="url(#lm2)" transform="rotate(120 50 50)"/>
-          </svg>
+          <img src="/logo.png" alt="Lumia" className="w-7 h-7 object-contain" />
           <span className="font-bold text-xl tracking-tight text-[#1C1C1E]">Lumia</span>
         </a>
         <div className="flex items-center gap-6 flex-wrap">
