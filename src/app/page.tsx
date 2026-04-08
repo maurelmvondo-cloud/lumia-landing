@@ -1,11 +1,418 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, CheckCircle2, AlertCircle, Loader2, Menu, X } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import LumiaAnimation, { HeroAnimation } from "@/components/LumiaAnimation";
 
-function WaitlistForm({ variant = "hero" }: { variant?: "hero" | "footer" }) {
+
+// ─── Global Styles ────────────────────────────────────────────────────────────
+// Note: DM Sans is loaded via <link> tag in the Home component (not @import here)
+const GLOBAL_STYLES = `
+  *, *::before, *::after { box-sizing: border-box; }
+  
+  .hero-title {
+    white-space: nowrap;
+    text-align: center;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .mobile-break {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .hero-title {
+      white-space: normal !important;
+      font-size: clamp(48px, 14vw, 64px) !important;
+      letter-spacing: -2px !important;
+    }
+    .mobile-break {
+      display: block;
+    }
+  }
+
+  :root {
+    --violet: #567EFC;
+    --violet-light: #8BA8FD;
+    --violet-soft: #EEF2FF;
+    --pink: #EB5E5E;
+    --bg: #F8F7FF;
+    --surface: #FFFFFF;
+    --surface-2: #F3F4FF;
+    --text: #0F0A1E;
+    --text-2: #6B6480;
+    --text-3: #A89FC0;
+    --border: rgba(86,126,252,0.12);
+    --border-2: rgba(86,126,252,0.06);
+    --gradient: linear-gradient(135deg, #567EFC 0%, #C2AED4 50%, #EB5E5E 100%);
+    --shadow-card: 0 2px 24px rgba(86,126,252,0.10);
+    --shadow-lg: 0 8px 48px rgba(86,126,252,0.18);
+    --shadow-dark: 0 24px 60px rgba(0,0,0,0.35);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #fff;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+    50% { opacity: 0.8; transform: scale(1.15); box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+  }
+  @keyframes blink-cursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  @keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(24px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes fillBar {
+    from { width: 0%; }
+    to { width: 94%; }
+  }
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+  }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(8px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+  .btn-spring {
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .btn-spring:hover {
+    transform: translateY(-2px) scale(1.02);
+  }
+  .blink { animation: blink-cursor 1s infinite; }
+
+  /* Marquee mask */
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+  }
+
+  /* AI logos marquee */
+  .ai-marquee { animation: marquee-scroll 22s linear infinite; }
+  .ai-marquee:hover { animation-play-state: paused; }
+
+  /* ─── Pain Section ──────────────────────────────────────────────────── */
+  .pain-section {
+    background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFF 100%);
+    border-top: 0.5px solid rgba(86,126,252,0.06);
+    border-bottom: 0.5px solid rgba(86,126,252,0.06);
+    padding: 80px 48px;
+  }
+  .pain-header-rule {
+    width: 40px;
+    height: 1.5px;
+    background: linear-gradient(90deg, #567EFC, #C2AED4, #FF7769);
+    margin: 24px auto 0;
+  }
+  .pain-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 48px;
+    align-items: stretch;
+  }
+  .pain-cards-right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .pain-card-hero {
+    background: #0F0A1E;
+    border: 0.5px solid rgba(86,126,252,0.2);
+    border-radius: 16px;
+    padding: 32px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    cursor: default;
+  }
+  .pain-card-hero:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 48px rgba(86,126,252,0.3);
+  }
+  .pain-card-hero-divider {
+    width: 100%;
+    height: 0.5px;
+    background: rgba(86,126,252,0.15);
+    margin: 24px 0;
+    flex-shrink: 0;
+  }
+  .pain-f1-inner-tag {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(167,139,250,0.6);
+    margin-bottom: 12px;
+  }
+  .pain-f1-inner-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.65);
+  }
+  .pain-f1-inner-text .accent {
+    background: linear-gradient(90deg, #567EFC, #C2AED4, #FF7769);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 500;
+  }
+  .pain-f1-inner-footer {
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 0.5px solid rgba(255,255,255,0.06);
+    font-style: italic;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .pain-card-sm {
+    background: #FFFFFF;
+    border: 0.5px solid rgba(124,58,237,0.12);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.25s ease;
+    flex: 1;
+    min-height: 0;
+    cursor: default;
+  }
+  .pain-card-sm.accented {
+    border-left: 3px solid rgba(86,126,252,0.45);
+    border-radius: 0 16px 16px 0;
+  }
+  .pain-card-sm.subtle {
+    background: #FAFAFA;
+    border-color: rgba(124,58,237,0.08);
+  }
+  .pain-card-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(86,126,252,0.10);
+  }
+  .pain-most-common {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    background: rgba(86,126,252,0.07);
+    color: #567EFC;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+  .pain-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bricolage Grotesque', var(--font-bricolage), sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    border-radius: 999px;
+    padding: 3px 10px;
+    width: fit-content;
+    margin-bottom: 20px;
+  }
+  .pain-badge-dark {
+    color: rgba(86,126,252,0.8);
+    background: rgba(86,126,252,0.08);
+    border: 0.5px solid rgba(86,126,252,0.2);
+  }
+  .pain-badge-light {
+    background: rgba(86,126,252,0.08);
+    border: 0.5px solid rgba(86,126,252,0.15);
+    color: #567EFC;
+  }
+  .pain-card-label-dark {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(86,126,252,0.5);
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 20px;
+  }
+  .pain-card-label-light {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 16px;
+  }
+  .pain-card-title {
+    font-family: 'Bricolage Grotesque', var(--font-bricolage), sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .pain-card-title-sm { font-size: 18px; margin-top: 4px; }
+  .pain-card-title-hero { font-size: 22px; letter-spacing: -0.5px; color: #FFFFFF; margin-top: 6px; }
+  .pain-card-desc {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.7;
+    margin-top: 10px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .pain-card-desc-hero { color: rgba(255,255,255,0.55); font-size: 14px; margin-top: 12px; }
+  .pain-card-quote {
+    font-size: 13px;
+    font-style: italic;
+    background: linear-gradient(90deg, #567EFC, #C2AED4, #FF7769);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 0.5px solid rgba(255,255,255,0.06);
+    line-height: 1.6;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .pain-card-quote-light {
+    font-size: 12px;
+    font-style: italic;
+    background: linear-gradient(90deg, #567EFC, #C2AED4, #FF7769);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 0.5px solid rgba(124,58,237,0.08);
+    line-height: 1.6;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .pain-bridge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 48px;
+    padding: 0 0 8px;
+  }
+  .pain-bridge-rule {
+    width: 48px;
+    height: 0.5px;
+    background: linear-gradient(90deg, #567EFC, #FF7769);
+    margin-bottom: 8px;
+  }
+  .pain-bridge-title {
+    font-family: 'Bricolage Grotesque', var(--font-bricolage), sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    text-align: center;
+  }
+  .pain-bridge-sub {
+    font-size: 15px;
+    color: var(--text-2);
+    font-style: italic;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .pain-bridge-link {
+    font-size: 14px;
+    font-weight: 600;
+    background: linear-gradient(90deg, #567EFC, #C2AED4, #FF7769);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-decoration: none;
+    cursor: pointer;
+    margin-top: 4px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .pain-bridge-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .pain-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .pain-reveal.visible { opacity: 1; transform: translateY(0); }
+  .pain-gradient {
+    background: linear-gradient(90deg, #567EFC, #C2AED4, #FF7769);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  @media (max-width: 768px) {
+    .pain-section { padding: 64px 24px; }
+    .pain-cards-grid { grid-template-columns: 1fr; }
+    .pain-bridge-title { font-size: 18px; }
+    .pain-card-sm.accented {
+      border-left: 0.5px solid rgba(124,58,237,0.12);
+      border-radius: 16px;
+    }
+  }
+`;
+
+// ─── AI Logos ─────────────────────────────────────────────────────────────────
+const AI_LOGOS = [
+  { src: "/logos/claude.webp",      name: "Claude" },
+  { src: "/logos/chatgpt.webp",     name: "ChatGPT" },
+  { src: "/logos/gemini.webp",      name: "Gemini" },
+  { src: "/logos/perplexity.webp",  name: "Perplexity" },
+  { src: "/logos/copilot.png",      name: "Copilot" },
+  { src: "/logos/deepseek.png",     name: "DeepSeek" },
+  { src: "/logos/notion.png",       name: "Notion AI" },
+  { src: "/logos/cursor.png",       name: "Cursor" },
+  { src: "/logos/mistral.png",      name: "Mistral" },
+  { src: "/logos/cohere.png",       name: "Cohere" },
+];
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+type QualityKey = "short" | "mid" | "struct";
+
+// ─── WaitlistForm ─────────────────────────────────────────────────────────────
+function WaitlistForm({ variant = "hero" }: { variant?: "hero" | "pricing" }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -15,33 +422,11 @@ function WaitlistForm({ variant = "hero" }: { variant?: "hero" | "footer" }) {
     if (!email) return;
     setStatus("loading");
     setErrorMessage("");
-
-    if (variant === "footer") {
-      try {
-        const response = await fetch("/api/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        });
-        const data = await response.json();
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          throw new Error(data.error || "Failed to create checkout session");
-        }
-      } catch (err: any) {
-        setStatus("error");
-        setErrorMessage(err.message || "Something went wrong.");
-      }
-      return;
-    }
-
     if (!isSupabaseConfigured) {
       setStatus("error");
-      setErrorMessage("Supabase configuration is missing.");
+      setErrorMessage("Configuration missing.");
       return;
     }
-
     try {
       const { error } = await supabase.from("waitlist").insert([{ email }]);
       if (error) {
@@ -58,40 +443,38 @@ function WaitlistForm({ variant = "hero" }: { variant?: "hero" | "footer" }) {
 
   if (status === "success") {
     return (
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-        className={`flex items-center gap-2 text-emerald-600 font-medium py-3 ${variant === "hero" ? "justify-center text-center w-full" : ""}`}>
-        <CheckCircle2 className="w-5 h-5 shrink-0" /><span>You are on the list.</span>
-      </motion.div>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#22C55E", fontWeight: 600, padding: "12px 0" }}>
+        <CheckCircle2 size={18} /> <span>You're on the list — we'll be in touch.</span>
+      </div>
     );
   }
 
   return (
-    <div className="w-full">
-      <form onSubmit={handleSubmit}
-        className={`w-full flex flex-col sm:flex-row items-center gap-2 sm:gap-3 p-2 bg-white/80 backdrop-blur-md border border-gray-100 transition-shadow ${variant === "hero" ? "rounded-[2rem] sm:rounded-full shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)]" : "rounded-2xl sm:rounded-full bg-gray-50/50"}`}>
-        <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+    <div style={{ width: "100%" }}>
+      <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <input
+          type="email" required value={email} onChange={e => setEmail(e.target.value)}
           placeholder="your@email.com"
-          className="flex-1 bg-transparent border-none outline-none px-5 py-3 text-[#1C1C1E] placeholder:text-[#A1A1A6] font-medium w-full" />
-        <button disabled={status === "loading"}
-          className={`flex items-center justify-center gap-2 px-6 py-3.5 text-white text-sm font-bold rounded-full transition-all whitespace-nowrap w-full sm:w-auto ${variant === "hero" ? "bg-[#1C1C1E] hover:opacity-90" : "bg-[#1C1C1E] hover:opacity-90"}`}
-          style={variant === "footer" ? { background: "linear-gradient(135deg, #567EFC 0%, #C2AED4 50%, #FF7769 100%)" } : {}}>
-          {status === "loading" ? <Loader2 className="w-4 h-4 animate-spin" /> :
-            <>{variant === "hero" ? "Join for free →" : "Become a founding member →"}<ArrowRight className="w-4 h-4" /></>}
+          style={{ flex: 1, minWidth: 200, padding: "12px 16px", borderRadius: 999, border: "1.5px solid var(--border)", background: "#fff", fontSize: 14, fontFamily: "DM Sans, sans-serif", color: "var(--text)", outline: "none" }}
+        />
+        <button type="submit" disabled={status === "loading"}
+          style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 20px", borderRadius: 999, background: "var(--gradient)", color: "#fff", border: "none", cursor: "pointer", fontWeight: 700, fontSize: 14, whiteSpace: "nowrap" }}>
+          {status === "loading" ? <Loader2 size={16} className="animate-spin" /> : <>Join waitlist <ArrowRight size={14} /></>}
         </button>
       </form>
       {status === "error" && (
-        <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2 text-rose-500 text-sm font-medium mt-3 px-4">
-          <AlertCircle className="w-4 h-4" /><span>{errorMessage}</span>
-        </motion.div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#EF4444", fontSize: 13, marginTop: 8, paddingLeft: 4 }}>
+          <AlertCircle size={14} /> {errorMessage}
+        </div>
       )}
     </div>
   );
 }
 
+// ─── PricingPaidForm ──────────────────────────────────────────────────────────
 function PricingPaidForm() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -117,52 +500,1271 @@ function PricingPaidForm() {
     }
   };
 
-  if (status === "success") {
-    return (
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-        className="flex items-center justify-center gap-2 text-emerald-600 font-medium py-3">
-        <CheckCircle2 className="w-5 h-5 shrink-0" /><span>Redirecting...</span>
-      </motion.div>
-    );
-  }
-
   return (
-    <div className="w-full">
-      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2">
+    <div style={{ width: "100%" }}>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="email" required value={email} onChange={e => setEmail(e.target.value)}
           placeholder="your@email.com"
-          className="w-full bg-white border-2 border-gray-200 rounded-full px-4 py-3 text-sm text-[#1C1C1E] placeholder:text-[#A1A1A6] font-medium outline-none transition-all focus:border-[#567EFC]"
+          style={{ width: "100%", padding: "13px 18px", borderRadius: 999, border: "1.5px solid rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.1)", color: "#fff", fontSize: 14, fontFamily: "DM Sans, sans-serif", outline: "none" }}
         />
-        <button
-          type="submit"
-          disabled={status === "loading"}
-          className="w-full py-3.5 rounded-full text-white text-sm font-bold transition-all flex items-center justify-center gap-2"
-          style={{ background: "linear-gradient(135deg, #567EFC 0%, #C2AED4 50%, #FF7769 100%)" }}
-        >
-          {status === "loading" ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <>Become a founding member → <ArrowRight className="w-4 h-4" /></>
-          )}
+        <button type="submit" disabled={status === "loading"}
+          className="btn-spring"
+          style={{ width: "100%", padding: "14px 24px", borderRadius: 999, background: "#fff", color: "#0F0A1E", border: "none", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+          {status === "loading" ? <Loader2 size={16} className="animate-spin" /> : <>Become a founding member <ArrowRight size={15} /></>}
         </button>
       </form>
       {status === "error" && (
-        <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2 text-rose-500 text-sm font-medium mt-3 px-4">
-          <AlertCircle className="w-4 h-4" /><span>{errorMessage}</span>
-        </motion.div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#FCA5A5", fontSize: 13, marginTop: 8 }}>
+          <AlertCircle size={14} /> {errorMessage}
+        </div>
       )}
     </div>
   );
 }
 
+// ─── Navbar ───────────────────────────────────────────────────────────────────
+function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    setMenuOpen(false);
+  };
+
+  return (
+    <>
+      <style>{`
+        .nav-link { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: var(--text-2); background: none; border: none; cursor: pointer; transition: color 0.2s; padding: 4px 0; }
+        .nav-link:hover { color: var(--text); }
+      `}</style>
+      <nav style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+        height: 64, display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "0 clamp(20px, 5vw, 64px)",
+        background: scrolled ? "rgba(255,255,255,0.96)" : "transparent",
+        backdropFilter: scrolled ? "blur(20px)" : "none",
+        borderBottom: scrolled ? "0.5px solid var(--border)" : "none",
+        transition: "all 0.3s ease",
+      }}>
+        <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+          <img src="/logo.png" alt="Lumia" style={{ width: 28, height: 28, objectFit: "contain" }} />
+          <span style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 20, color: "var(--text)", letterSpacing: "-0.5px" }}>Lumia</span>
+        </a>
+
+        {/* Desktop nav */}
+        <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", alignItems: "center", gap: 36 }} className="hidden md:flex">
+          {[["How it works", "how"], ["Compare", "compare"], ["Pricing", "pricing"]].map(([label, id]) => (
+            <button key={id} className="nav-link" onClick={() => scrollTo(id)}>{label}</button>
+          ))}
+        </div>
+
+        {/* Desktop CTA */}
+        <button onClick={() => scrollTo("pricing")}
+          className="btn-spring hidden md:flex"
+          style={{ alignItems: "center", gap: 8, background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, padding: "10px 18px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap" }}>
+          <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#EF4444", display: "inline-block", animation: "pulse-dot 1.5s infinite" }} />
+          41 spots left — $99 lifetime
+        </button>
+
+        {/* Mobile burger */}
+        <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden"
+          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text)", padding: 6 }}>
+          {menuOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+      </nav>
+
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}
+            style={{ position: "fixed", top: 64, left: 0, right: 0, zIndex: 99, background: "#fff", padding: "20px 24px 24px", borderBottom: "0.5px solid var(--border)", display: "flex", flexDirection: "column", gap: 16 }}>
+            {[["How it works", "how"], ["Compare", "compare"], ["Pricing", "pricing"]].map(([label, id]) => (
+              <button key={id} onClick={() => scrollTo(id)} style={{ textAlign: "left", background: "none", border: "none", fontSize: 17, fontWeight: 500, color: "var(--text)", cursor: "pointer", fontFamily: "DM Sans, sans-serif", padding: "4px 0" }}>{label}</button>
+            ))}
+            <button onClick={() => scrollTo("pricing")}
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, padding: "14px 24px", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15, cursor: "pointer", marginTop: 4 }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#EF4444", display: "inline-block", animation: "pulse-dot 1.5s infinite" }} />
+              41 spots left — $99 lifetime
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+// ─── Hero Section ─────────────────────────────────────────────────────────────
+function HeroSection() {
+  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+
+  return (
+    <>
+    <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start", textAlign: "center", padding: "clamp(100px, 13vh, 150px) clamp(20px, 5vw, 64px) 32px", position: "relative", overflow: "hidden", background: "var(--bg)" }}>
+      {/* Background glows */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
+        <div style={{ position: "absolute", top: "10%", left: "15%", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(86,126,252,0.10) 0%, transparent 70%)", animation: "glow-pulse 6s infinite ease-in-out" }} />
+        <div style={{ position: "absolute", bottom: "15%", right: "10%", width: 360, height: 360, borderRadius: "50%", background: "radial-gradient(circle, rgba(235,94,94,0.08) 0%, transparent 70%)", animation: "glow-pulse 6s 3s infinite ease-in-out" }} />
+      </div>
+
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 1200, width: "100%", margin: "0 auto" }}>
+        {/* Eyebrow */}
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--violet-soft)", border: "0.5px solid var(--border)", borderRadius: 999, padding: "7px 16px", marginBottom: 28, fontSize: 13, fontWeight: 600, color: "var(--violet)", letterSpacing: "0.01em", animation: "fadeUp 0.6s ease both" }}>
+          ✦ Your personal prompt consultant — always on
+        </div>
+
+        {/* H1 */}
+        <h1 className="hero-title" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: "clamp(64px, 9.5vw, 120px)", letterSpacing: "-4px", lineHeight: 1.0, color: "var(--text)", margin: "0 auto 28px", animation: "fadeUp 0.7s 0.08s ease both" }}>
+          Don&apos;t prompt, <br className="mobile-break" />
+          <span style={{ background: "linear-gradient(90deg, #567EFC, #C2AED4, #FF7769)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>just pilot.</span>
+        </h1>
+
+        {/* Subtitle */}
+        <p style={{ fontFamily: "DM Sans, sans-serif", fontStyle: "italic", fontWeight: 300, fontSize: "clamp(16px, 2.5vw, 20px)", color: "var(--text-2)", maxWidth: 520, margin: "0 auto 0", lineHeight: 1.6, animation: "fadeUp 0.7s 0.15s ease both" }}>
+          Like having a senior prompt engineer on call, 24/7 — who already knows everything about your work.
+        </p>
+
+        {/* Hero Animation */}
+        <div style={{ width: "100%", maxWidth: 480, margin: "48px auto 32px", animation: "fadeUp 0.8s 0.4s ease both" }}>
+          <HeroAnimation />
+        </div>
+
+        {/* CTA — below animation */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 0, marginBottom: 50, animation: "fadeUp 0.7s 0.5s ease both" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
+            <button onClick={() => scrollTo("pricing")}
+              className="btn-spring"
+              style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "transparent", color: "var(--text)", border: "1.5px solid var(--text)", borderRadius: 999, padding: "15px 28px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 16 }}>
+              Get founding access — $99 lifetime
+              <ArrowRight size={15} />
+            </button>
+            <button onClick={() => scrollTo("pricing")}
+              className="btn-spring"
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, padding: "15px 28px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 16 }}>
+              Join free waitlist
+            </button>
+          </div>
+          <p style={{ fontSize: 12, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", margin: 0 }}>
+            Mac at launch · 41 founding spots remaining
+          </p>
+        </div>
+      </div>
+ 
+      {/* Works on top of — moved INSIDE section to be visible at the bottom of the first fold */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, width: "100%", borderTop: "0.5px solid var(--border)", background: "rgba(255,255,255,0.7)", backdropFilter: "blur(8px)", padding: "16px 0", zIndex: 2 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--text-3)", marginBottom: 14, fontFamily: "DM Sans, sans-serif", textAlign: "center" }}>Works on top of</p>
+        <div style={{ overflow: "hidden" }} className="marquee-mask">
+          <div className="ai-marquee" style={{ display: "flex", alignItems: "center", width: "max-content" }}>
+            {[0, 1, 2, 3, 4, 5].map(copyIdx => (
+              <div key={copyIdx} style={{ display: "flex", gap: 48, paddingRight: 48, alignItems: "center" }}>
+                {AI_LOGOS.map(({ src, name }, i) => (
+                  <img key={i} src={src} alt={name} title={name}
+                    style={{ width: 40, height: 40, objectFit: "contain", flexShrink: 0, opacity: 0.75, filter: "grayscale(20%)", transition: "opacity 0.2s" }}
+                    onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
+                    onMouseLeave={e => (e.currentTarget.style.opacity = "0.75")} />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    </>
+  );
+}
+
+// ─── Pain Section ─────────────────────────────────────────────────────────────
+function PainSection() {
+  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+
+  return (
+    <section className="pain-section">
+      {/* Header */}
+      <div style={{ textAlign: "center" }}>
+        <p className="pain-reveal" style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", background: "linear-gradient(90deg, #567EFC, #C2AED4, #FF7769)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", marginBottom: 16, fontFamily: "DM Sans, sans-serif" }}>
+          The Skill Gap
+        </p>
+        <h2 className="pain-reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(36px, 5vw, 56px)", letterSpacing: "-1px", color: "var(--text)", lineHeight: 1.1, maxWidth: 820, margin: "0 auto 20px" }}>
+          The best model in the world<br />
+          <span className="pain-gradient">is useless if you can&apos;t drive it.</span>
+        </h2>
+        <p className="pain-reveal" style={{ fontSize: 17, fontWeight: 300, fontStyle: "italic", color: "var(--text-2)", lineHeight: 1.75, maxWidth: 560, margin: "0 auto", fontFamily: "DM Sans, sans-serif" }}>
+          Getting real results from AI isn&apos;t just about having access to the right model. It&apos;s about knowing exactly what to say, when to say it, and how to give it the context it needs — every single time. That&apos;s a skill most people never have time to learn.
+        </p>
+        <div className="pain-header-rule" />
+      </div>
+
+      {/* Main grid — 2 columns equal width */}
+      <div className="pain-cards-grid">
+
+        {/* Left: dark hero card with F1 merged inside */}
+        <div className="pain-card-hero">
+          {/* Zone A: Pain 01 */}
+          <span className="pain-badge pain-badge-dark">01</span>
+          <p className="pain-card-label-dark">No One Taught You This</p>
+          <h3 className="pain-card-title pain-card-title-hero">
+            Prompting well is a discipline. You never signed up to learn it.
+          </h3>
+          <p className="pain-card-desc pain-card-desc-hero">
+            Structuring context, managing memory, defining roles, chaining prompts — these are real skills that take months to develop. You&apos;re trying to ship product, not get a PhD in prompt engineering.
+          </p>
+          <p className="pain-card-quote">
+            &ldquo;Getting a useful answer from AI requires 20 minutes of setup. By the time it understands me, I&apos;ve lost the thread of what I was building.&rdquo;
+          </p>
+
+          {/* Divider */}
+          <div className="pain-card-hero-divider" />
+
+          {/* Zone B: F1 analogy moved inside card */}
+          <p className="pain-f1-inner-tag">The F1 Analogy</p>
+          <p className="pain-f1-inner-text">
+            A Formula 1 car is the fastest vehicle ever built.<br />
+            Put an average driver behind the wheel — it crashes in the first corner.<br />
+            AI is the same. The model isn&apos;t the bottleneck. <span className="accent">You are. And that&apos;s not your fault — nobody taught you how to be a context engineer.</span>
+          </p>
+          <p className="pain-f1-inner-footer">
+            The gap between what AI can do and what most people get out of it — is your real problem.
+          </p>
+        </div>
+
+        {/* Right: 2 stacked cards */}
+        <div className="pain-cards-right">
+          {/* Card 02 */}
+          <div className="pain-card-sm accented pain-reveal">
+            <span className="pain-badge pain-badge-light">02</span>
+            <p className="pain-card-label-light">Every Switch Resets Everything</p>
+            <h3 className="pain-card-title pain-card-title-sm">Claude, ChatGPT, Cursor. Three tools, three blank slates.</h3>
+            <p className="pain-card-desc">
+              Every time you change tools, you start from zero. There&apos;s no shared memory, no persistent context. You are the integration layer — manually.
+            </p>
+            <p className="pain-card-quote-light">
+              &ldquo;I keep a 2000-word brief I paste into every session. Every. Single. One.&rdquo;
+            </p>
+          </div>
+
+          {/* Card 03 */}
+          <div className="pain-card-sm subtle pain-reveal">
+            <span className="pain-most-common">Most common pain</span>
+            <span className="pain-badge pain-badge-light">03</span>
+            <p className="pain-card-label-light">The Context Tax</p>
+            <h3 className="pain-card-title pain-card-title-sm">You spend more time explaining than actually building.</h3>
+            <p className="pain-card-desc">
+              Before every real question, you re-explain your project, your tone, your constraints, your stack. The overhead is invisible — until you add it up.
+            </p>
+            <p className="pain-card-quote-light">
+              &ldquo;New chat = re-explain everything. I&apos;m basically doing memory management manually at this point.&rdquo;
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Bridge */}
+      <div className="pain-bridge">
+        <div className="pain-bridge-rule" />
+        <p className="pain-bridge-title">This isn&apos;t an AI problem. It&apos;s a context gap problem.</p>
+        <p className="pain-bridge-sub">Lumia closes that gap — automatically, silently, on every AI you already use.</p>
+        <button className="pain-bridge-link" onClick={() => scrollTo("how")}>See how it works →</button>
+      </div>
+    </section>
+  );
+}
+
+// ─── Tweet Marquee ────────────────────────────────────────────────────────────
+const TWEETS = [
+  { handle: "@KeepItFLOSSY", name: "KeepItFLOSSY", avatar: "KeepItFLOSSY.jpg", text: "The AI just <strong>drops all the important details mid-project</strong>. Context compaction is genuinely one of the most frustrating things right now." },
+  { handle: "@sharaff", name: "sharaff", avatar: "sharaff.jpg", text: "The fact we even have to <strong>save entire chats to git</strong> just so the AI doesn't forget is exhausting. We're basically doing memory management manually." },
+  { handle: "@VVoluspa", name: "VÖLUSPÁ", avatar: "VVoluspa.jpg", text: "About halfway in the AI <strong>forgets the whole setup</strong>. I spend more time correcting it than actually working." },
+  { handle: "@swyx", name: "swyx", avatar: "swyx.jpg", text: "Hot take: <strong>prompt engineering is just compensating for bad tooling</strong>. We shouldn't have to structure context manually every single time." },
+  { handle: "@levelsio", name: "levelsio", avatar: "levelsio.jpg", text: "I probably spend 30% of my AI time just <strong>re-explaining my product</strong> to the model. That's insane when you think about it." },
+  { handle: "@tibo_maker", name: "Tibo", avatar: "tibo.jpg", text: "Tried a new AI tool today. First thing I had to do: <strong>write a 600-word brief about my company</strong>. Why does every tool start from zero?" },
+  { handle: "@marc_louvion", name: "Marc Lou", avatar: "marclou.jpg", text: "The best prompt engineers I know all have <strong>the same trick: they just have better context files</strong>. That's literally it. The model isn't the difference." },
+];
+
+function TweetMarquee() {
+  const doubled = [...TWEETS, ...TWEETS];
+
+  return (
+    <section style={{ background: "#fff", borderTop: "0.5px solid var(--border)", borderBottom: "0.5px solid var(--border)", padding: "72px 0", overflow: "hidden" }}>
+      <div style={{ textAlign: "center", marginBottom: 48 }}>
+        <p style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>You&apos;re not alone</p>
+        <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(28px, 5vw, 48px)", letterSpacing: "-1.5px", color: "var(--text)", margin: "0 auto", maxWidth: 600, lineHeight: 1.1 }}>
+          Everyone re-explains everything.<br /><span style={{ color: "var(--text-2)" }}>Every. Single. Session.</span>
+        </h2>
+      </div>
+
+      <div className="marquee-mask" style={{ overflow: "hidden" }}>
+        <div style={{ display: "flex", gap: 16, width: "max-content", animation: "marquee-scroll 32s linear infinite" }}>
+          {doubled.map((tweet, i) => (
+            <div key={i} style={{ width: 280, flexShrink: 0, background: "#fff", border: "0.5px solid var(--border)", borderRadius: 16, padding: "20px", boxShadow: "var(--shadow-card)", transition: "transform 0.2s, box-shadow 0.2s", cursor: "default" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "var(--shadow-lg)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "var(--shadow-card)"; }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                {tweet.avatar ? (
+                  <img src={tweet.avatar} alt={tweet.name} style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: "var(--gradient)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
+                    {tweet.name[0]}
+                  </div>
+                )}
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{tweet.name}</div>
+                  <div style={{ fontSize: 12, color: "var(--text-3)" }}>{tweet.handle}</div>
+                </div>
+                <span style={{ marginLeft: "auto", fontSize: 16, opacity: 0.2 }}>𝕏</span>
+              </div>
+              <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.55, margin: 0 }} dangerouslySetInnerHTML={{ __html: tweet.text }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Dashboard Mockup ─────────────────────────────────────────────────────────
+function DashboardMockup() {
+  return (
+    <div style={{ background: "#fff", borderRadius: 18, border: "0.5px solid var(--border)", boxShadow: "var(--shadow-lg)", overflow: "hidden", maxWidth: 460, width: "100%" }}>
+      {/* Title bar */}
+      <div style={{ background: "#F5F5F7", borderBottom: "0.5px solid rgba(0,0,0,0.08)", padding: "12px 16px", display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ display: "flex", gap: 6 }}>
+          {["#FF5F57", "#FEBC2E", "#28C840"].map((c, i) => <div key={i} style={{ width: 12, height: 12, borderRadius: "50%", background: c }} />)}
+        </div>
+        <span style={{ flex: 1, textAlign: "center", fontSize: 13, fontWeight: 600, color: "#6E6E73", fontFamily: "DM Sans, sans-serif", marginLeft: -54 }}>Lumia AI</span>
+      </div>
+      {/* Tabs */}
+      <div style={{ display: "flex", borderBottom: "0.5px solid var(--border-2)", padding: "0 16px", background: "#fff" }}>
+        {["Dashboard", "Vault", "Templates"].map((tab, i) => (
+          <div key={tab} style={{ padding: "10px 16px", fontSize: 13, fontWeight: i === 0 ? 600 : 400, color: i === 0 ? "var(--violet)" : "var(--text-3)", borderBottom: i === 0 ? "2px solid var(--violet)" : "2px solid transparent", cursor: "default", fontFamily: "DM Sans, sans-serif" }}>{tab}</div>
+        ))}
+      </div>
+      {/* Body */}
+      <div style={{ padding: 20 }}>
+        <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", marginBottom: 4, fontFamily: "DM Sans, sans-serif" }}>DASHBOARD</p>
+        <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 20, color: "var(--text)", marginBottom: 16, letterSpacing: "-0.5px" }}>Recent activity</h3>
+        {/* Stat cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 20 }}>
+          {[
+            { value: "50", label: "Prompts generated", color: "var(--violet)", bg: "var(--violet-soft)" },
+            { value: "19,949", label: "Words saved", color: "#EF4444", bg: "#FEF2F2" },
+            { value: "+40%", label: "Precision gained", color: "#22C55E", bg: "#F0FDF4" },
+          ].map(stat => (
+            <div key={stat.label} style={{ background: stat.bg, borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
+              <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 18, color: stat.color, letterSpacing: "-0.5px" }}>{stat.value}</div>
+              <div style={{ fontSize: 10, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.3, marginTop: 2 }}>{stat.label}</div>
+            </div>
+          ))}
+        </div>
+        {/* Prompt history */}
+        <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-2)", marginBottom: 10, fontFamily: "DM Sans, sans-serif" }}>Prompt history</p>
+        {[
+          { text: "Roadmap to reach 1K MRR for a SaaS", gain: "+38%" },
+          { text: "Content strategy for launch week", gain: "+35%" },
+        ].map((row, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: "var(--bg)", borderRadius: 10, marginBottom: 6 }}>
+            <span style={{ fontSize: 12, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginRight: 10 }}>{row.text}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#22C55E", background: "#F0FDF4", padding: "2px 8px", borderRadius: 999, flexShrink: 0 }}>{row.gain}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Consultant Section ───────────────────────────────────────────────────────
+const CONSULTANT_TABS = ["Dashboard", "Vault", "Templates"] as const;
+type ConsultantTab = typeof CONSULTANT_TABS[number];
+
+function ConsultantSection() {
+  const [activeTab, setActiveTab] = useState<ConsultantTab>("Dashboard");
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setActiveTab(t => {
+        const idx = CONSULTANT_TABS.indexOf(t);
+        return CONSULTANT_TABS[(idx + 1) % CONSULTANT_TABS.length];
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isPaused]);
+
+  const featureCards = [
+    { icon: "📊", title: "Track your stats", desc: "Words Lumia added for you · Precision gained in your prompts · Prompts generated · Time saved", accent: "#FF7769" },
+    { icon: "🗂️", title: "Knows your project", desc: "Your Vault stores docs, tone, past decisions. Lumia pulls the right context automatically — no briefing needed.", accent: "#567EFC" },
+    { icon: "🔁", title: "Follows you across every AI", desc: "Claude, ChatGPT, Gemini, Perplexity — your consultant doesn\'t lose context on switch.", accent: "#C2AED4" },
+    { icon: "👁️", title: "Full transparency, no black box", desc: "See exactly which context was used. Override anything before it fires.", accent: "#FF7769" },
+    { icon: "❓", title: "Smart clarifying questions", desc: "Lumia asks the right questions before building — so the output actually fits your context.", accent: "#567EFC" },
+    { icon: "🫙", title: "Persistent context vault", desc: "Your context is stored, layered, and reused across every session — so nothing is ever lost.", accent: "#C2AED4" },
+  ];
+
+  return (
+    <section style={{ padding: "96px clamp(20px, 5vw, 80px)", background: "var(--bg)", borderTop: "0.5px solid var(--border-2)" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 440px), 1fr))", gap: 64, alignItems: "center" }}>
+          {/* Left */}
+          <div>
+            <p className="reveal" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--violet)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>The concept</p>
+            <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(30px, 4.5vw, 50px)", letterSpacing: "-1.5px", color: "var(--text)", marginBottom: 16, lineHeight: 1.1 }}>Your prompt consultant,<br />always on call.</h2>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              {featureCards.map((f, i) => (
+                <div key={f.title} className="reveal" style={{
+                  background: "#fff",
+                  border: "0.5px solid var(--border)",
+                  borderRadius: 16,
+                  padding: "22px 20px 20px 18px",
+                  transitionDelay: `${i * 0.07}s`,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                  cursor: "pointer",
+                  transition: "transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.boxShadow = `0 12px 32px ${f.accent}30`;
+                  e.currentTarget.style.borderColor = f.accent;
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = "";
+                  e.currentTarget.style.boxShadow = "";
+                  e.currentTarget.style.borderColor = "var(--border)";
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 2 }}>
+                    <span style={{ fontSize: 20 }}>{f.icon}</span>
+                    <span style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15, color: "var(--text)", letterSpacing: "-0.3px" }}>{f.title}</span>
+                  </div>
+                  <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.5, margin: 0, fontFamily: "DM Sans, sans-serif" }}>{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Right — interactive mockup */}
+          <div className="reveal" style={{ display: "flex", justifyContent: "center" }}>
+            <div style={{ background: "#fff", borderRadius: 20, border: "0.5px solid var(--border)", boxShadow: "var(--shadow-dark)", overflow: "hidden", width: "100%", maxWidth: 580 }}
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}>
+              {/* Title bar */}
+              <div style={{ background: "#F5F5F7", borderBottom: "0.5px solid rgba(0,0,0,0.08)", padding: "12px 16px", display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#FF5F57" }} />
+                  <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#FEBC2E" }} />
+                  <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#28C840" }} />
+                </div>
+                <span style={{ flex: 1, textAlign: "center", fontSize: 13, fontWeight: 600, color: "#6E6E73", fontFamily: "DM Sans, sans-serif", marginLeft: -54 }}>Lumia AI</span>
+              </div>
+              {/* Tabs */}
+              <div style={{ display: "flex", borderBottom: "0.5px solid var(--border-2)", padding: "0 20px", background: "#fff" }}>
+                {CONSULTANT_TABS.map(tab => (
+                  <div key={tab} onClick={() => { setActiveTab(tab); setIsPaused(true); }} style={{ padding: "12px 18px", fontSize: 13, fontWeight: activeTab === tab ? 600 : 400, color: activeTab === tab ? "var(--violet)" : "var(--text-3)", borderBottom: activeTab === tab ? "2px solid var(--violet)" : "2px solid transparent", cursor: "pointer", fontFamily: "DM Sans, sans-serif", transition: "color 0.2s, border-color 0.2s" }}>{tab}</div>
+                ))}
+              </div>
+              {/* Tab body with fade */}
+              <AnimatePresence mode="wait">
+                {activeTab === "Dashboard" && (
+                  <motion.div key="dashboard" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
+                    <div style={{ padding: 24 }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", marginBottom: 4, fontFamily: "DM Sans, sans-serif" }}>DASHBOARD</p>
+                      <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 22, color: "var(--text)", marginBottom: 18, letterSpacing: "-0.5px" }}>Recent activity</h3>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 24 }}>
+                        <div style={{ background: "var(--violet-soft)", borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
+                          <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 22, color: "var(--violet)", letterSpacing: "-0.5px" }}>50</div>
+                          <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.3, marginTop: 3 }}>Prompts generated</div>
+                        </div>
+                        <div style={{ background: "#FEF2F2", borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
+                          <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 22, color: "#EF4444", letterSpacing: "-0.5px" }}>19,949</div>
+                          <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.3, marginTop: 3 }}>Words saved</div>
+                        </div>
+                        <div style={{ background: "#F0FDF4", borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
+                          <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 22, color: "#22C55E", letterSpacing: "-0.5px" }}>+40%</div>
+                          <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.3, marginTop: 3 }}>Precision gained</div>
+                        </div>
+                      </div>
+                      <p style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-3)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>Prompt history</p>
+                      {[
+                        { text: "Roadmap to reach 1k MRR for a SaaS product", gain: "+40%" },
+                        { text: "Write cold emails for Lumia beta launch", gain: "+35%" },
+                        { text: "Code review: NextJS auth flow", gain: "+52%" },
+                        { text: "Competitive analysis for B2B SaaS positioning", gain: "+44%" },
+                      ].map((row, i, arr) => (
+                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 0", borderBottom: i < arr.length - 1 ? "0.5px solid var(--border-2)" : "none" }}>
+                          <div style={{ flex: 1 }}>
+                            <p style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", fontFamily: "DM Sans, sans-serif", margin: 0 }}>{row.text}</p>
+                          </div>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: "#22C55E", fontFamily: "DM Sans, sans-serif", background: "#F0FDF4", padding: "3px 10px", borderRadius: 999, flexShrink: 0 }}>{row.gain}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+                {activeTab === "Vault" && (
+                  <motion.div key="vault" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
+                    <div style={{ padding: 24 }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--violet)", marginBottom: 4, fontFamily: "DM Sans, sans-serif" }}>VAULT</p>
+                      <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 22, color: "var(--text)", marginBottom: 4, letterSpacing: "-0.5px" }}>Your knowledge base</h3>
+                      <p style={{ fontSize: 13, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", margin: "0 0 16px" }}>All your documents, notes and context — one place.</p>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--bg)", border: "0.5px solid var(--border)", borderRadius: 10, padding: "9px 14px", marginBottom: 20 }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <span style={{ fontSize: 13, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>Search your Vault…</span>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", fontFamily: "DM Sans, sans-serif" }}>Documents</span>
+                        <span style={{ fontSize: 12, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>24 items</span>
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                        {[
+                          { title: "Target Lumia", badge: "PDF", badgeColor: "#567EFC", tag: "Document", date: "3 April 2026" },
+                          { title: "Lumia targetuser", badge: "FILE", badgeColor: "#FF7769", tag: "Document", date: "2 April 2026" },
+                          { title: "Strategy GenZVirale", badge: "FILE", badgeColor: "#567EFC", tag: "Document", date: "2 April 2026" },
+                          { title: "Lumia concurrence", badge: "FILE", badgeColor: "#FF7769", tag: "Document", date: "2 April 2026" },
+                        ].map((doc, i) => (
+                          <div key={i} style={{ background: "#fff", border: "0.5px solid var(--border)", borderRadius: 14, padding: "14px", cursor: "default", transition: "box-shadow 0.2s" }}
+                            onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.boxShadow = "var(--shadow-card)"}
+                            onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.boxShadow = "none"}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+                              <div style={{ width: 32, height: 32, borderRadius: 8, background: "var(--violet-soft)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                              </div>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: doc.badgeColor, background: doc.badgeColor + "18", padding: "2px 7px", borderRadius: 4, fontFamily: "DM Sans, sans-serif" }}>{doc.badge}</span>
+                            </div>
+                            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", fontFamily: "DM Sans, sans-serif", margin: "0 0 8px" }}>{doc.title}</p>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                              <span style={{ fontSize: 10, fontWeight: 600, color: "var(--violet)", background: "var(--violet-soft)", padding: "2px 8px", borderRadius: 4, fontFamily: "DM Sans, sans-serif" }}>{doc.tag}</span>
+                              <span style={{ fontSize: 10, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>{doc.date}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--text)", color: "#fff", borderRadius: 10, padding: "9px 16px", fontSize: 13, fontWeight: 600, fontFamily: "DM Sans, sans-serif", cursor: "pointer" }}>
+                          <span style={{ fontSize: 16, lineHeight: 1 }}>+</span> Add to Vault
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+                {activeTab === "Templates" && (
+                  <motion.div key="templates" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
+                    <div style={{ padding: 24 }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", marginBottom: 4, fontFamily: "DM Sans, sans-serif" }}>TEMPLATES</p>
+                      <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 22, color: "var(--text)", marginBottom: 6, letterSpacing: "-0.5px" }}>Saved prompts</h3>
+                      <p style={{ fontSize: 13, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", margin: "0 0 18px" }}>Reuse your best-performing prompt structures instantly.</p>
+                      {[
+                        { label: "Cold email sequence", tag: "Sales", uses: "12x" },
+                        { label: "Weekly content calendar", tag: "Marketing", uses: "8x" },
+                        { label: "Feature spec write-up", tag: "Product", uses: "5x" },
+                        { label: "Investor update draft", tag: "Founders", uses: "3x" },
+                      ].map((tpl, i, arr) => (
+                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: i < arr.length - 1 ? "0.5px solid var(--border-2)" : "none" }}>
+                          <div style={{ width: 32, height: 32, borderRadius: 8, background: "var(--violet-soft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", fontFamily: "DM Sans, sans-serif", margin: 0 }}>{tpl.label}</p>
+                            <span style={{ fontSize: 11, color: "var(--violet)", fontFamily: "DM Sans, sans-serif" }}>{tpl.tag}</span>
+                          </div>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", background: "var(--bg)", padding: "3px 9px", borderRadius: 999 }}>Used {tpl.uses}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── How It Works ─────────────────────────────────────────────────────────────
+function HowItWorksSection() {
+  const [activeStep, setActiveStep] = useState(0);
+
+  useEffect(() => {
+    // Cycle every 8s to loosely match the 24s animation loop
+    const interval = setInterval(() => setActiveStep(s => (s + 1) % 3), 8000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const steps = [
+    { num: "01", title: "Share your intent", desc: "Voice or text, no structure needed. Just say what you're trying to do in plain language.", tag: "🎙 Voice or text" },
+    { num: "02", title: "Lumia pulls your context", desc: "Grabs templates, documents, and past decisions from your Vault automatically.", tag: "🗂 Vault injection" },
+    { num: "03", title: "Perfect prompt, instantly", desc: "Structured prompt, copy, paste, done. Full transparency on what context was used.", tag: "✓ Prompt copied — ⌘V to paste" },
+  ];
+
+  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+
+  return (
+    <section id="how" style={{ padding: "96px clamp(20px, 5vw, 80px)", background: "linear-gradient(160deg, #F8F6FF 0%, #EDE9FE 50%, #F0EEF8 100%)", position: "relative", overflow: "hidden" }}>
+      {/* Glow */}
+      <div style={{ position: "absolute", top: "20%", right: "5%", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(86,126,252,0.08) 0%, transparent 70%)", pointerEvents: "none", animation: "glow-pulse 8s infinite" }} />
+
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        {/* Header */}
+        <div style={{ marginBottom: 64 }}>
+          <p className="reveal" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--violet)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>Zero prompt engineering</p>
+          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(30px, 4.5vw, 50px)", letterSpacing: "-1.5px", color: "var(--text)", marginBottom: 16, lineHeight: 1.1 }}>Three steps.<br />Sharp answer.</h2>
+          <p className="reveal" style={{ fontSize: 16, color: "var(--text-2)", lineHeight: 1.7, maxWidth: 440, fontFamily: "DM Sans, sans-serif" }}>Say what you need in plain language. Lumia handles the context, the structure, and the prompt — you just collect the output.</p>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 400px), 1fr))", gap: 64, alignItems: "center" }}>
+          {/* Steps */}
+          <div style={{ position: "relative" }}>
+            {/* Connecting line */}
+            <div style={{ position: "absolute", left: 19, top: 28, bottom: 28, width: "0.5px", background: "linear-gradient(to bottom, var(--violet), transparent)" }} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+              {steps.map((step, i) => (
+                <div key={step.num} className="reveal" style={{ display: "flex", gap: 20, padding: "20px 0", transitionDelay: `${i * 0.1}s`, cursor: "pointer" }} onClick={() => setActiveStep(i)}>
+                  <div style={{ width: 40, height: 40, borderRadius: "50%", background: activeStep === i ? "var(--gradient)" : "#fff", border: "0.5px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 13, color: activeStep === i ? "#fff" : "var(--text-3)", flexShrink: 0, boxShadow: activeStep === i ? "0 4px 16px rgba(86,126,252,0.3)" : "none", transition: "all 0.3s ease", zIndex: 1, position: "relative" }}>
+                    {step.num}
+                  </div>
+                  <div style={{ paddingTop: 8 }}>
+                    <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 17, color: activeStep === i ? "var(--violet)" : "var(--text)", marginBottom: 6, transition: "color 0.3s" }}>{step.title}</h3>
+                    <p style={{ fontSize: 14, color: "var(--text-2)", lineHeight: 1.6, marginBottom: 10, fontFamily: "DM Sans, sans-serif" }}>{step.desc}</p>
+                    <span style={{ display: "inline-block", fontSize: 12, fontWeight: 600, background: activeStep === i ? "var(--violet-soft)" : "rgba(0,0,0,0.05)", color: activeStep === i ? "var(--violet)" : "var(--text-3)", padding: "4px 10px", borderRadius: 999, transition: "all 0.3s" }}>{step.tag}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Step dots */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 24, paddingLeft: 4 }}>
+              {[0, 1, 2].map(i => (
+                <div key={i} onClick={() => setActiveStep(i)} style={{ height: 6, borderRadius: 999, background: activeStep === i ? "var(--gradient)" : "var(--border)", width: activeStep === i ? 28 : 6, transition: "all 0.3s ease", cursor: "pointer" }} />
+              ))}
+            </div>
+          </div>
+
+          {/* Animation */}
+          <div className="reveal" style={{ display: "flex", justifyContent: "center" }}>
+            <div style={{ width: "100%", maxWidth: 460 }}>
+              <LumiaAnimation />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Comparison Section ───────────────────────────────────────────────────────
+const STORYBOARD_SEGMENTS = [
+  { n: "01", title: "The hook", type: "Avatar close-up", time: "0:00–0:08", line: "\"How much time do you spend re-explaining your project every time you open a new AI tool?\"" },
+  { n: "02", title: "The problem", type: "Screen recording", time: "0:08–0:16", line: "\"Claude. ChatGPT. Gemini. Every switch, you start from zero. That's pure friction.\"" },
+  { n: "03", title: "The founder moment", type: "Avatar side-angle", time: "0:16–0:24", line: "\"After six months of building, I realized one thing: people don't want a new tool. They want a layer.\"" },
+  { n: "04", title: "Product intro", type: "Screen — overlay", time: "0:24–0:32", line: "\"Lumia is an overlay that sits on top of every AI tool you use. It already knows your context.\"" },
+  { n: "05", title: "The Vault", type: "Avatar close-up", time: "0:32–0:40", line: "\"Your Vault stores your docs, your tone, your past decisions. Lumia builds the perfect prompt for you.\"" },
+  { n: "06", title: "Prompt demo", type: "Screen — messy → structured", time: "0:40–0:48", line: "\"Rough idea in. Structured prompt out. Zero prompt engineering required.\"" },
+  { n: "07", title: "The philosophy", type: "Avatar side-angle", time: "0:48–0:56", line: "\"Replacing your interfaces is the wrong move. The future is a layer that adapts to you — not the other way around.\"" },
+  { n: "08", title: "Cross-tool demo", type: "Screen — Claude → ChatGPT", time: "0:56–1:04", line: "\"Switch from Claude to ChatGPT — Lumia follows. Context stays. Friction disappears.\"" },
+  { n: "09", title: "The rally cry", type: "Avatar tight close-up", time: "1:04–1:12", line: "\"I built this because I lived this problem every single day. It's made for power-users. For you.\"" },
+  { n: "10", title: "Final CTA", type: "Product shot + URL", time: "1:12–1:20", line: "\"Stop re-explaining. Start building. getlumia.ca\"" },
+];
+
+function ClaudeAvatar() {
+  return (
+    <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg, #D97757 0%, #CC785C 100%)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" fill="rgba(255,255,255,0.25)"/><path d="M8 12.5c0-2.209 1.791-4 4-4s4 1.791 4 4-1.791 4-4 4-4-1.791-4-4z" fill="white"/></svg>
+    </div>
+  );
+}
+
+function ComparisonSection() {
+  return (
+    <section id="compare" style={{ padding: "96px clamp(20px, 5vw, 64px)", background: "linear-gradient(180deg, #0D0B18 0%, #12101F 100%)", position: "relative", overflow: "hidden" }}>
+      {/* bg glow */}
+      <div style={{ position: "absolute", top: "40%", left: "50%", transform: "translateX(-50%)", width: 700, height: 500, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(86,126,252,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+      <div style={{ maxWidth: 1260, margin: "0 auto", position: "relative", zIndex: 1 }}>
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <p className="reveal" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--violet)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>The difference</p>
+          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(28px, 4.5vw, 52px)", letterSpacing: "-1.5px", color: "#ffffff", lineHeight: 1.1, marginBottom: 16 }}>Same AI. Same question.<br />Different result.</h2>
+          <p className="reveal" style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", fontFamily: "DM Sans, sans-serif", fontStyle: "italic" }}>
+            Two fresh chats · same AI (Claude) · same topic · zero prior context — only the prompt is different
+          </p>
+        </div>
+
+        {/* Chat panels */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 540px), 1fr))", gap: 24, alignItems: "start" }}>
+
+          {/* ── WITHOUT LUMIA ── */}
+          <div className="reveal" style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,0.6)", border: "0.5px solid rgba(255,255,255,0.07)" }}>
+            {/* Chrome */}
+            <div style={{ background: "#1C1C1E", padding: "12px 16px", display: "flex", alignItems: "center", gap: 8, borderBottom: "0.5px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ display: "flex", gap: 6 }}>
+                {["#FF5F57","#FEBC2E","#28C840"].map((c, i) => <div key={i} style={{ width: 12, height: 12, borderRadius: "50%", background: c }} />)}
+              </div>
+              <span style={{ flex: 1, textAlign: "center", fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.65)", fontFamily: "DM Sans, sans-serif", marginLeft: -54 }}>Claude</span>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(239,68,68,0.12)", border: "0.5px solid rgba(239,68,68,0.25)", borderRadius: 999, padding: "3px 10px" }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#EF4444", display: "inline-block" }} />
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#EF4444", fontFamily: "DM Sans, sans-serif" }}>Without Lumia</span>
+              </div>
+            </div>
+
+            {/* Scrollable chat */}
+            <div style={{ background: "#FAFAF8", height: 600, overflowY: "auto", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 18 }}>
+              {/* User message */}
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <div style={{ background: "#1E1E1E", color: "rgba(255,255,255,0.85)", borderRadius: "18px 18px 4px 18px", padding: "14px 18px", maxWidth: "90%", fontSize: 13, lineHeight: 1.7, fontFamily: "DM Sans, sans-serif" }}>
+                  Ok so basically I want to make like a 16:9 video for my startup Lumia, it&apos;s gonna be a presentation video and, basically, I was thinking it could be an avatar that talks and like tells the founder journey, where I explain why I built Lumia and like what&apos;s the main pain point it solves and stuff like that, why we built it, and it explains what Lumia is, like the fact that it&apos;s an overlay and all that. So basically I want to make a video to put on my landing page and also post it on social media. Tell me if it&apos;s a good idea, like analyze my landing page, tell me if it&apos;s worth doing, what mistakes to avoid. And then I want you to help me write the script so I can use VO3 for it. Also I want to know if it&apos;s better to do it in multiple shots, like 8-second clips because that&apos;s the max you can do, so we do 8-second clips and switch angles, like the guy sitting at his desk, then you see his screen, then another angle, so it feels fluid — landing: getlumia.ca
+                </div>
+              </div>
+
+              {/* Status pill */}
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#EF4444", background: "#FEF2F2", border: "0.5px solid #FECACA", padding: "4px 14px", borderRadius: 999, fontFamily: "DM Sans, sans-serif" }}>→ Generic response received</span>
+              </div>
+
+              {/* Claude response */}
+              <div style={{ display: "flex", gap: 12 }}>
+                <ClaudeAvatar />
+                <div style={{ flex: 1, fontSize: 13, lineHeight: 1.75, color: "#374151", fontFamily: "DM Sans, sans-serif" }}>
+                  <p style={{ margin: "0 0 12px", fontWeight: 600 }}>Got it, I read everything. Here&apos;s my full analysis + format recommendation + script.</p>
+                  <p style={{ margin: "0 0 8px", fontWeight: 700 }}>🔍 Landing page analysis</p>
+                  <p style={{ margin: "0 0 10px" }}>Your landing is solid — the messaging is clear, the pain is well articulated, and the social proof → how it works → features → pricing structure is solid.</p>
+                  <p style={{ margin: "0 0 6px", fontWeight: 600 }}>What works well:</p>
+                  <ul style={{ margin: "0 0 12px", paddingLeft: 18, color: "#4B5563" }}>
+                    <li>The universal pain: &quot;re-explaining everything from scratch every session&quot;</li>
+                    <li>The overlay concept is differentiating — needs to be shown visually</li>
+                    <li>&quot;Stop crafting prompts. Just say what you need.&quot; → your hook line</li>
+                  </ul>
+                  <p style={{ margin: "0 0 8px", fontWeight: 700 }}>🎬 Format: multiple 8s clips — YES</p>
+                  <p style={{ margin: "0 0 10px" }}>You&apos;re right. Veo3 generates each clip independently. Alternate between: Founder face-cam, screen POV, side-angle, close-up hands + keyboard, CTA.</p>
+                  <p style={{ margin: "0 0 8px", fontWeight: 700 }}>📝 Script (~90 seconds, ~12 clips)</p>
+                  <p style={{ margin: "0 0 6px", fontSize: 12, color: "#6B7280", fontStyle: "italic" }}>CLIP 1 — Face cam, warm desk lighting (8s)</p>
+                  <p style={{ margin: "0 0 8px", background: "#F9FAFB", padding: "8px 10px", borderRadius: 8, fontSize: 12, border: "0.5px solid #E5E7EB" }}>&quot;Every time I opened a new chat with an AI... I had to start from scratch. Re-explain my project, my tone, my context. Every. Single. Time.&quot;</p>
+                  <p style={{ margin: "0 0 6px", fontSize: 12, color: "#6B7280", fontStyle: "italic" }}>CLIP 2 — Side profile, contemplative (8s)</p>
+                  <p style={{ margin: "0 0 8px", background: "#F9FAFB", padding: "8px 10px", borderRadius: 8, fontSize: 12, border: "0.5px solid #E5E7EB" }}>&quot;I&apos;m a builder. I use AI every day. And I was spending more time managing the AI than actually building. That felt broken.&quot;</p>
+                  <p style={{ margin: "0 0 6px", fontSize: 12, color: "#6B7280", fontStyle: "italic" }}>CLIP 3 — Face cam, leaning forward (8s)</p>
+                  <p style={{ margin: "0 0 12px", background: "#F9FAFB", padding: "8px 10px", borderRadius: 8, fontSize: 12, border: "0.5px solid #E5E7EB" }}>&quot;So I built Lumia. Not a new AI. Not another chatbot. Something that lives on top of whatever AI you already use.&quot;</p>
+                  <p style={{ margin: "0 0 6px", fontSize: 12, color: "#9CA3AF", fontStyle: "italic" }}>...and so on — no critical analysis, no visual storyboard with timecodes, no production notes, no voice cloning guidance.</p>
+                  <p style={{ margin: "0 0 8px", fontWeight: 700 }}>⚠️ Mistakes to avoid</p>
+                  <ul style={{ margin: 0, paddingLeft: 18, color: "#4B5563" }}>
+                    <li>Don&apos;t show too many features — sell the pain and the concept</li>
+                    <li>Avoid a static talking head for 90s straight</li>
+                    <li>Don&apos;t forget the verbal CTA — say the URL out loud</li>
+                    <li>Subtitles are mandatory — 85% watch without sound</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Result badge */}
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "12px 14px", background: "#FEF2F2", borderRadius: 12, border: "0.5px solid #FECACA" }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>↩️</span>
+                <div>
+                  <p style={{ margin: "0 0 2px", fontSize: 13, fontWeight: 700, color: "#DC2626", fontFamily: "DM Sans, sans-serif" }}>Reprompts needed: 2–3</p>
+                  <p style={{ margin: 0, fontSize: 12, color: "#EF4444", fontFamily: "DM Sans, sans-serif" }}>Response too generic — no visual storyboard, no critical avatar analysis, no ElevenLabs production notes, no voice cloning guidance</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── WITH LUMIA ── */}
+          <div className="reveal" style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 32px 80px rgba(86,126,252,0.2)", border: "0.5px solid rgba(86,126,252,0.18)" }}>
+            {/* Chrome */}
+            <div style={{ background: "#1C1C1E", padding: "12px 16px", display: "flex", alignItems: "center", gap: 8, borderBottom: "0.5px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ display: "flex", gap: 6 }}>
+                {["#FF5F57","#FEBC2E","#28C840"].map((c, i) => <div key={i} style={{ width: 12, height: 12, borderRadius: "50%", background: c }} />)}
+              </div>
+              <span style={{ flex: 1, textAlign: "center", fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.65)", fontFamily: "DM Sans, sans-serif", marginLeft: -54 }}>Claude</span>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(34,197,94,0.12)", border: "0.5px solid rgba(34,197,94,0.25)", borderRadius: 999, padding: "3px 10px" }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E", display: "inline-block" }} />
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#22C55E", fontFamily: "DM Sans, sans-serif" }}>With Lumia</span>
+              </div>
+            </div>
+
+            {/* Scrollable chat */}
+            <div style={{ background: "#FAFAF8", height: 600, overflowY: "auto", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 18 }}>
+
+              {/* Vault injection banner */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "var(--violet-soft)", borderRadius: 10, border: "0.5px solid rgba(86,126,252,0.2)" }}>
+                <span style={{ fontSize: 14 }}>✦</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--violet)", fontFamily: "DM Sans, sans-serif" }}>Lumia Vault injected · Context loaded automatically</span>
+              </div>
+
+              {/* User message - structured prompt */}
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <div style={{ background: "#12101F", color: "rgba(255,255,255,0.88)", borderRadius: "18px 18px 4px 18px", padding: "16px 18px", maxWidth: "92%", fontSize: 12, lineHeight: 1.8, fontFamily: "'JetBrains Mono', 'Fira Code', 'Courier New', monospace" }}>
+                  <div style={{ marginBottom: 10 }}>
+                    <span style={{ color: "#A78BFA", fontWeight: 700 }}>EXECUTION CONTEXT</span>
+                    <span style={{ color: "rgba(255,255,255,0.6)" }}> — I am the founder of Lumia (getlumia.ca), a startup building a Mac desktop overlay acting as a universal context layer for Claude, ChatGPT, Gemini, etc. Creating a 16:9 presentation video for landing page + social. Using an AI avatar to narrate my Founder Journey.</span>
+                  </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <span style={{ color: "#A78BFA", fontWeight: 700 }}>MAIN OBJECTIVE</span>
+                    <div style={{ color: "rgba(255,255,255,0.7)", paddingLeft: 12, marginTop: 4 }}>
+                      <div>1. Analyze AI Avatar + Founder Journey strategy (pros, cons, uncanny valley)</div>
+                      <div>2. Design technical storyboard — 8s clips optimized for VO3</div>
+                      <div>3. Write high-impact script for each 8s segment</div>
+                      <div>4. Integrate philosophy: replacing interfaces is wrong — future = frictionless layer</div>
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <span style={{ color: "#A78BFA", fontWeight: 700 }}>TONE & VOICE</span>
+                    <span style={{ color: "rgba(255,255,255,0.6)" }}> — &quot;Build in Public&quot; · authentic · punchy · power-user to power-user · words: friction, context, overlay, layer</span>
+                  </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <span style={{ color: "#A78BFA", fontWeight: 700 }}>EXTRACTED KNOWLEDGE</span>
+                    <div style={{ color: "rgba(255,255,255,0.6)", paddingLeft: 12, marginTop: 4 }}>
+                      <div>• Lumia = Mac overlay, follows user across Claude/ChatGPT/Gemini/Perplexity</div>
+                      <div>• Core pain: 20+ min/day lost re-explaining projects to AI tools</div>
+                      <div>• Solution: persistent Vault → docs, tone, past decisions → perfect prompts</div>
+                      <div>• Founder Journey: 6 months dev → users don&apos;t want new apps, they want a layer</div>
+                      <div>• Clips: max 8 seconds each · VO3 compatible · 16:9 format</div>
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <span style={{ color: "#A78BFA", fontWeight: 700 }}>EXECUTION CONSTRAINTS</span>
+                    <div style={{ color: "rgba(255,255,255,0.6)", paddingLeft: 12, marginTop: 4 }}>
+                      <div>• Script in 8s timed segments with visual descriptions</div>
+                      <div>• Critical analysis required: suggest voice cloning mitigation if avatar feels fake</div>
+                      <div>• Script language: English · Analysis language: English</div>
+                    </div>
+                  </div>
+                  <div>
+                    <span style={{ color: "#A78BFA", fontWeight: 700 }}>FINAL DIRECTIVE</span>
+                    <span style={{ color: "rgba(255,255,255,0.6)" }}> — Analyze video strategy + write complete 8s segmented script for Lumia video.</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status pill */}
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#16A34A", background: "#F0FDF4", border: "0.5px solid #BBF7D0", padding: "4px 14px", borderRadius: 999, fontFamily: "DM Sans, sans-serif" }}>→ Complete deliverable on first response</span>
+              </div>
+
+              {/* Claude response - full */}
+              <div style={{ display: "flex", gap: 12 }}>
+                <ClaudeAvatar />
+                <div style={{ flex: 1, fontSize: 13, lineHeight: 1.75, color: "#374151", fontFamily: "DM Sans, sans-serif" }}>
+                  <p style={{ margin: "0 0 14px", fontWeight: 700, fontSize: 15 }}>Strategic Analysis: AI Avatar + Founder Journey</p>
+
+                  <p style={{ margin: "0 0 6px", fontWeight: 700 }}>The Core Tension</p>
+                  <p style={{ margin: "0 0 4px" }}><strong>Why it works for Lumia specifically:</strong> Your product is pro-AI. An avatar isn&apos;t a contradiction — it&apos;s a statement: <em>&quot;I&apos;m so comfortable with AI I use it to represent myself.&quot;</em> For builders and power-users, this reads as confidence, not cowardice.</p>
+                  <p style={{ margin: "0 0 14px" }}><strong>Why it can fail:</strong> The uncanny valley kills trust fast. If the avatar blinks weirdly or sounds too smooth, viewers spend cognitive energy on the artificiality — your founder credibility evaporates.</p>
+
+                  <p style={{ margin: "0 0 6px", fontWeight: 700 }}>✅ Pros</p>
+                  <ul style={{ margin: "0 0 12px", paddingLeft: 18 }}>
+                    <li><strong>Production velocity.</strong> 90s video = hours, not days. Critical for a solo founder.</li>
+                    <li><strong>Brand consistency.</strong> Avatar never looks tired, always matches your palette.</li>
+                    <li><strong>Forced discipline.</strong> 8s clips force punchy, dense copy — exactly right for social.</li>
+                    <li><strong>Signal to ICP.</strong> A founder using AI for marketing is a subtle proof-of-concept.</li>
+                  </ul>
+
+                  <p style={{ margin: "0 0 6px", fontWeight: 700 }}>⚠️ Cons &amp; Mitigation</p>
+                  <ul style={{ margin: "0 0 14px", paddingLeft: 18 }}>
+                    <li><strong>Voice is king — clone yours.</strong> Use ElevenLabs Instant Voice Clone. Synthetic avatar + your real voice closes 70% of the authenticity gap.</li>
+                    <li><strong>Cut on motion.</strong> Never hold talking head &gt;3–4s. Cut to screen recordings immediately.</li>
+                    <li><strong>Mix real artifacts.</strong> Real Lumia UI + text overlays dilute the &quot;this is fake&quot; feeling.</li>
+                    <li><strong>Speed &amp; rhythm.</strong> Fast cuts (every 6–8s) prevent dwelling on uncanny details.</li>
+                  </ul>
+
+                  <p style={{ margin: "0 0 10px", fontWeight: 700, borderTop: "0.5px solid #E5E7EB", paddingTop: 14 }}>📋 Visual Storyboard — 10 segments × 8s</p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 14 }}>
+                    {STORYBOARD_SEGMENTS.map(seg => (
+                      <div key={seg.n} style={{ display: "flex", gap: 10, padding: "9px 12px", background: "#F9FAFB", borderRadius: 10, border: "0.5px solid #E5E7EB" }}>
+                        <span style={{ fontWeight: 800, fontSize: 11, color: "#22C55E", fontFamily: "DM Sans, sans-serif", minWidth: 22, paddingTop: 1 }}>{seg.n}</span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4, flexWrap: "wrap" }}>
+                            <span style={{ fontWeight: 700, fontSize: 12, color: "#111827" }}>{seg.title}</span>
+                            <span style={{ fontSize: 10, color: "#6B7280", background: "#F3F4F6", padding: "1px 7px", borderRadius: 4, fontFamily: "DM Sans, sans-serif" }}>{seg.type}</span>
+                            <span style={{ fontSize: 10, color: "#9CA3AF", marginLeft: "auto", fontFamily: "DM Sans, sans-serif" }}>{seg.time}</span>
+                          </div>
+                          <p style={{ fontSize: 12, color: "#4B5563", fontStyle: "italic", margin: 0, lineHeight: 1.5 }}>{seg.line}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ padding: "14px 16px", background: "#F0FDF4", borderRadius: 12, border: "0.5px solid #BBF7D0" }}>
+                    <p style={{ margin: "0 0 8px", fontWeight: 700, fontSize: 12, color: "#166534" }}>🎙 Production Notes</p>
+                    <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12, color: "#374151", lineHeight: 1.7 }}>
+                      <li><strong>Voice cloning:</strong> Record 5–10 min naturally → ElevenLabs Instant Voice Clone. This closes 70% of the authenticity gap.</li>
+                      <li><strong>Color grade:</strong> Export Lumia UI recordings with +10 warmth curve + slight vignette. Makes product feel intentional.</li>
+                      <li><strong>Pacing:</strong> 80 words over 80s — resist adding words. Every empty second is breathing room.</li>
+                      <li><strong>CTA hook:</strong> &quot;Stop re-explaining&quot; mirrors the exact pain from segment 01. That loop is what makes people click.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Result badge */}
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "12px 14px", background: "#F0FDF4", borderRadius: 12, border: "0.5px solid #BBF7D0" }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>✅</span>
+                <div>
+                  <p style={{ margin: "0 0 2px", fontSize: 13, fontWeight: 700, color: "#166534", fontFamily: "DM Sans, sans-serif" }}>Reprompts needed: 0</p>
+                  <p style={{ margin: 0, fontSize: 12, color: "#16A34A", fontFamily: "DM Sans, sans-serif" }}>Full critical analysis · 10-segment storyboard with timecodes · Complete script · ElevenLabs production notes · Avatar strategy pros/cons</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <p className="reveal" style={{ textAlign: "center", fontSize: 14, color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans, sans-serif", marginTop: 36, fontStyle: "italic" }}>
+          Same AI · Same topic · Fresh chat for both — the only difference: the Lumia Vault.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ─── Friction Calculator ──────────────────────────────────────────────────────
+const QUALITY_CONFIG: Record<QualityKey, { frictionMin: number }> = {
+  short:  { frictionMin: 4 },
+  mid:    { frictionMin: 5 },
+  struct: { frictionMin: 6 },
+};
+
+function fmtTime(totalMins: number): string {
+  const h = Math.floor(totalMins / 60);
+  const m = Math.round(totalMins % 60);
+  if (h === 0) return `${m}min`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
+
+function useCountUp(target: number, duration = 400) {
+  const [value, setValue] = useState(target);
+  const rafRef = useRef<number | null>(null);
+  const startRef = useRef({ from: target, to: target, startTime: 0 });
+
+  useEffect(() => {
+    const from = value;
+    const to = target;
+    startRef.current = { from, to, startTime: performance.now() };
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    const tick = (now: number) => {
+      const progress = Math.min((now - startRef.current.startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(startRef.current.from + (startRef.current.to - startRef.current.from) * eased);
+      if (progress < 1) rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target]);
+
+  return value;
+}
+
+function FrictionCalculator() {
+  const [mode, setMode] = useState<"time" | "money">("time");
+  const [quality, setQuality] = useState<QualityKey>("mid");
+  const [prompts, setPrompts] = useState(50);
+  const [hourlyRate, setHourlyRate] = useState(75);
+
+  const cfg = QUALITY_CONFIG[quality];
+  const minsPerDay = prompts * cfg.frictionMin;
+  const minsPerMonth = minsPerDay * 22;
+  const hoursPerYear = (minsPerDay * 365) / 60;
+  const daysLostYear = Math.round(hoursPerYear / 8);
+
+  const moneyPerMonth = Math.round((minsPerMonth / 60) * hourlyRate);
+  const moneyPerYear = Math.round(hoursPerYear * hourlyRate);
+  const roiMultiple = Math.round(moneyPerMonth / 39);
+
+  const animMinsDay = useCountUp(minsPerDay);
+  const animMinsMonth = useCountUp(minsPerMonth);
+  const animMoneyMonth = useCountUp(moneyPerMonth);
+  const animMoneyYear = useCountUp(moneyPerYear);
+  const animRoi = useCountUp(roiMultiple);
+  const animHoursYear = useCountUp(hoursPerYear);
+
+  const qualityWarnings: Record<QualityKey, string> = {
+    short:  "Short prompts = overly generic responses. You reprompt 2–3× before getting something usable. Lumia injects the missing context automatically.",
+    mid:    "Partial context = the AI has to guess. Result: approximate answers, 1–2 systematic reprompts. Lumia fills the missing context on every prompt.",
+    struct: "You know how to structure — but you rewrite the context every session. That's where you lose the most time. Lumia injects it automatically: zero rewriting.",
+  };
+
+  const qualityLabels: Record<QualityKey, { title: string; sub: string }> = {
+    short:  { title: "Short and direct", sub: "~4 min per usable response" },
+    mid:    { title: "Medium, sometimes vague", sub: "~5 min per usable response" },
+    struct: { title: "Structured with context", sub: "~6 min per usable response" },
+  };
+
+  const insightText = mode === "money"
+    ? `At $${hourlyRate}/h, friction costs you $${moneyPerMonth}/month. Lumia Pro costs $39. ROI: ${roiMultiple}×.`
+    : `${prompts} prompts/day × ${cfg.frictionMin} min = ${fmtTime(minsPerDay)} lost daily. Over a year: ${daysLostYear} full work days.`;
+
+  return (
+    <section style={{ padding: "96px clamp(20px, 5vw, 80px)", background: "#fff" }}>
+      <div style={{ maxWidth: 960, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <p className="reveal" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--violet)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>Calculator</p>
+          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(28px, 4.5vw, 46px)", letterSpacing: "-1.5px", color: "var(--text)", marginBottom: 12, lineHeight: 1.1 }}>How much are you losing each week?</h2>
+          <p className="reveal" style={{ fontSize: 16, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif" }}>Slide to see your real-time friction cost.</p>
+        </div>
+
+        <div className="reveal" style={{ background: "#F8F7FF", borderRadius: 24, padding: "clamp(24px, 4vw, 40px)", boxShadow: "var(--shadow-card)" }}>
+          {/* Mode Toggle */}
+          <div style={{ display: "flex", background: "#F3F4F6", borderRadius: 999, padding: 4, marginBottom: 32, width: "fit-content" }}>
+            {[["time", "Time lost"], ["money", "Money value"]].map(([m, label]) => (
+              <button key={m} onClick={() => setMode(m as "time" | "money")}
+                style={{ padding: "8px 20px", borderRadius: 999, border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, fontFamily: "DM Sans, sans-serif", background: mode === m ? "#fff" : "transparent", color: mode === m ? "var(--text)" : "var(--text-3)", boxShadow: mode === m ? "0 1px 6px rgba(0,0,0,0.1)" : "none", transition: "all 0.2s" }}>
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Two-column layout */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 380px), 1fr))", gap: 40 }}>
+            {/* Left: Controls */}
+            <div>
+              {/* Quality Selector */}
+              <div style={{ marginBottom: 24 }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>How do you usually send your prompts?</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {(Object.keys(qualityLabels) as QualityKey[]).map(key => (
+                    <button key={key} onClick={() => setQuality(key)}
+                      style={{ padding: "12px 16px", borderRadius: 12, border: `1.5px solid ${quality === key ? "var(--violet)" : "var(--border)"}`, background: quality === key ? "var(--violet-soft)" : "#fff", cursor: "pointer", textAlign: "left", transition: "all 0.2s", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: quality === key ? "var(--violet)" : "var(--text)", fontFamily: "DM Sans, sans-serif" }}>{qualityLabels[key].title}</span>
+                      <span style={{ fontSize: 11, color: quality === key ? "var(--violet)" : "var(--text-3)", fontFamily: "DM Sans, sans-serif", textAlign: "right", maxWidth: 180, lineHeight: 1.3 }}>{qualityLabels[key].sub}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Warning */}
+              <div style={{ background: "var(--violet-soft)", borderRadius: 12, padding: "12px 16px", marginBottom: 24, fontSize: 13, color: "var(--text-2)", lineHeight: 1.6, fontFamily: "DM Sans, sans-serif" }}>
+                {qualityWarnings[quality]}
+              </div>
+
+              {/* Slider: prompts/day */}
+              <div style={{ marginBottom: mode === "money" ? 24 : 0 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <label style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", fontFamily: "DM Sans, sans-serif" }}>Prompts per day</label>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: "var(--violet)", fontFamily: "var(--font-bricolage), sans-serif" }}>{prompts}/day</span>
+                </div>
+                <input type="range" min={5} max={150} step={5} value={prompts} onChange={e => setPrompts(+e.target.value)}
+                  style={{ width: "100%", accentColor: "var(--violet)", cursor: "pointer" }} />
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", marginTop: 4 }}>
+                  <span>5</span><span>150</span>
+                </div>
+              </div>
+
+              {/* Hourly rate (money mode) */}
+              {mode === "money" && (
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <label style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", fontFamily: "DM Sans, sans-serif" }}>Your hourly rate</label>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: "var(--violet)", fontFamily: "var(--font-bricolage), sans-serif" }}>${hourlyRate}/h</span>
+                  </div>
+                  <input type="range" min={25} max={400} step={25} value={hourlyRate} onChange={e => setHourlyRate(+e.target.value)}
+                    style={{ width: "100%", accentColor: "var(--violet)", cursor: "pointer" }} />
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", marginTop: 4 }}>
+                    <span>$25</span><span>$400</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right: Results */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {/* Lost/day */}
+                <div style={{ background: "var(--bg)", borderRadius: 14, padding: "20px 16px", textAlign: "center" }}>
+                  <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 26, color: "var(--text)", letterSpacing: "-0.5px" }}>
+                    {mode === "time" ? fmtTime(animMinsDay) : `$${Math.round(animMinsDay / 60 * hourlyRate)}`}
+                  </div>
+                  <div style={{ fontSize: 12, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", marginTop: 4 }}>Lost/day</div>
+                </div>
+                {/* Lost/month */}
+                <div style={{ background: "var(--bg)", borderRadius: 14, padding: "20px 16px", textAlign: "center" }}>
+                  <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 26, color: "var(--text)", letterSpacing: "-0.5px" }}>
+                    {mode === "time" ? fmtTime(animMinsMonth) : `$${Math.round(animMoneyMonth)}`}
+                  </div>
+                  <div style={{ fontSize: 12, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", marginTop: 4 }}>Lost/month</div>
+                </div>
+                {/* Saved/year */}
+                <div style={{ background: "#F0FDF4", borderRadius: 14, padding: "20px 16px", textAlign: "center" }}>
+                  <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 26, color: "#16A34A", letterSpacing: "-0.5px" }}>
+                    {mode === "time" ? fmtTime(animHoursYear * 60) : `$${Math.round(animMoneyYear).toLocaleString()}`}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#16A34A", fontFamily: "DM Sans, sans-serif", marginTop: 4 }}>Saved with Lumia</div>
+                  <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>per year</div>
+                </div>
+                {/* Work days / ROI */}
+                {mode === "money" ? (
+                  <div style={{ background: "var(--violet-soft)", borderRadius: 14, padding: "20px 16px", textAlign: "center" }}>
+                    <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 26, color: "var(--violet)", letterSpacing: "-0.5px" }}>
+                      {Math.round(animRoi)}×
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--violet)", fontFamily: "DM Sans, sans-serif", marginTop: 4 }}>Lumia ROI</div>
+                    <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>at $39/month</div>
+                  </div>
+                ) : (
+                  <div style={{ background: "var(--bg)", borderRadius: 14, padding: "20px 16px", textAlign: "center" }}>
+                    <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 26, color: "var(--text)", letterSpacing: "-0.5px" }}>
+                      {daysLostYear}
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", marginTop: 4 }}>Work days</div>
+                    <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>lost per year</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Insight */}
+              <div style={{ background: "var(--violet-soft)", borderRadius: 14, padding: "14px 18px", fontSize: 13, color: "var(--text-2)", lineHeight: 1.6, fontFamily: "DM Sans, sans-serif" }}>
+                💡 {insightText}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Pricing Section ──────────────────────────────────────────────────────────
+function PricingSection() {
+  const barRef = useRef<HTMLDivElement>(null);
+  const [animated, setAnimated] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setAnimated(true); observer.disconnect(); }
+    }, { threshold: 0.3 });
+    if (barRef.current) observer.observe(barRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const features = [
+    "Priority beta access — skip the queue",
+    "Lifetime price — never pay monthly",
+    "Shape the product — direct founder access",
+    "All features, unlimited Vault",
+    "Works on Claude, ChatGPT, Gemini, Perplexity",
+  ];
+
+  return (
+    <section id="pricing" style={{ padding: "96px clamp(20px, 5vw, 80px)", background: "var(--bg)", borderTop: "0.5px solid var(--border)" }}>
+      <div style={{ maxWidth: 960, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <p className="reveal" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--violet)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>Founding access</p>
+          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(30px, 5vw, 52px)", letterSpacing: "-1.5px", color: "var(--text)", marginBottom: 8, lineHeight: 1.1 }}>Lock in before it&apos;s gone.</h2>
+          <p className="reveal" style={{ fontSize: 16, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif" }}>One-time payment. Locked forever.</p>
+        </div>
+
+        {/* Side-by-side cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 400px), 1fr))", gap: 20, alignItems: "start" }}>
+
+          {/* Paid card — dark */}
+          <div className="reveal" style={{ background: "#0F0A1E", borderRadius: 22, padding: "clamp(28px, 4vw, 40px)", textAlign: "left", color: "#fff" }}>
+            <div style={{ display: "inline-block", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#A78BFA", marginBottom: 16, fontFamily: "DM Sans, sans-serif" }}>⚡ Founding member</div>
+            <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 22, color: "#fff", marginBottom: 12 }}>Lumia — Life access</h3>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
+              <span style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 56, color: "#fff", letterSpacing: "-2px", lineHeight: 1 }}>$99</span>
+              <span style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", fontFamily: "DM Sans, sans-serif" }}>once</span>
+            </div>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", fontFamily: "DM Sans, sans-serif", marginBottom: 28 }}>
+              <s style={{ opacity: 0.6 }}>then $19/mo</s> · Save $130+/year · Locked forever
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
+              {features.map((f, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg, #567EFC, #EB5E5E)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </div>
+                  <span style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", fontFamily: "DM Sans, sans-serif" }}>{f}</span>
+                </div>
+              ))}
+            </div>
+            <PricingPaidForm />
+            <div ref={barRef} style={{ marginTop: 24 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,0.5)", fontFamily: "DM Sans, sans-serif", marginBottom: 8 }}>
+                <span>9 / 50 spots taken</span>
+                <span style={{ color: "#4ADE80", fontWeight: 600 }}>41 remaining</span>
+              </div>
+              <div style={{ height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 999, overflow: "hidden" }}>
+                <div style={{ height: "100%", background: "linear-gradient(90deg, #567EFC, #EB5E5E)", borderRadius: 999, width: animated ? "18%" : "0%", transition: "width 1.2s cubic-bezier(0.34,1.1,0.64,1)" }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Free waitlist card — light */}
+          <div className="reveal" style={{ background: "#fff", border: "0.5px solid var(--border)", borderRadius: 22, padding: "clamp(28px, 4vw, 40px)", textAlign: "left" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>Free option</span>
+              <span style={{ fontSize: 11, fontWeight: 700, background: "var(--violet-soft)", color: "var(--violet)", borderRadius: 999, padding: "2px 8px", fontFamily: "DM Sans, sans-serif" }}>$0</span>
+            </div>
+            <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 22, color: "var(--text)", marginBottom: 12 }}>Free waitlist</h3>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
+              <span style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 56, color: "var(--text)", letterSpacing: "-2px", lineHeight: 1 }}>$0</span>
+              <span style={{ fontSize: 14, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>forever</span>
+            </div>
+            <p style={{ fontSize: 13, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", marginBottom: 28 }}>
+              No payment needed · Access when we open
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
+              {[
+                "Access when public beta opens",
+                "All core features included",
+                "Works on Claude, ChatGPT, Gemini, Perplexity",
+                "No priority queue",
+                "Price not locked — may change",
+              ].map((f, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 18, height: 18, borderRadius: "50%", background: "var(--violet-soft)", border: "1.5px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#567EFC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </div>
+                  <span style={{ fontSize: 14, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif" }}>{f}</span>
+                </div>
+              ))}
+            </div>
+            <WaitlistForm variant="pricing" />
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Footer ───────────────────────────────────────────────────────────────────
+function Footer() {
+  return (
+    <footer style={{ borderTop: "0.5px solid var(--border)", padding: "28px clamp(20px, 5vw, 64px)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, background: "#fff" }}>
+      <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+        <img src="/logo.png" alt="Lumia" style={{ width: 24, height: 24, objectFit: "contain" }} />
+        <span style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 18, color: "var(--text)" }}>Lumia</span>
+      </a>
+      <div style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 13, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>Building in public</span>
+        <a href="https://x.com/_r0sly_" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "var(--violet)", fontWeight: 600, textDecoration: "none", fontFamily: "DM Sans, sans-serif" }}>@_r0sly_ on X ↗</a>
+        <span style={{ fontSize: 13, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>© 2026 Lumia</span>
+      </div>
+    </footer>
+  );
+}
+
+// ─── Home ─────────────────────────────────────────────────────────────────────
 export default function Home() {
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // Scroll reveal
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add("visible");
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll(".reveal, .pain-reveal").forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  // Success state
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.search.includes("success=true")) {
       setIsSuccess(true);
@@ -170,289 +1772,40 @@ export default function Home() {
     }
   }, []);
 
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
-
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div style={{ minHeight: "100vh", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full text-center space-y-6">
-          <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto"><CheckCircle2 className="w-10 h-10 text-emerald-600" /></div>
-          <h1 className="text-3xl font-bold text-[#1C1C1E]">Welcome, Founding Member!</h1>
-          <p className="text-[#6E6E73]">Your payment was successful. You are now officially a Founding Member of Lumia. We&apos;ll be in touch shortly.</p>
-          <button onClick={() => setIsSuccess(false)} className="px-8 py-3 bg-[#1C1C1E] text-white rounded-full font-medium hover:bg-[#333333] transition-all">Back to Home</button>
+          style={{ maxWidth: 420, width: "100%", textAlign: "center", display: "flex", flexDirection: "column", gap: 20, alignItems: "center" }}>
+          <div style={{ width: 72, height: 72, background: "#F0FDF4", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CheckCircle2 size={36} color="#22C55E" />
+          </div>
+          <h1 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 32, color: "var(--text)", letterSpacing: "-1px" }}>Welcome, Founding Member!</h1>
+          <p style={{ color: "var(--text-2)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.6 }}>Your payment was successful. You are now officially a Founding Member of Lumia. We'll be in touch shortly.</p>
+          <button onClick={() => setIsSuccess(false)} style={{ padding: "12px 28px", background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, fontWeight: 700, fontSize: 15, cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif" }}>Back to Home</button>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
-
-      {/* NAV */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 md:px-12 py-4 bg-white/90 backdrop-blur-xl border-b border-gray-100">
-        <a href="/" className="flex items-center gap-2.5 no-underline">
-          <img src="/logo.png" alt="Lumia" className="w-7 h-7 object-contain" />
-          <span className="font-bold text-xl tracking-tight text-[#1C1C1E]">Lumia</span>
-        </a>
-        <div className="flex items-center gap-8">
-          <button onClick={() => scrollTo("how")} className="text-sm font-medium text-[#6E6E73] hover:text-[#1C1C1E] transition-colors hidden sm:block">How it works</button>
-          <button onClick={() => scrollTo("features")} className="text-sm font-medium text-[#6E6E73] hover:text-[#1C1C1E] transition-colors hidden sm:block">Features</button>
-          <button onClick={() => scrollTo("pricing")} className="text-sm font-medium text-[#6E6E73] hover:text-[#1C1C1E] transition-colors hidden sm:block">Pricing</button>
-          <a href="https://x.com/_r0sly_" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-[#567EFC] hover:text-[#1C1C1E] transition-colors no-underline">@_r0sly_ ↗</a>
-        </div>
-      </nav>
-
-      {/* HERO */}
-      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 pb-20 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none opacity-5 z-0">
-          <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#567EFC] blur-[120px] animate-pulse" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[#FF7769] blur-[100px] animate-pulse" style={{animationDelay:"2s"}} />
-        </div>
-        <div className="relative z-10 max-w-3xl mx-auto">
-          <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:0.6}}
-            className="inline-flex items-center gap-2.5 bg-white border border-gray-200 rounded-full px-4 py-2 mb-6 shadow-sm">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#567EFC] via-[#C2AED4] to-[#FF7769] flex items-center justify-center text-white text-xs font-bold">R</div>
-            <span className="text-sm font-medium text-[#6E6E73]">Built by</span>
-            <a href="https://x.com/_r0sly_" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#567EFC] no-underline hover:text-[#1C1C1E] transition-colors">@_r0sly_ on X</a>
-            <span className="text-gray-300">·</span>
-            <span className="text-sm font-medium text-[#6E6E73]">follow the build ↗</span>
-          </motion.div>
-
-          <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:0.6,delay:0.05}}
-            className="inline-flex items-center gap-2 bg-[rgba(86,126,252,0.06)] border border-[rgba(86,126,252,0.18)] rounded-full px-4 py-2 mb-8">
-            <div className="w-2 h-2 rounded-full bg-gradient-to-br from-[#567EFC] to-[#FF7769] animate-pulse" />
-            <span className="text-xs font-bold text-[#567EFC]">Only 50 founding spots — very few left</span>
-          </motion.div>
-
-          <motion.h1 initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.7,delay:0.1}}
-            className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight text-[#1C1C1E] leading-tight mb-6">
-            Stop crafting prompts.<br/>
-            <span className="bg-gradient-to-r from-[#567EFC] via-[#C2AED4] to-[#FF7769] bg-clip-text text-transparent">Just say what you need.</span>
-          </motion.h1>
-
-          <motion.p initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.7,delay:0.15}}
-            className="text-base md:text-lg text-[#6E6E73] max-w-md mx-auto mb-10 leading-relaxed">
-            Lumia overlays on top of <strong className="text-[#1C1C1E]">any AI</strong> you already use.
-            Share a rough idea by voice or text — it pulls your context and writes the perfect prompt for you.
-          </motion.p>
-
-          <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.7,delay:0.2}} className="max-w-sm sm:max-w-md mx-auto mb-4">
-            <WaitlistForm variant="hero" />
-          </motion.div>
-          <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{duration:0.6,delay:0.3}} className="text-xs text-[#A1A1A6]">
-            Free waitlist · or <button onClick={() => scrollTo("pricing")} className="text-[#567EFC] font-semibold no-underline">get founding access for $99</button> · Mac at launch
-          </motion.p>
-        </div>
-      </section>
-
-      {/* WORKS WITH */}
-      <div className="bg-[#F6F7FB] border-t border-b border-gray-100 py-5 px-8 flex items-center justify-center flex-wrap gap-3">
-        <span className="text-xs font-bold text-[#A1A1A6] uppercase tracking-widest">Works on top of</span>
-        <span className="text-gray-300">·</span>
-        {["Claude","ChatGPT","Gemini","Perplexity","Any AI interface"].map((item) => (
-          <span key={item} className="text-sm font-medium text-[#6E6E73] bg-white border border-gray-200 rounded-full px-4 py-1.5">{item}</span>
-        ))}
+    <>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
+      <style dangerouslySetInnerHTML={{ __html: GLOBAL_STYLES }} />
+      <div style={{ minHeight: "100vh", background: "#fff", overflowX: "hidden" }}>
+        <Navbar />
+        <HeroSection />
+        <PainSection />
+        <HowItWorksSection />
+        <ConsultantSection />
+        <ComparisonSection />
+        <FrictionCalculator />
+        <TweetMarquee />
+        <PricingSection />
+        <Footer />
       </div>
-
-      {/* SOCIAL PROOF */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-16 text-center">
-            <span className="text-xs font-bold uppercase tracking-widest bg-gradient-to-r from-[#567EFC] via-[#C2AED4] to-[#FF7769] bg-clip-text text-transparent mb-3 block">People feel this pain</span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1C1C1E] leading-tight mb-4">You&apos;re not the only one<br/>re-explaining everything.</h2>
-            <p className="text-[#6E6E73] text-base md:text-lg leading-relaxed max-w-md mx-auto">Every day, thousands of people lose time to the same problem. Lumia fixes it.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { avatar:"KeepItFLOSSY.jpg", name:"KeepItFLOSSY", handle:"@KeepItFLOSSY", text:"The AI just <strong>drops all the important details mid-project</strong>. Context compaction killing your whole thread is genuinely one of the most frustrating things right now." },
-              { avatar:"sharaff.jpg", name:"sharaff", handle:"@sharaff", text:"The fact we even have to <strong>save entire chats to git</strong> just so the AI doesn&apos;t forget is exhausting. We&apos;re basically doing memory management manually." },
-              { avatar:"VVoluspa.jpg", name:"VÖLUSPÁ", handle:"@VVoluspa", text:"About halfway in the AI <strong>forgets the whole setup</strong> and starts making zero sense. I spend more time correcting it than actually working." },
-            ].map((t) => (
-              <div key={t.handle} className="bg-white border-2 border-gray-100 rounded-2xl p-6 hover:-translate-y-0.5 hover:shadow-lg hover:border-[rgba(86,126,252,0.2)] transition-all">
-                <div className="flex items-center gap-3 mb-4">
-                  <img src={t.avatar} alt={t.name} className="w-9 h-9 rounded-full object-cover shrink-0" />
-                  <div><div className="text-sm font-bold text-[#1C1C1E]">{t.name}</div><div className="text-xs text-[#A1A1A6]">{t.handle}</div></div>
-                  <span className="ml-auto text-lg opacity-30">𝕏</span>
-                </div>
-                <p className="text-sm text-[#6E6E73] leading-relaxed" dangerouslySetInnerHTML={{__html:t.text}}/>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* URGENCY BAR */}
-      <div className="bg-gradient-to-r from-[rgba(86,126,252,0.04)] to-[rgba(255,119,105,0.04)] border-t border-b border-gray-100 py-5 px-6 text-center">
-        <p className="text-sm font-semibold text-[#6E6E73]">⚡ <strong className="text-[#1C1C1E]">Founding spots are limited.</strong> Only a handful remain — once they&apos;re gone, the price goes up.</p>
-      </div>
-
-      {/* HOW IT WORKS */}
-      <section id="how" className="py-24 px-6 bg-white scroll-mt-24">
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-16 text-center">
-            <span className="text-xs font-bold uppercase tracking-widest bg-gradient-to-r from-[#567EFC] via-[#C2AED4] to-[#FF7769] bg-clip-text text-transparent mb-3 block">How it works</span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1C1C1E] leading-tight mb-4">Three steps.<br/>Zero prompt engineering.</h2>
-            <p className="text-[#6E6E73] text-base md:text-lg leading-relaxed max-w-md mx-auto">You give the rough idea. Lumia handles the rest — context, structure, and a prompt that actually works.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[
-              {num:"01",title:"Share your intent",desc:"Voice or text — say what you&apos;re trying to do in plain language. No structure needed, no format to remember."},
-              {num:"02",title:"Lumia pulls your context",desc:"It grabs the right templates, documents, and past decisions from your vault — and asks one clarifying question if something&apos;s missing."},
-              {num:"03",title:"Perfect prompt, instantly",desc:"A clean structured prompt lands in whatever AI you&apos;re using. You see exactly what context was used — full transparency, no black box."},
-            ].map((s) => (
-              <div key={s.num} className="bg-white border-2 border-gray-100 rounded-2xl p-8 hover:-translate-y-1 hover:shadow-xl hover:border-[rgba(86,126,252,0.3)] transition-all">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#567EFC] via-[#C2AED4] to-[#FF7769] flex items-center justify-center text-white text-sm font-bold mb-5">{s.num}</div>
-                <h3 className="text-lg font-bold text-[#1C1C1E] mb-3 tracking-tight">{s.title}</h3>
-                <p className="text-sm text-[#6E6E73] leading-relaxed" dangerouslySetInnerHTML={{__html:s.desc}}/>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* BEFORE / AFTER */}
-      <section className="py-24 px-6 bg-[#F6F7FB] border-t border-b border-gray-100">
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-16 text-center">
-            <span className="text-xs font-bold uppercase tracking-widest bg-gradient-to-r from-[#567EFC] via-[#C2AED4] to-[#FF7769] bg-clip-text text-transparent mb-3 block">The real problem</span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1C1C1E] leading-tight mb-4">AI is powerful.<br/>Using it well is exhausting.</h2>
-            <p className="text-[#6E6E73] text-base md:text-lg leading-relaxed max-w-md mx-auto">You spend more time managing the AI than actually working. Lumia fixes that layer.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              {tag:"without",label:"Without Lumia",title:"Re-explaining everything from scratch, every session",desc:"New chat = blank slate. You paste your context, re-describe your tone, re-explain your project — before you&apos;ve asked the real question."},
-              {tag:"with",label:"With Lumia",title:"Your context is always ready and loaded",desc:"Your vault remembers what matters. Every prompt is pre-loaded with the right documents and templates — automatically, silently, correctly."},
-              {tag:"without",label:"Without Lumia",title:"20 minutes crafting a prompt to get a useful answer",desc:"Chain three prompts, tweak the structure, re-run because it drifted. The cognitive load of prompting has become a full-time job."},
-              {tag:"with",label:"With Lumia",title:"Rough idea in — sharp, usable answer out",desc:"Say what you need in plain language. Lumia turns it into a precision prompt and fires it at your AI of choice. Done in seconds."},
-            ].map((c) => (
-              <div key={c.title} className="bg-white border-2 border-gray-100 rounded-2xl p-7 hover:shadow-md transition-all">
-                <div className={`inline-block text-xs font-bold uppercase tracking-wide rounded-lg px-3 py-1 mb-4 ${c.tag==="without"?"bg-gray-100 text-[#A1A1A6] border border-gray-200":"bg-[rgba(86,126,252,0.08)] text-[#567EFC] border border-[rgba(86,126,252,0.2)]"}`}>{c.label}</div>
-                <h3 className="text-base font-bold text-[#1C1C1E] mb-3 leading-snug tracking-tight">{c.title}</h3>
-                <p className="text-sm text-[#6E6E73] leading-relaxed" dangerouslySetInnerHTML={{__html:c.desc}}/>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <section id="features" className="py-24 px-6 bg-white scroll-mt-24">
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-16 text-center">
-            <span className="text-xs font-bold uppercase tracking-widest bg-gradient-to-r from-[#567EFC] via-[#C2AED4] to-[#FF7769] bg-clip-text text-transparent mb-3 block">Features</span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1C1C1E] leading-tight mb-4">Built to live above<br/>every AI tool you already use.</h2>
-            <p className="text-[#6E6E73] text-base md:text-lg leading-relaxed max-w-md mx-auto">A desktop overlay that plugs into your workflow without replacing anything.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              {icon:"🔗",title:"Works on any AI interface",desc:"Claude, ChatGPT, Perplexity — Lumia overlays on top. No switching tools, no new tab to manage."},
-              {icon:"🎙️",title:"Voice or text intent",desc:"Talk your rough idea out loud or type it. Lumia cleans, structures, and builds the prompt — you just share the intent."},
-              {icon:"🗂️",title:"Persistent context vault",desc:"Store your templates, documents, and tone once. Tell Lumia when to use each — it pulls the right context automatically."},
-              {icon:"👁️",title:"Full transparency",desc:"See exactly which context chunks were used to build your prompt. Override anything before it sends. No black box ever."},
-              {icon:"❓",title:"Smart clarifying questions",desc:"When your intent is ambiguous, Lumia asks before firing — not after wasting your time with a bad answer."},
-              {icon:"🔁",title:"Learns from your feedback",desc:"Give a quick correction after a prompt — Lumia adapts to how you work and gets sharper over time."},
-            ].map((f) => (
-              <div key={f.title} className="bg-white border-2 border-gray-100 rounded-2xl p-6 relative overflow-hidden hover:-translate-y-0.5 hover:shadow-lg hover:border-[rgba(86,126,252,0.25)] transition-all group">
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#567EFC] via-[#C2AED4] to-[#FF7769] opacity-0 group-hover:opacity-100 transition-opacity"/>
-                <div className="w-10 h-10 rounded-xl bg-[#F6F7FB] border border-gray-200 flex items-center justify-center text-xl mb-4">{f.icon}</div>
-                <h3 className="text-base font-bold text-[#1C1C1E] mb-2 tracking-tight">{f.title}</h3>
-                <p className="text-sm text-[#6E6E73] leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* WHO IT'S FOR */}
-      <section className="py-24 px-6 bg-[#F6F7FB] border-t border-b border-gray-100">
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-16 text-center">
-            <span className="text-xs font-bold uppercase tracking-widest bg-gradient-to-r from-[#567EFC] via-[#C2AED4] to-[#FF7769] bg-clip-text text-transparent mb-3 block">Who it&apos;s for</span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1C1C1E] leading-tight mb-4">If you use AI daily and it<br/>still feels like hard work —</h2>
-            <p className="text-[#6E6E73] text-base md:text-lg leading-relaxed max-w-md mx-auto">Doesn&apos;t matter what field. If you&apos;re tired of bad prompts getting bad answers, Lumia fixes that.</p>
-          </div>
-          <div className="flex flex-wrap gap-3 justify-center">
-            {["💼 Solopreneurs","🛍️ E-commerce operators","🎓 Students","✍️ Content creators","📊 Freelancers","📣 Marketers","🏗️ Builders & makers","🤔 Anyone tired of bad AI answers"].map((c) => (
-              <div key={c} className="bg-white border-2 border-gray-200 rounded-full px-5 py-2.5 text-sm font-medium text-[#6E6E73] cursor-default hover:border-[rgba(86,126,252,0.4)] hover:text-[#567EFC] hover:shadow-md transition-all">{c}</div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* PRICING */}
-      <section id="pricing" className="py-24 px-6 bg-white scroll-mt-24">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-16 text-center">
-            <span className="text-xs font-bold uppercase tracking-widest bg-gradient-to-r from-[#567EFC] via-[#C2AED4] to-[#FF7769] bg-clip-text text-transparent mb-3 block">Pricing</span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1C1C1E] leading-tight mb-4">Two ways to get in.</h2>
-            <p className="text-[#6E6E73] text-base md:text-lg leading-relaxed max-w-md mx-auto">Join the free waitlist and wait for your invite — or lock in founding access now before the price goes up.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-            {/* Free */}
-            <div className="bg-white border-2 border-gray-100 rounded-2xl p-8 hover:shadow-lg transition-all">
-              <div className="inline-block text-xs font-bold uppercase tracking-wide bg-gray-100 text-[#A1A1A6] border border-gray-200 rounded-lg px-3 py-1 mb-5">Free waitlist</div>
-              <h3 className="text-2xl font-bold text-[#1C1C1E] mb-2 tracking-tight">Join the queue</h3>
-              <div className="text-5xl font-bold text-[#1C1C1E] mb-1">$0</div>
-              <p className="text-sm text-[#A1A1A6] mb-6">Free · get your invite when ready</p>
-              <p className="text-sm text-[#6E6E73] leading-relaxed mb-6">Get on the list, follow the build, and receive your beta invite when your spot opens up. No credit card, no commitment.</p>
-              <ul className="space-y-2.5 mb-8 list-none">
-                {["Beta access when available","Build-in-public updates","No credit card required"].map((p) => (
-                  <li key={p} className="flex items-center gap-2.5 text-sm text-[#6E6E73]">
-                    <div className="w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center text-[10px] text-[#A1A1A6] shrink-0">✓</div>
-                    {p}
-                  </li>
-                ))}
-              </ul>
-              <button onClick={() => window.scrollTo({top:0,behavior:"smooth"})} className="w-full py-3.5 bg-[#F6F7FB] text-[#6E6E73] border-2 border-gray-200 rounded-full font-bold text-sm hover:bg-gray-100 hover:text-[#1C1C1E] transition-all">Join free waitlist</button>
-            </div>
-
-            {/* Paid */}
-            <div className="relative rounded-2xl p-8" style={{border:"2px solid transparent",boxShadow:"0 8px 40px rgba(86,126,252,0.15)"}}>
-              <div style={{position:"absolute",inset:"-2px",borderRadius:"1rem",background:"linear-gradient(135deg, #567EFC 0%, #C2AED4 50%, #FF7769 100%)",zIndex:-1}}/>
-              <div style={{borderRadius:"0.875rem"}} className="bg-white h-full">
-                <div className="inline-block text-xs font-bold uppercase tracking-wide rounded-lg px-3 py-1 mb-5 bg-gradient-to-r from-[#567EFC] to-[#FF7769] text-white">⚡ Founding member</div>
-                <h3 className="text-2xl font-bold text-[#1C1C1E] mb-2 tracking-tight">Lock in your spot</h3>
-                <div className="text-5xl font-bold bg-gradient-to-r from-[#567EFC] via-[#C2AED4] to-[#FF7769] bg-clip-text text-transparent mb-1">$99</div>
-                <p className="text-sm text-[#A1A1A6] mb-6"><s>then $19/mo</s> · save $130+/year forever</p>
-                <p className="text-sm text-[#6E6E73] leading-relaxed mb-6">Skip the queue. Get priority beta access, help shape the product, and lock in lifetime pricing before it&apos;s gone. Only 50 spots total — very few remaining.</p>
-                <ul className="space-y-2.5 mb-6 list-none">
-                  {[
-                    {text:<><strong>Priority beta access</strong> — skip the queue</>},
-                    {text:<><strong>Lifetime price</strong> — never pay monthly</>},
-                    {text:<><strong>Shape the product</strong> — direct founder access</>},
-                    {text:<>All features, forever</>},
-                    {text:<>⚡ Limited spots — filling up fast</>},
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start gap-2.5 text-sm text-[#6E6E73]">
-                      <div className="w-4 h-4 rounded-full bg-gradient-to-br from-[#567EFC] to-[#FF7769] flex items-center justify-center text-[10px] text-white shrink-0 mt-0.5">✓</div>
-                      <span>{item.text}</span>
-                    </li>
-                  ))}
-                </ul>
-                <PricingPaidForm />
-              </div>
-            </div>
-          </div>
-          <p className="text-center mt-8 text-xs text-[#A1A1A6]">Price increases to $19/mo after beta. Founding price is locked for life. Spots are limited.</p>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="bg-[#F6F7FB] border-t border-gray-100 py-8 px-12 flex items-center justify-between flex-wrap gap-4">
-        <a href="/" className="flex items-center gap-2.5 no-underline">
-          <img src="/logo.png" alt="Lumia" className="w-7 h-7 object-contain" />
-          <span className="font-bold text-xl tracking-tight text-[#1C1C1E]">Lumia</span>
-        </a>
-        <div className="flex items-center gap-6 flex-wrap">
-          <a href="https://x.com/_r0sly_" target="_blank" rel="noopener noreferrer" className="text-sm text-[#A1A1A6] hover:text-[#1C1C1E] transition-colors no-underline">Building in public on X ↗</a>
-          <p className="text-sm text-[#A1A1A6]">© 2026 Lumia</p>
-        </div>
-      </footer>
-
-    </div>
+    </>
   );
 }
