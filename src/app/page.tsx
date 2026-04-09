@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, CheckCircle2, AlertCircle, Loader2, Menu, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertCircle, XCircle, Sparkles, Loader2, Menu, X } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import LumiaAnimation, { HeroAnimation } from "@/components/LumiaAnimation";
 
@@ -627,7 +627,7 @@ function HeroSection() {
 
         {/* Subtitle */}
         <p style={{ fontFamily: "DM Sans, sans-serif", fontStyle: "italic", fontWeight: 300, fontSize: "clamp(16px, 2.5vw, 20px)", color: "var(--text-2)", maxWidth: 520, margin: "0 auto 0", lineHeight: 1.6, animation: "fadeUp 0.7s 0.15s ease both" }}>
-          Like having a senior prompt engineer on call, 24/7 — who already knows everything about your work.
+          A Mac overlay that floats over your AI tools. Give it a raw intention — it knows your context, crafts the perfect prompt, and pastes it for you.
         </p>
 
         {/* Hero Animation */}
@@ -640,38 +640,17 @@ function HeroSection() {
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
             <button onClick={() => scrollTo("pricing")}
               className="btn-spring"
-              style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "transparent", color: "var(--text)", border: "1.5px solid var(--text)", borderRadius: 999, padding: "15px 28px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 16 }}>
-              Get founding access — $99 lifetime
-              <ArrowRight size={15} />
-            </button>
-            <button onClick={() => scrollTo("pricing")}
-              className="btn-spring"
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, padding: "15px 28px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 16 }}>
-              Join free waitlist
+              style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, padding: "18px 40px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 18, boxShadow: "0 10px 30px rgba(0,0,0,0.15)" }}>
+              Join the waitlist
+              <ArrowRight size={18} />
             </button>
           </div>
           <p style={{ fontSize: 12, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", margin: 0 }}>
             Mac at launch · 41 founding spots remaining
           </p>
-        </div>
-      </div>
- 
-      {/* Works on top of — moved INSIDE section to be visible at the bottom of the first fold */}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, width: "100%", borderTop: "0.5px solid var(--border)", background: "rgba(255,255,255,0.7)", backdropFilter: "blur(8px)", padding: "16px 0", zIndex: 2 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--text-3)", marginBottom: 14, fontFamily: "DM Sans, sans-serif", textAlign: "center" }}>Works on top of</p>
-        <div style={{ overflow: "hidden" }} className="marquee-mask">
-          <div className="ai-marquee" style={{ display: "flex", alignItems: "center", width: "max-content" }}>
-            {[0, 1, 2, 3, 4, 5].map(copyIdx => (
-              <div key={copyIdx} style={{ display: "flex", gap: 48, paddingRight: 48, alignItems: "center" }}>
-                {AI_LOGOS.map(({ src, name }, i) => (
-                  <img key={i} src={src} alt={name} title={name}
-                    style={{ width: 40, height: 40, objectFit: "contain", flexShrink: 0, opacity: 0.75, filter: "grayscale(20%)", transition: "opacity 0.2s" }}
-                    onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
-                    onMouseLeave={e => (e.currentTarget.style.opacity = "0.75")} />
-                ))}
-              </div>
-            ))}
-          </div>
+          <p style={{ fontSize: 11, fontWeight: 500, color: "var(--text-2)", opacity: 0.7, fontFamily: "DM Sans, sans-serif", marginTop: 4, letterSpacing: "0.02em" }}>
+            No extension. No copy-paste. One shortcut.
+          </p>
         </div>
       </div>
     </section>
@@ -903,7 +882,16 @@ function ConsultantSection() {
     { icon: "🔁", title: "Follows you across every AI", desc: "Claude, ChatGPT, Gemini, Perplexity — your consultant doesn\'t lose context on switch.", accent: "#C2AED4" },
     { icon: "👁️", title: "Full transparency, no black box", desc: "See exactly which context was used. Override anything before it fires.", accent: "#FF7769" },
     { icon: "❓", title: "Smart clarifying questions", desc: "Lumia asks the right questions before building — so the output actually fits your context.", accent: "#567EFC" },
-    { icon: "🫙", title: "Persistent context vault", desc: "Your context is stored, layered, and reused across every session — so nothing is ever lost.", accent: "#C2AED4" },
+    { 
+      icon: "🎯", 
+      title: "Precision context targeting", 
+      desc: (
+        <>
+          Point to any saved prompt template with <span style={{ fontFamily: 'monospace', background: 'rgba(0,0,0,0.06)', borderRadius: '4px', padding: '1px 6px', color: 'var(--violet)' }}>#template</span> {/* #template = routes to a saved prompt template in the Vault */} or any doc with <span style={{ fontFamily: 'monospace', background: 'rgba(0,0,0,0.06)', borderRadius: '4px', padding: '1px 6px', color: 'var(--violet)' }}>@document</span> {/* @document = routes to a specific doc or folder in the Vault */}. Lumia routes exactly what the AI needs — the right structure, the right source. You decide. It executes.
+        </>
+      ), 
+      accent: "#C2AED4" 
+    },
   ];
 
   return (
@@ -1098,9 +1086,9 @@ function HowItWorksSection() {
   }, []);
 
   const steps = [
-    { num: "01", title: "Share your intent", desc: "Voice or text, no structure needed. Just say what you're trying to do in plain language.", tag: "🎙 Voice or text" },
-    { num: "02", title: "Lumia pulls your context", desc: "Grabs templates, documents, and past decisions from your Vault automatically.", tag: "🗂 Vault injection" },
-    { num: "03", title: "Perfect prompt, instantly", desc: "Structured prompt, copy, paste, done. Full transparency on what context was used.", tag: "✓ Prompt copied — ⌘V to paste" },
+    { num: "01", title: "Fire a raw thought", desc: "No structure. No context setup. No prompt engineering. One sentence — or one sentence spoken out loud.", tag: "🎙 Voice or text · No format required" },
+    { num: "02", title: "Your Vault closes the context gap", desc: "Lumia reads your stored docs, decisions, and tone — then selects only what's relevant. No context dumping. No signal buried in noise.", tag: "📦 Vault injection · Precision retrieval" },
+    { num: "03", title: "The prompt builds itself", desc: "Lumia reverse-engineers your intention into a structured, context-loaded prompt. You see exactly what went in. Then: ⌘V. Done.", tag: "✓ Prompt copied — ⌘V to paste" },
   ];
 
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -1114,8 +1102,8 @@ function HowItWorksSection() {
         {/* Header */}
         <div style={{ marginBottom: 64 }}>
           <p className="reveal" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--violet)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>Zero prompt engineering</p>
-          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(30px, 4.5vw, 50px)", letterSpacing: "-1.5px", color: "var(--text)", marginBottom: 16, lineHeight: 1.1 }}>Three steps.<br />Sharp answer.</h2>
-          <p className="reveal" style={{ fontSize: 16, color: "var(--text-2)", lineHeight: 1.7, maxWidth: 440, fontFamily: "DM Sans, sans-serif" }}>Say what you need in plain language. Lumia handles the context, the structure, and the prompt — you just collect the output.</p>
+          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(30px, 4.5vw, 50px)", letterSpacing: "-1.5px", color: "var(--text)", marginBottom: 16, lineHeight: 1.1 }}>Drop the intent. Get the prompt.<br />Skip everything in between.</h2>
+          <p className="reveal" style={{ fontSize: 16, color: "var(--text-2)", lineHeight: 1.7, maxWidth: 440, fontFamily: "DM Sans, sans-serif" }}>Raw intention in. Structured prompt out. Your Vault handles the context gap — automatically, on every AI you already use.</p>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 400px), 1fr))", gap: 64, alignItems: "center" }}>
@@ -1146,7 +1134,7 @@ function HowItWorksSection() {
           </div>
 
           {/* Animation */}
-          <div className="reveal" style={{ display: "flex", justifyContent: "center" }}>
+          <div className="reveal" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div style={{ width: "100%", maxWidth: 460 }}>
               <LumiaAnimation />
             </div>
@@ -1158,266 +1146,287 @@ function HowItWorksSection() {
 }
 
 // ─── Comparison Section ───────────────────────────────────────────────────────
-const STORYBOARD_SEGMENTS = [
-  { n: "01", title: "The hook", type: "Avatar close-up", time: "0:00–0:08", line: "\"How much time do you spend re-explaining your project every time you open a new AI tool?\"" },
-  { n: "02", title: "The problem", type: "Screen recording", time: "0:08–0:16", line: "\"Claude. ChatGPT. Gemini. Every switch, you start from zero. That's pure friction.\"" },
-  { n: "03", title: "The founder moment", type: "Avatar side-angle", time: "0:16–0:24", line: "\"After six months of building, I realized one thing: people don't want a new tool. They want a layer.\"" },
-  { n: "04", title: "Product intro", type: "Screen — overlay", time: "0:24–0:32", line: "\"Lumia is an overlay that sits on top of every AI tool you use. It already knows your context.\"" },
-  { n: "05", title: "The Vault", type: "Avatar close-up", time: "0:32–0:40", line: "\"Your Vault stores your docs, your tone, your past decisions. Lumia builds the perfect prompt for you.\"" },
-  { n: "06", title: "Prompt demo", type: "Screen — messy → structured", time: "0:40–0:48", line: "\"Rough idea in. Structured prompt out. Zero prompt engineering required.\"" },
-  { n: "07", title: "The philosophy", type: "Avatar side-angle", time: "0:48–0:56", line: "\"Replacing your interfaces is the wrong move. The future is a layer that adapts to you — not the other way around.\"" },
-  { n: "08", title: "Cross-tool demo", type: "Screen — Claude → ChatGPT", time: "0:56–1:04", line: "\"Switch from Claude to ChatGPT — Lumia follows. Context stays. Friction disappears.\"" },
-  { n: "09", title: "The rally cry", type: "Avatar tight close-up", time: "1:04–1:12", line: "\"I built this because I lived this problem every single day. It's made for power-users. For you.\"" },
-  { n: "10", title: "Final CTA", type: "Product shot + URL", time: "1:12–1:20", line: "\"Stop re-explaining. Start building. getlumia.ca\"" },
-];
-
-function ClaudeAvatar() {
-  return (
-    <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg, #D97757 0%, #CC785C 100%)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" fill="rgba(255,255,255,0.25)"/><path d="M8 12.5c0-2.209 1.791-4 4-4s4 1.791 4 4-1.791 4-4 4-4-1.791-4-4z" fill="white"/></svg>
-    </div>
-  );
-}
-
 function ComparisonSection() {
-  return (
-    <section id="compare" style={{ padding: "96px clamp(20px, 5vw, 64px)", background: "linear-gradient(180deg, #0D0B18 0%, #12101F 100%)", position: "relative", overflow: "hidden" }}>
-      {/* bg glow */}
-      <div style={{ position: "absolute", top: "40%", left: "50%", transform: "translateX(-50%)", width: 700, height: 500, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(86,126,252,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
+  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
-      <div style={{ maxWidth: 1260, margin: "0 auto", position: "relative", zIndex: 1 }}>
+  const tableData = [
+
+    {
+      feature: "Works on top of any AI",
+      memory: { type: "cross", text: "API only" },
+      screen: { type: "cross", text: "" },
+      overlay: { type: "cross", text: "Locked to one LLM" },
+      lumia: { type: "check", text: "Claude, GPT, Gemini..." }
+    },
+    {
+      feature: "Persistent vault (docs, tone, decisions)",
+      memory: { type: "warning", text: "Dev setup required" },
+      screen: { type: "warning", text: "Passive only" },
+      overlay: { type: "cross", text: "" },
+      lumia: { type: "check", text: "No setup" }
+    },
+    {
+      feature: "Injects into existing AI UIs",
+      memory: { type: "cross", text: "" },
+      screen: { type: "cross", text: "" },
+      overlay: { type: "cross", text: "" },
+      lumia: { type: "check", text: "Full integration", highlight: true }
+    },
+    {
+      feature: "Zero developer setup",
+      memory: { type: "cross", text: "" },
+      screen: { type: "check", text: "Passive", muted: true },
+      overlay: { type: "check", text: "" },
+      lumia: { type: "check", text: "Instant" }
+    },
+    {
+      feature: "Model-agnostic",
+      memory: { type: "check", text: "" },
+      screen: { type: "na", text: "N/A" },
+      overlay: { type: "cross", text: "" },
+      lumia: { type: "check", text: "Any LLM" }
+    },
+    {
+      feature: "Reverse prompt engineering",
+      memory: { type: "cross", text: "" },
+      screen: { type: "cross", text: "" },
+      overlay: { type: "cross", text: "" },
+      lumia: { type: "check", text: "Automated" }
+    }
+  ];
+
+  const mobileData = [
+
+    { feature: "Works on top of any AI", competitor: { icon: "cross", text: "" }, lumia: { icon: "check", text: "Claude, GPT, Gemini\u2026" } },
+    { feature: "Persistent vault (docs, tone, decisions)", competitor: { icon: "warning", text: "Dev setup or passive only" }, lumia: { icon: "check", text: "No setup" } },
+    { feature: "Injects into existing AI UIs", competitor: { icon: "cross", text: "" }, lumia: { icon: "check", text: "" } },
+    { feature: "Zero developer setup", competitor: { icon: "warning", text: "Partial" }, lumia: { icon: "check", text: "" } },
+    { feature: "Model-agnostic", competitor: { icon: "cross", text: "" }, lumia: { icon: "check", text: "" } },
+    { feature: "Reverse prompt engineering", competitor: { icon: "cross", text: "" }, lumia: { icon: "check", text: "Automated" } },
+  ];
+
+  const renderIcon = (type: string, isLumia: boolean, size = 16) => {
+    switch (type) {
+      case "check": return <CheckCircle2 size={size} color={isLumia ? "#567EFC" : "#22C55E"} />;
+      case "cross": return <XCircle size={size} color="#EF4444" style={{ opacity: 0.4 }} />;
+      case "warning": return <AlertCircle size={size} color="#FBBF24" />;
+      default: return null;
+    }
+  };
+
+  return (
+    <section id="compare" style={{ padding: "100px clamp(20px, 5vw, 64px)", background: "#0D0B18", position: "relative", overflow: "hidden" }}>
+      {/* Dynamic background glow */}
+      <div style={{ position: "absolute", top: "15%", left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 1200, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(86,126,252,0.12) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+      
+      <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <p className="reveal" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--violet)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>The difference</p>
-          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(28px, 4.5vw, 52px)", letterSpacing: "-1.5px", color: "#ffffff", lineHeight: 1.1, marginBottom: 16 }}>Same AI. Same question.<br />Different result.</h2>
-          <p className="reveal" style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", fontFamily: "DM Sans, sans-serif", fontStyle: "italic" }}>
-            Two fresh chats · same AI (Claude) · same topic · zero prior context — only the prompt is different
+        <div style={{ textAlign: "center", marginBottom: 64, maxWidth: 800 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(86,126,252,0.1)", border: "0.5px solid rgba(86,126,252,0.2)", padding: "4px 12px", borderRadius: 999, marginBottom: 16 }}>
+            <Sparkles size={12} color="#567EFC" />
+            <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#567EFC", fontFamily: "DM Sans, sans-serif" }}>Competitive Edge</span>
+          </div>
+          <h2 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(32px, 4.5vw, 48px)", letterSpacing: "-0.03em", color: "#ffffff", lineHeight: 1.1, marginBottom: 20 }}>Built different. Not just better.</h2>
+          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.6 }}>
+            Every tool solves one piece. Lumia is the only layer that connects them all — sitting directly on top of the AI you already use.
           </p>
         </div>
 
-        {/* Chat panels */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 540px), 1fr))", gap: 24, alignItems: "start" }}>
-
-          {/* ── WITHOUT LUMIA ── */}
-          <div className="reveal" style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,0.6)", border: "0.5px solid rgba(255,255,255,0.07)" }}>
-            {/* Chrome */}
-            <div style={{ background: "#1C1C1E", padding: "12px 16px", display: "flex", alignItems: "center", gap: 8, borderBottom: "0.5px solid rgba(255,255,255,0.06)" }}>
-              <div style={{ display: "flex", gap: 6 }}>
-                {["#FF5F57","#FEBC2E","#28C840"].map((c, i) => <div key={i} style={{ width: 12, height: 12, borderRadius: "50%", background: c }} />)}
-              </div>
-              <span style={{ flex: 1, textAlign: "center", fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.65)", fontFamily: "DM Sans, sans-serif", marginLeft: -54 }}>Claude</span>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(239,68,68,0.12)", border: "0.5px solid rgba(239,68,68,0.25)", borderRadius: 999, padding: "3px 10px" }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#EF4444", display: "inline-block" }} />
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#EF4444", fontFamily: "DM Sans, sans-serif" }}>Without Lumia</span>
-              </div>
-            </div>
-
-            {/* Scrollable chat */}
-            <div style={{ background: "#FAFAF8", height: 600, overflowY: "auto", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 18 }}>
-              {/* User message */}
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <div style={{ background: "#1E1E1E", color: "rgba(255,255,255,0.85)", borderRadius: "18px 18px 4px 18px", padding: "14px 18px", maxWidth: "90%", fontSize: 13, lineHeight: 1.7, fontFamily: "DM Sans, sans-serif" }}>
-                  Ok so basically I want to make like a 16:9 video for my startup Lumia, it&apos;s gonna be a presentation video and, basically, I was thinking it could be an avatar that talks and like tells the founder journey, where I explain why I built Lumia and like what&apos;s the main pain point it solves and stuff like that, why we built it, and it explains what Lumia is, like the fact that it&apos;s an overlay and all that. So basically I want to make a video to put on my landing page and also post it on social media. Tell me if it&apos;s a good idea, like analyze my landing page, tell me if it&apos;s worth doing, what mistakes to avoid. And then I want you to help me write the script so I can use VO3 for it. Also I want to know if it&apos;s better to do it in multiple shots, like 8-second clips because that&apos;s the max you can do, so we do 8-second clips and switch angles, like the guy sitting at his desk, then you see his screen, then another angle, so it feels fluid — landing: getlumia.ca
-                </div>
-              </div>
-
-              {/* Status pill */}
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#EF4444", background: "#FEF2F2", border: "0.5px solid #FECACA", padding: "4px 14px", borderRadius: 999, fontFamily: "DM Sans, sans-serif" }}>→ Generic response received</span>
-              </div>
-
-              {/* Claude response */}
-              <div style={{ display: "flex", gap: 12 }}>
-                <ClaudeAvatar />
-                <div style={{ flex: 1, fontSize: 13, lineHeight: 1.75, color: "#374151", fontFamily: "DM Sans, sans-serif" }}>
-                  <p style={{ margin: "0 0 12px", fontWeight: 600 }}>Got it, I read everything. Here&apos;s my full analysis + format recommendation + script.</p>
-                  <p style={{ margin: "0 0 8px", fontWeight: 700 }}>🔍 Landing page analysis</p>
-                  <p style={{ margin: "0 0 10px" }}>Your landing is solid — the messaging is clear, the pain is well articulated, and the social proof → how it works → features → pricing structure is solid.</p>
-                  <p style={{ margin: "0 0 6px", fontWeight: 600 }}>What works well:</p>
-                  <ul style={{ margin: "0 0 12px", paddingLeft: 18, color: "#4B5563" }}>
-                    <li>The universal pain: &quot;re-explaining everything from scratch every session&quot;</li>
-                    <li>The overlay concept is differentiating — needs to be shown visually</li>
-                    <li>&quot;Stop crafting prompts. Just say what you need.&quot; → your hook line</li>
-                  </ul>
-                  <p style={{ margin: "0 0 8px", fontWeight: 700 }}>🎬 Format: multiple 8s clips — YES</p>
-                  <p style={{ margin: "0 0 10px" }}>You&apos;re right. Veo3 generates each clip independently. Alternate between: Founder face-cam, screen POV, side-angle, close-up hands + keyboard, CTA.</p>
-                  <p style={{ margin: "0 0 8px", fontWeight: 700 }}>📝 Script (~90 seconds, ~12 clips)</p>
-                  <p style={{ margin: "0 0 6px", fontSize: 12, color: "#6B7280", fontStyle: "italic" }}>CLIP 1 — Face cam, warm desk lighting (8s)</p>
-                  <p style={{ margin: "0 0 8px", background: "#F9FAFB", padding: "8px 10px", borderRadius: 8, fontSize: 12, border: "0.5px solid #E5E7EB" }}>&quot;Every time I opened a new chat with an AI... I had to start from scratch. Re-explain my project, my tone, my context. Every. Single. Time.&quot;</p>
-                  <p style={{ margin: "0 0 6px", fontSize: 12, color: "#6B7280", fontStyle: "italic" }}>CLIP 2 — Side profile, contemplative (8s)</p>
-                  <p style={{ margin: "0 0 8px", background: "#F9FAFB", padding: "8px 10px", borderRadius: 8, fontSize: 12, border: "0.5px solid #E5E7EB" }}>&quot;I&apos;m a builder. I use AI every day. And I was spending more time managing the AI than actually building. That felt broken.&quot;</p>
-                  <p style={{ margin: "0 0 6px", fontSize: 12, color: "#6B7280", fontStyle: "italic" }}>CLIP 3 — Face cam, leaning forward (8s)</p>
-                  <p style={{ margin: "0 0 12px", background: "#F9FAFB", padding: "8px 10px", borderRadius: 8, fontSize: 12, border: "0.5px solid #E5E7EB" }}>&quot;So I built Lumia. Not a new AI. Not another chatbot. Something that lives on top of whatever AI you already use.&quot;</p>
-                  <p style={{ margin: "0 0 6px", fontSize: 12, color: "#9CA3AF", fontStyle: "italic" }}>...and so on — no critical analysis, no visual storyboard with timecodes, no production notes, no voice cloning guidance.</p>
-                  <p style={{ margin: "0 0 8px", fontWeight: 700 }}>⚠️ Mistakes to avoid</p>
-                  <ul style={{ margin: 0, paddingLeft: 18, color: "#4B5563" }}>
-                    <li>Don&apos;t show too many features — sell the pain and the concept</li>
-                    <li>Avoid a static talking head for 90s straight</li>
-                    <li>Don&apos;t forget the verbal CTA — say the URL out loud</li>
-                    <li>Subtitles are mandatory — 85% watch without sound</li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Result badge */}
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "12px 14px", background: "#FEF2F2", borderRadius: 12, border: "0.5px solid #FECACA" }}>
-                <span style={{ fontSize: 16, flexShrink: 0 }}>↩️</span>
-                <div>
-                  <p style={{ margin: "0 0 2px", fontSize: 13, fontWeight: 700, color: "#DC2626", fontFamily: "DM Sans, sans-serif" }}>Reprompts needed: 2–3</p>
-                  <p style={{ margin: 0, fontSize: 12, color: "#EF4444", fontFamily: "DM Sans, sans-serif" }}>Response too generic — no visual storyboard, no critical avatar analysis, no ElevenLabs production notes, no voice cloning guidance</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ── WITH LUMIA ── */}
-          <div className="reveal" style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 32px 80px rgba(86,126,252,0.2)", border: "0.5px solid rgba(86,126,252,0.18)" }}>
-            {/* Chrome */}
-            <div style={{ background: "#1C1C1E", padding: "12px 16px", display: "flex", alignItems: "center", gap: 8, borderBottom: "0.5px solid rgba(255,255,255,0.06)" }}>
-              <div style={{ display: "flex", gap: 6 }}>
-                {["#FF5F57","#FEBC2E","#28C840"].map((c, i) => <div key={i} style={{ width: 12, height: 12, borderRadius: "50%", background: c }} />)}
-              </div>
-              <span style={{ flex: 1, textAlign: "center", fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.65)", fontFamily: "DM Sans, sans-serif", marginLeft: -54 }}>Claude</span>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(34,197,94,0.12)", border: "0.5px solid rgba(34,197,94,0.25)", borderRadius: 999, padding: "3px 10px" }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E", display: "inline-block" }} />
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#22C55E", fontFamily: "DM Sans, sans-serif" }}>With Lumia</span>
-              </div>
-            </div>
-
-            {/* Scrollable chat */}
-            <div style={{ background: "#FAFAF8", height: 600, overflowY: "auto", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 18 }}>
-
-              {/* Vault injection banner */}
-              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "var(--violet-soft)", borderRadius: 10, border: "0.5px solid rgba(86,126,252,0.2)" }}>
-                <span style={{ fontSize: 14 }}>✦</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--violet)", fontFamily: "DM Sans, sans-serif" }}>Lumia Vault injected · Context loaded automatically</span>
-              </div>
-
-              {/* User message - structured prompt */}
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <div style={{ background: "#12101F", color: "rgba(255,255,255,0.88)", borderRadius: "18px 18px 4px 18px", padding: "16px 18px", maxWidth: "92%", fontSize: 12, lineHeight: 1.8, fontFamily: "'JetBrains Mono', 'Fira Code', 'Courier New', monospace" }}>
-                  <div style={{ marginBottom: 10 }}>
-                    <span style={{ color: "#A78BFA", fontWeight: 700 }}>EXECUTION CONTEXT</span>
-                    <span style={{ color: "rgba(255,255,255,0.6)" }}> — I am the founder of Lumia (getlumia.ca), a startup building a Mac desktop overlay acting as a universal context layer for Claude, ChatGPT, Gemini, etc. Creating a 16:9 presentation video for landing page + social. Using an AI avatar to narrate my Founder Journey.</span>
-                  </div>
-                  <div style={{ marginBottom: 10 }}>
-                    <span style={{ color: "#A78BFA", fontWeight: 700 }}>MAIN OBJECTIVE</span>
-                    <div style={{ color: "rgba(255,255,255,0.7)", paddingLeft: 12, marginTop: 4 }}>
-                      <div>1. Analyze AI Avatar + Founder Journey strategy (pros, cons, uncanny valley)</div>
-                      <div>2. Design technical storyboard — 8s clips optimized for VO3</div>
-                      <div>3. Write high-impact script for each 8s segment</div>
-                      <div>4. Integrate philosophy: replacing interfaces is wrong — future = frictionless layer</div>
+        {/* ─── DESKTOP VIEW (≥768px) ─── */}
+        <div className="reveal comp-desktop-wrapper" style={{ 
+          width: "100%", 
+          maxWidth: 960, 
+          marginInline: "auto",
+          background: "rgba(255,255,255,0.02)", 
+          borderRadius: 20, 
+          border: "1px solid rgba(255,255,255,0.05)",
+          boxShadow: "0 40px 100px -20px rgba(0,0,0,0.8)",
+          overflow: "hidden"
+        }}>
+          <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, tableLayout: "fixed" }}>
+            <thead>
+              <tr>
+                <th style={{ padding: "12px 10px", paddingLeft: 24, textAlign: "left", color: "rgba(255,255,255,0.4)", fontWeight: 500, fontSize: "0.875rem", borderBottom: "1px solid rgba(255,255,255,0.05)", width: "28%" }}>Capability</th>
+                {["Memory Tools", "Screen Recorders", "Overlay Tools"].map((label, idx) => (
+                  <th key={idx} style={{ padding: "12px 10px", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.05)", width: "16%" }}>
+                    <div style={{ fontWeight: 600, fontSize: "0.875rem", color: "rgba(255,255,255,0.9)" }}>{label}</div>
+                    <div style={{ fontWeight: 400, fontSize: "0.75rem", color: "rgba(255,255,255,0.3)", marginTop: 2 }}>{idx === 0 ? "Mem0, ContextMD" : idx === 1 ? "Recall, Rewind" : "Sentient, Phantom"}</div>
+                  </th>
+                ))}
+                <th style={{ padding: "12px 10px", textAlign: "center", width: "24%", position: "relative" }}>
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(86,126,252,0.05)", zIndex: -1 }} />
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "#567EFC" }} />
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 4, background: "#567EFC", color: "#fff", padding: "2px 8px", borderRadius: 999, fontSize: 9, fontWeight: 700, textTransform: "uppercase" }}>
+                      <Sparkles size={8} fill="#fff" /> You are here
                     </div>
+                    <div style={{ fontWeight: 800, fontSize: "1rem", color: "#fff" }}>Lumia</div>
                   </div>
-                  <div style={{ marginBottom: 10 }}>
-                    <span style={{ color: "#A78BFA", fontWeight: 700 }}>TONE & VOICE</span>
-                    <span style={{ color: "rgba(255,255,255,0.6)" }}> — &quot;Build in Public&quot; · authentic · punchy · power-user to power-user · words: friction, context, overlay, layer</span>
-                  </div>
-                  <div style={{ marginBottom: 10 }}>
-                    <span style={{ color: "#A78BFA", fontWeight: 700 }}>EXTRACTED KNOWLEDGE</span>
-                    <div style={{ color: "rgba(255,255,255,0.6)", paddingLeft: 12, marginTop: 4 }}>
-                      <div>• Lumia = Mac overlay, follows user across Claude/ChatGPT/Gemini/Perplexity</div>
-                      <div>• Core pain: 20+ min/day lost re-explaining projects to AI tools</div>
-                      <div>• Solution: persistent Vault → docs, tone, past decisions → perfect prompts</div>
-                      <div>• Founder Journey: 6 months dev → users don&apos;t want new apps, they want a layer</div>
-                      <div>• Clips: max 8 seconds each · VO3 compatible · 16:9 format</div>
-                    </div>
-                  </div>
-                  <div style={{ marginBottom: 10 }}>
-                    <span style={{ color: "#A78BFA", fontWeight: 700 }}>EXECUTION CONSTRAINTS</span>
-                    <div style={{ color: "rgba(255,255,255,0.6)", paddingLeft: 12, marginTop: 4 }}>
-                      <div>• Script in 8s timed segments with visual descriptions</div>
-                      <div>• Critical analysis required: suggest voice cloning mitigation if avatar feels fake</div>
-                      <div>• Script language: English · Analysis language: English</div>
-                    </div>
-                  </div>
-                  <div>
-                    <span style={{ color: "#A78BFA", fontWeight: 700 }}>FINAL DIRECTIVE</span>
-                    <span style={{ color: "rgba(255,255,255,0.6)" }}> — Analyze video strategy + write complete 8s segmented script for Lumia video.</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status pill */}
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#16A34A", background: "#F0FDF4", border: "0.5px solid #BBF7D0", padding: "4px 14px", borderRadius: 999, fontFamily: "DM Sans, sans-serif" }}>→ Complete deliverable on first response</span>
-              </div>
-
-              {/* Claude response - full */}
-              <div style={{ display: "flex", gap: 12 }}>
-                <ClaudeAvatar />
-                <div style={{ flex: 1, fontSize: 13, lineHeight: 1.75, color: "#374151", fontFamily: "DM Sans, sans-serif" }}>
-                  <p style={{ margin: "0 0 14px", fontWeight: 700, fontSize: 15 }}>Strategic Analysis: AI Avatar + Founder Journey</p>
-
-                  <p style={{ margin: "0 0 6px", fontWeight: 700 }}>The Core Tension</p>
-                  <p style={{ margin: "0 0 4px" }}><strong>Why it works for Lumia specifically:</strong> Your product is pro-AI. An avatar isn&apos;t a contradiction — it&apos;s a statement: <em>&quot;I&apos;m so comfortable with AI I use it to represent myself.&quot;</em> For builders and power-users, this reads as confidence, not cowardice.</p>
-                  <p style={{ margin: "0 0 14px" }}><strong>Why it can fail:</strong> The uncanny valley kills trust fast. If the avatar blinks weirdly or sounds too smooth, viewers spend cognitive energy on the artificiality — your founder credibility evaporates.</p>
-
-                  <p style={{ margin: "0 0 6px", fontWeight: 700 }}>✅ Pros</p>
-                  <ul style={{ margin: "0 0 12px", paddingLeft: 18 }}>
-                    <li><strong>Production velocity.</strong> 90s video = hours, not days. Critical for a solo founder.</li>
-                    <li><strong>Brand consistency.</strong> Avatar never looks tired, always matches your palette.</li>
-                    <li><strong>Forced discipline.</strong> 8s clips force punchy, dense copy — exactly right for social.</li>
-                    <li><strong>Signal to ICP.</strong> A founder using AI for marketing is a subtle proof-of-concept.</li>
-                  </ul>
-
-                  <p style={{ margin: "0 0 6px", fontWeight: 700 }}>⚠️ Cons &amp; Mitigation</p>
-                  <ul style={{ margin: "0 0 14px", paddingLeft: 18 }}>
-                    <li><strong>Voice is king — clone yours.</strong> Use ElevenLabs Instant Voice Clone. Synthetic avatar + your real voice closes 70% of the authenticity gap.</li>
-                    <li><strong>Cut on motion.</strong> Never hold talking head &gt;3–4s. Cut to screen recordings immediately.</li>
-                    <li><strong>Mix real artifacts.</strong> Real Lumia UI + text overlays dilute the &quot;this is fake&quot; feeling.</li>
-                    <li><strong>Speed &amp; rhythm.</strong> Fast cuts (every 6–8s) prevent dwelling on uncanny details.</li>
-                  </ul>
-
-                  <p style={{ margin: "0 0 10px", fontWeight: 700, borderTop: "0.5px solid #E5E7EB", paddingTop: 14 }}>📋 Visual Storyboard — 10 segments × 8s</p>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 14 }}>
-                    {STORYBOARD_SEGMENTS.map(seg => (
-                      <div key={seg.n} style={{ display: "flex", gap: 10, padding: "9px 12px", background: "#F9FAFB", borderRadius: 10, border: "0.5px solid #E5E7EB" }}>
-                        <span style={{ fontWeight: 800, fontSize: 11, color: "#22C55E", fontFamily: "DM Sans, sans-serif", minWidth: 22, paddingTop: 1 }}>{seg.n}</span>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4, flexWrap: "wrap" }}>
-                            <span style={{ fontWeight: 700, fontSize: 12, color: "#111827" }}>{seg.title}</span>
-                            <span style={{ fontSize: 10, color: "#6B7280", background: "#F3F4F6", padding: "1px 7px", borderRadius: 4, fontFamily: "DM Sans, sans-serif" }}>{seg.type}</span>
-                            <span style={{ fontSize: 10, color: "#9CA3AF", marginLeft: "auto", fontFamily: "DM Sans, sans-serif" }}>{seg.time}</span>
-                          </div>
-                          <p style={{ fontSize: 12, color: "#4B5563", fontStyle: "italic", margin: 0, lineHeight: 1.5 }}>{seg.line}</p>
-                        </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableData.map((row, i) => (
+                <tr key={i} className="hover-row">
+                  <td style={{ padding: "10px 10px", paddingLeft: 24, fontSize: "0.875rem", fontWeight: 500, color: "#fff", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    {row.feature}
+                  </td>
+                  {[row.memory, row.screen, row.overlay].map((cell, cIdx) => (
+                    <td key={cIdx} style={{ padding: "10px 10px", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                        {renderIcon(cell.type, false, 16)}
+                        {cell.text && <span style={{ fontSize: "0.6875rem", color: "rgba(255,255,255,0.4)" }}>{cell.text}</span>}
                       </div>
-                    ))}
-                  </div>
-
-                  <div style={{ padding: "14px 16px", background: "#F0FDF4", borderRadius: 12, border: "0.5px solid #BBF7D0" }}>
-                    <p style={{ margin: "0 0 8px", fontWeight: 700, fontSize: 12, color: "#166534" }}>🎙 Production Notes</p>
-                    <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12, color: "#374151", lineHeight: 1.7 }}>
-                      <li><strong>Voice cloning:</strong> Record 5–10 min naturally → ElevenLabs Instant Voice Clone. This closes 70% of the authenticity gap.</li>
-                      <li><strong>Color grade:</strong> Export Lumia UI recordings with +10 warmth curve + slight vignette. Makes product feel intentional.</li>
-                      <li><strong>Pacing:</strong> 80 words over 80s — resist adding words. Every empty second is breathing room.</li>
-                      <li><strong>CTA hook:</strong> &quot;Stop re-explaining&quot; mirrors the exact pain from segment 01. That loop is what makes people click.</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              {/* Result badge */}
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "12px 14px", background: "#F0FDF4", borderRadius: 12, border: "0.5px solid #BBF7D0" }}>
-                <span style={{ fontSize: 16, flexShrink: 0 }}>✅</span>
-                <div>
-                  <p style={{ margin: "0 0 2px", fontSize: 13, fontWeight: 700, color: "#166534", fontFamily: "DM Sans, sans-serif" }}>Reprompts needed: 0</p>
-                  <p style={{ margin: 0, fontSize: 12, color: "#16A34A", fontFamily: "DM Sans, sans-serif" }}>Full critical analysis · 10-segment storyboard with timecodes · Complete script · ElevenLabs production notes · Avatar strategy pros/cons</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
+                    </td>
+                  ))}
+                  <td style={{ padding: "10px 10px", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.05)", position: "relative" }}>
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(86,126,252,0.03)", zIndex: -1 }} />
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                      {renderIcon(row.lumia.type, true, 16)}
+                      {row.lumia.text && <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "#fff" }}>{row.lumia.text}</span>}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
-        <p className="reveal" style={{ textAlign: "center", fontSize: 14, color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans, sans-serif", marginTop: 36, fontStyle: "italic" }}>
-          Same AI · Same topic · Fresh chat for both — the only difference: the Lumia Vault.
-        </p>
+        {/* ─── MOBILE VIEW (<768px) ─── */}
+        <div className="reveal comp-mobile-wrapper" style={{ width: "100%", paddingInline: 12 }}>
+          {mobileData.map((item, idx) => (
+            <div key={idx} style={{ 
+              background: "rgba(255,255,255,0.02)", 
+              borderRadius: 20, 
+              border: "1px solid rgba(255,255,255,0.05)",
+              overflow: "hidden",
+              backdropFilter: "blur(10px)",
+              boxShadow: "0 10px 30px -10px rgba(0,0,0,0.5)"
+            }}>
+              {/* Feature Title */}
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                <span style={{ 
+                  fontSize: 14, 
+                  fontWeight: 700, 
+                  color: "#fff", 
+                  fontFamily: "var(--font-bricolage), sans-serif",
+                  letterSpacing: "-0.01em"
+                }}>
+                  {item.feature}
+                </span>
+              </div>
+
+              {/* Comparison Split */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+                {/* Competitor */}
+                <div style={{ 
+                  padding: "20px 16px", 
+                  background: "rgba(0,0,0,0.2)", 
+                  display: "flex", 
+                  flexDirection: "column", 
+                  alignItems: "center", 
+                  gap: 8,
+                  borderRight: "1px solid rgba(255,255,255,0.05)"
+                }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "rgba(255,255,255,0.3)", letterSpacing: "0.05em", marginBottom: 2 }}>Other Tools</div>
+                  {renderIcon(item.competitor.icon, false, 20)}
+                  {item.competitor.text && (
+                    <span style={{ 
+                      fontSize: 11, 
+                      color: item.competitor.icon === "warning" ? "#FBBF24" : "rgba(255,255,255,0.4)", 
+                      textAlign: "center",
+                      lineHeight: 1.3,
+                      fontWeight: 500
+                    }}>
+                      {item.competitor.text}
+                    </span>
+                  )}
+                </div>
+
+                {/* Lumia */}
+                <div style={{ 
+                  padding: "20px 16px", 
+                  background: "rgba(86,126,252,0.12)", 
+                  display: "flex", 
+                  flexDirection: "column", 
+                  alignItems: "center", 
+                  gap: 8,
+                  position: "relative"
+                }}>
+                  {/* Subtle Inner Glow */}
+                  <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at center, rgba(86,126,252,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
+                  
+                  <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", color: "#8BA8FD", letterSpacing: "0.05em", marginBottom: 2, display: "flex", alignItems: "center", gap: 3 }}>
+                    Lumia <Sparkles size={8} fill="#8BA8FD" />
+                  </div>
+                  {renderIcon(item.lumia.icon, true, 20)}
+                  {item.lumia.text && (
+                    <span style={{ 
+                      fontSize: 12, 
+                      fontWeight: 700, 
+                      color: "#fff", 
+                      textAlign: "center",
+                      lineHeight: 1.3
+                    }}>
+                      {item.lumia.text}
+                    </span>
+                  )}
+                  {!item.lumia.text && (
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Unlimited</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <style dangerouslySetInnerHTML={{ __html: `
+          .comp-desktop-wrapper { display: block; }
+          .comp-mobile-wrapper { display: none; }
+          .hover-row:hover { background: rgba(255,255,255,0.03); }
+          
+          @media (max-width: 767px) {
+            .comp-desktop-wrapper { display: none; }
+            .comp-mobile-wrapper { display: flex; flex-direction: column; gap: 16px; }
+          }
+        `}} />
+
+        {/* Bottom CTA */}
+        <div className="reveal" style={{ textAlign: "center", marginTop: 80, display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <div style={{ width: 1, height: 40, background: "linear-gradient(to bottom, #567EFC, transparent)", marginBottom: 32 }} />
+          <h3 style={{ fontSize: 28, fontWeight: 700, color: "#fff", marginBottom: 12, fontFamily: "var(--font-bricolage), sans-serif", letterSpacing: "-0.02em" }}>The only tool that does all of it.</h3>
+          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", marginBottom: 40, maxWidth: 400, lineHeight: 1.6 }}>And it sits seamlessly on top of the workflow you&apos;ve already built.</p>
+          <button onClick={() => scrollTo("pricing")} style={{ 
+            background: "var(--gradient)", 
+            color: "#fff", 
+            border: "none", 
+            borderRadius: 999, 
+            padding: "16px 40px", 
+            fontSize: 16, 
+            fontWeight: 700, 
+            cursor: "pointer", 
+            boxShadow: "0 10px 30px -5px rgba(86,126,252,0.4)",
+            transition: "transform 0.2s, box-shadow 0.2s",
+            fontFamily: "DM Sans, sans-serif"
+          }} 
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 15px 40px -5px rgba(86,126,252,0.6)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 10px 30px -5px rgba(86,126,252,0.4)";
+          }}>
+            Get early access {"\u2192"}
+          </button>
+        </div>
       </div>
     </section>
   );
 }
+
+
+
 
 // ─── Friction Calculator ──────────────────────────────────────────────────────
 const QUALITY_CONFIG: Record<QualityKey, { frictionMin: number }> = {
@@ -1501,7 +1510,7 @@ function FrictionCalculator() {
     <section style={{ padding: "96px clamp(20px, 5vw, 80px)", background: "#fff" }}>
       <div style={{ maxWidth: 960, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <p className="reveal" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--violet)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>Calculator</p>
+          <p className="reveal" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", background: "var(--gradient)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>Calculator</p>
           <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(28px, 4.5vw, 46px)", letterSpacing: "-1.5px", color: "var(--text)", marginBottom: 12, lineHeight: 1.1 }}>How much are you losing each week?</h2>
           <p className="reveal" style={{ fontSize: 16, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif" }}>Slide to see your real-time friction cost.</p>
         </div>
@@ -1587,20 +1596,22 @@ function FrictionCalculator() {
                   <div style={{ fontSize: 12, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", marginTop: 4 }}>Lost/month</div>
                 </div>
                 {/* Saved/year */}
-                <div style={{ background: "#F0FDF4", borderRadius: 14, padding: "20px 16px", textAlign: "center" }}>
-                  <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 26, color: "#16A34A", letterSpacing: "-0.5px" }}>
+                <div style={{ background: "var(--bg)", borderRadius: 14, padding: "20px 16px", textAlign: "center", position: "relative" }}>
+                  <div style={{ position: "absolute", inset: 0, borderRadius: 14, background: "var(--gradient)", opacity: 0.08 }} />
+                  <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 26, background: "var(--gradient)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: "-0.5px" }}>
                     {mode === "time" ? fmtTime(animHoursYear * 60) : `$${Math.round(animMoneyYear).toLocaleString()}`}
                   </div>
-                  <div style={{ fontSize: 12, color: "#16A34A", fontFamily: "DM Sans, sans-serif", marginTop: 4 }}>Saved with Lumia</div>
+                  <div style={{ fontSize: 12, color: "var(--text)", fontWeight: 700, fontFamily: "DM Sans, sans-serif", marginTop: 4 }}>Saved with Lumia</div>
                   <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>per year</div>
                 </div>
                 {/* Work days / ROI */}
                 {mode === "money" ? (
-                  <div style={{ background: "var(--violet-soft)", borderRadius: 14, padding: "20px 16px", textAlign: "center" }}>
-                    <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 26, color: "var(--violet)", letterSpacing: "-0.5px" }}>
+                  <div style={{ background: "var(--bg)", borderRadius: 14, padding: "20px 16px", textAlign: "center", position: "relative" }}>
+                    <div style={{ position: "absolute", inset: 0, borderRadius: 14, background: "var(--gradient)", opacity: 0.08 }} />
+                    <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 26, background: "var(--gradient)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: "-0.5px" }}>
                       {Math.round(animRoi)}×
                     </div>
-                    <div style={{ fontSize: 12, color: "var(--violet)", fontFamily: "DM Sans, sans-serif", marginTop: 4 }}>Lumia ROI</div>
+                    <div style={{ fontSize: 12, color: "var(--text)", fontWeight: 700, fontFamily: "DM Sans, sans-serif", marginTop: 4 }}>Lumia ROI</div>
                     <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>at $39/month</div>
                   </div>
                 ) : (
@@ -1708,17 +1719,21 @@ function PricingSection() {
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
               {[
-                "Access when public beta opens",
-                "All core features included",
-                "Works on Claude, ChatGPT, Gemini, Perplexity",
-                "No priority queue",
-                "Price not locked — may change",
-              ].map((f, i) => (
+                { text: "Access when public beta opens", type: "check" },
+                { text: "All core features included", type: "check" },
+                { text: "Works on Claude, ChatGPT, Gemini, Perplexity", type: "check" },
+                { text: "No priority queue", type: "warning" },
+                { text: "Price not locked — may change", type: "warning" },
+              ].map((item, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 18, height: 18, borderRadius: "50%", background: "var(--violet-soft)", border: "1.5px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#567EFC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <div style={{ width: 18, height: 18, borderRadius: "50%", background: item.type === "warning" ? "#F5F5F7" : "var(--violet-soft)", border: item.type === "warning" ? "1px solid var(--border)" : "1.5px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    {item.type === "warning" ? (
+                      <span style={{ fontSize: 10, color: "var(--text-3)", fontWeight: 700, lineHeight: 1 }}>—</span>
+                    ) : (
+                      <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#567EFC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    )}
                   </div>
-                  <span style={{ fontSize: 14, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif" }}>{f}</span>
+                  <span style={{ fontSize: 14, color: item.type === "warning" ? "var(--text-3)" : "var(--text-2)", fontFamily: "DM Sans, sans-serif" }}>{item.text}</span>
                 </div>
               ))}
             </div>
@@ -1745,6 +1760,176 @@ function Footer() {
         <span style={{ fontSize: 13, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>© 2026 Lumia</span>
       </div>
     </footer>
+  );
+}
+
+// ─── Works On Top Of Section ──────────────────────────────────────────────────
+function WorksOnTopOfSection() {
+  return (
+    <section style={{ borderTop: "0.5px solid var(--border)", borderBottom: "0.5px solid var(--border)", background: "#fff", padding: "40px 0" }}>
+      <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--text-3)", marginBottom: 14, fontFamily: "DM Sans, sans-serif", textAlign: "center" }}>Works on top of</p>
+      <div style={{ overflow: "hidden" }} className="marquee-mask">
+        <div className="ai-marquee" style={{ display: "flex", alignItems: "center", width: "max-content" }}>
+          {[0, 1, 2, 3, 4, 5].map(copyIdx => (
+            <div key={copyIdx} style={{ display: "flex", gap: 48, paddingRight: 48, alignItems: "center" }}>
+              {AI_LOGOS.map(({ src, name }, i) => (
+                <img key={i} src={src} alt={name} title={name}
+                  style={{ width: 40, height: 40, objectFit: "contain", flexShrink: 0, opacity: 0.75, filter: "grayscale(20%)", transition: "opacity 0.2s" }}
+                  onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
+                  onMouseLeave={e => (e.currentTarget.style.opacity = "0.75")} />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Made For You Section ─────────────────────────────────────────────────────
+const PERSONAS = [
+  {
+    label: "Solo Entrepreneurs",
+    emoji: "🚀",
+    title: "Lumia for Solo Entrepreneurs",
+    desc: "You open ChatGPT for copy, Perplexity for research, Claude for strategy — and re-explain your whole business every single time. Lumia injects your brand positioning, pricing structure, and founder voice into every session, on every AI, the instant you hit the shortcut. One vault. Every tool. Zero re-intro.",
+  },
+  {
+    label: "Content Creators",
+    emoji: "✍️",
+    title: "Lumia for Content Creators",
+    desc: "You brief Claude on your YouTube persona, then switch to ChatGPT for the newsletter hook, then Perplexity for the research angle — and rebuild context three times. Lumia carries your content pillars, audience persona, and posting cadence across every session. Type the topic. Get the output. Already in your voice.",
+  },
+  {
+    label: "Freelancers",
+    emoji: "💼",
+    title: "Lumia for Freelancers",
+    desc: "Client A is on Shopify, requires FR/EN copy, hates Oxford commas. Client B is a SaaS, wants punchy B2B tone, Notion-first deliverables. You switch AI tools mid-morning and start over every time. Lumia vaults each client separately — brand guide, stack, constraints, past decisions. Hit the shortcut, load the client, ship.",
+  },
+  {
+    label: "Vibe Coders",
+    emoji: "⚡",
+    title: "Lumia for Vibe Coders",
+    desc: "You describe a feature in Cursor, debug in Claude Code, prototype in Bolt.new — and paste your stack context manually each time. Lumia injects your tech stack, repo structure, and architectural constraints into every Cursor session automatically. Say what you want to build. Skip the setup prompt.",
+  },
+  {
+    label: "E-commerce",
+    emoji: "🛒",
+    title: "Lumia for E-commerce Operators",
+    desc: "New product drop: you need 40 Shopify descriptions, 8 email sequences, and a Meta ad set — all in your brand tone, with your size guide, return policy, and seasonal promo injected. Lumia loads your full catalog context into Claude or ChatGPT instantly. Batch output your entire launch in one session, not eight.",
+  },
+  {
+    label: "Marketers",
+    emoji: "📈",
+    title: "Lumia for Marketers",
+    desc: "You're running 4 brand accounts, each with its own tone guide, target ICP, and creative brief. Every new Claude or ChatGPT session starts blank. Lumia injects the right brand context per project — audience segments, messaging pillars, campaign constraints — before you type your first word. On-brand output, from prompt one.",
+  },
+  {
+    label: "Power Users",
+    emoji: "⚙️",
+    title: "Lumia for Power Users",
+    desc: "Your stack: Claude for deep work, Perplexity for research, Cursor for code, ChatGPT for quick tasks. Every session starts with a fresh context window and ends with you having pasted the same project brief for the 11th time today. Lumia is the persistent layer between all of them. One shortcut. Full context. Everywhere.",
+  },
+];
+
+function MadeForYouSection() {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setActiveIdx(i => (i + 1) % PERSONAS.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [isPaused]);
+
+  const active = PERSONAS[activeIdx];
+
+  return (
+    <section style={{ background: "#0F0A1E", padding: "96px clamp(20px, 5vw, 80px)", position: "relative", overflow: "hidden" }}>
+      {/* Background glows */}
+      <div style={{ position: "absolute", top: "10%", left: "5%", width: 350, height: 350, borderRadius: "50%", background: "radial-gradient(circle, rgba(86,126,252,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: "10%", right: "10%", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(235,94,94,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+      <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 400px), 1fr))", gap: 64, alignItems: "center" }}>
+          {/* Left */}
+          <div>
+            <p className="reveal" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(86,126,252,0.7)", marginBottom: 16, fontFamily: "DM Sans, sans-serif" }}>Who it&apos;s for</p>
+            <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(36px, 5vw, 56px)", color: "#fff", letterSpacing: "-1.5px", lineHeight: 1.1, marginBottom: 40 }}>
+              Lumia is made<br /><span style={{ background: "linear-gradient(90deg, #567EFC, #C2AED4, #FF7769)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>for you</span>
+            </h2>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {PERSONAS.map((p, i) => (
+                <button
+                  key={p.label}
+                  onClick={() => { setActiveIdx(i); setIsPaused(true); }}
+                  className="btn-spring"
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: 999,
+                    border: activeIdx === i ? "1.5px solid rgba(255,255,255,0.6)" : "1px solid rgba(255,255,255,0.15)",
+                    background: activeIdx === i ? "rgba(255,255,255,0.1)" : "transparent",
+                    color: activeIdx === i ? "#fff" : "rgba(255,255,255,0.4)",
+                    fontSize: 13,
+                    fontWeight: activeIdx === i ? 600 : 400,
+                    fontFamily: "DM Sans, sans-serif",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Right — dynamic content */}
+          <div
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            style={{ minHeight: 260 }}
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeIdx}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+              >
+                <span style={{ fontSize: 48, display: "block", marginBottom: 20 }}>{active.emoji}</span>
+                <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: "clamp(22px, 3vw, 28px)", color: "#fff", letterSpacing: "-0.5px", marginBottom: 16, lineHeight: 1.2 }}>
+                  {active.title}
+                </h3>
+                <p style={{ fontSize: 16, color: "rgba(255,255,255,0.55)", lineHeight: 1.75, fontFamily: "DM Sans, sans-serif", maxWidth: 460 }}>
+                  {active.desc}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Progress dots */}
+            <div style={{ display: "flex", gap: 6, marginTop: 32 }}>
+              {PERSONAS.map((_, i) => (
+                <div
+                  key={i}
+                  onClick={() => { setActiveIdx(i); setIsPaused(true); }}
+                  style={{
+                    width: activeIdx === i ? 28 : 6,
+                    height: 6,
+                    borderRadius: 999,
+                    background: activeIdx === i ? "linear-gradient(90deg, #567EFC, #FF7769)" : "rgba(255,255,255,0.15)",
+                    cursor: "pointer",
+                    transition: "all 0.4s ease",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -1796,11 +1981,12 @@ export default function Home() {
       <div style={{ minHeight: "100vh", background: "#fff", overflowX: "hidden" }}>
         <Navbar />
         <HeroSection />
-        <PainSection />
         <HowItWorksSection />
-        <ConsultantSection />
+        <WorksOnTopOfSection />
         <ComparisonSection />
         <FrictionCalculator />
+        <MadeForYouSection />
+        <ConsultantSection />
         <TweetMarquee />
         <PricingSection />
         <Footer />
