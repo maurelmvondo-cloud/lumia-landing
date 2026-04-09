@@ -396,16 +396,15 @@ const GLOBAL_STYLES = `
 
 // ─── AI Logos ─────────────────────────────────────────────────────────────────
 const AI_LOGOS = [
-  { src: "/logos/claude.webp",      name: "Claude" },
-  { src: "/logos/chatgpt.webp",     name: "ChatGPT" },
-  { src: "/logos/gemini.webp",      name: "Gemini" },
-  { src: "/logos/perplexity.webp",  name: "Perplexity" },
-  { src: "/logos/copilot.png",      name: "Copilot" },
-  { src: "/logos/deepseek.png",     name: "DeepSeek" },
-  { src: "/logos/notion.png",       name: "Notion AI" },
-  { src: "/logos/cursor.png",       name: "Cursor" },
-  { src: "/logos/mistral.png",      name: "Mistral" },
-  { src: "/logos/cohere.png",       name: "Cohere" },
+  { src: "/claude-ai-icon.webp",      name: "Claude" },
+  { src: "/chatgpt-icon.webp",       name: "ChatGPT" },
+  { src: "/google-gemini-icon.webp",  name: "Gemini" },
+  { src: "/perplexity-ai-icon.webp", name: "Perplexity" },
+  { src: "/microsoft_copilot-logo_brandlogos.net_zaqzr.png", name: "Copilot" },
+  { src: "/Deepseek-logo-icon.svg.png", name: "DeepSeek" },
+  { src: "/Notion_app_logo.png",      name: "Notion AI" },
+  { src: "/cursor-logo-icon-freelogovectors.net_.png", name: "Cursor" },
+  { src: "/grok-icon.webp",          name: "Grok" },
 ];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -782,10 +781,10 @@ const TWEETS = [
   { handle: "@KeepItFLOSSY", name: "KeepItFLOSSY", avatar: "KeepItFLOSSY.jpg", text: "The AI just <strong>drops all the important details mid-project</strong>. Context compaction is genuinely one of the most frustrating things right now." },
   { handle: "@sharaff", name: "sharaff", avatar: "sharaff.jpg", text: "The fact we even have to <strong>save entire chats to git</strong> just so the AI doesn't forget is exhausting. We're basically doing memory management manually." },
   { handle: "@VVoluspa", name: "VÖLUSPÁ", avatar: "VVoluspa.jpg", text: "About halfway in the AI <strong>forgets the whole setup</strong>. I spend more time correcting it than actually working." },
-  { handle: "@swyx", name: "swyx", avatar: "swyx.jpg", text: "Hot take: <strong>prompt engineering is just compensating for bad tooling</strong>. We shouldn't have to structure context manually every single time." },
-  { handle: "@levelsio", name: "levelsio", avatar: "levelsio.jpg", text: "I probably spend 30% of my AI time just <strong>re-explaining my product</strong> to the model. That's insane when you think about it." },
-  { handle: "@tibo_maker", name: "Tibo", avatar: "tibo.jpg", text: "Tried a new AI tool today. First thing I had to do: <strong>write a 600-word brief about my company</strong>. Why does every tool start from zero?" },
-  { handle: "@marc_louvion", name: "Marc Lou", avatar: "marclou.jpg", text: "The best prompt engineers I know all have <strong>the same trick: they just have better context files</strong>. That's literally it. The model isn't the difference." },
+  { handle: "@swyx", name: "swyx", avatar: "RIF4Kt7U_400x400.jpg", text: "Hot take: <strong>prompt engineering is just compensating for bad tooling</strong>. We shouldn't have to structure context manually every single time." },
+  { handle: "@levelsio", name: "levelsio", avatar: "vycHz0uG_400x400.jpg", text: "I probably spend 30% of my AI time just <strong>re-explaining my product</strong> to the model. That's insane when you think about it." },
+  { handle: "@tibo_maker", name: "Tibo", avatar: "59z_ZFKm_400x400.jpg", text: "Tried a new AI tool today. First thing I had to do: <strong>write a 600-word brief about my company</strong>. Why does every tool start from zero?" },
+  { handle: "@marc_louvion", name: "Marc Lou", avatar: "9k7PqDTA_400x400.jpg", text: "The best prompt engineers I know all have <strong>the same trick: they just have better context files</strong>. That's literally it. The model isn't the difference." },
 ];
 
 function TweetMarquee() {

@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "lumia-landing",
+      "runtimeExecutable": "/opt/homebrew/bin/node",
+      "runtimeArgs": ["/Volumes/la bibliothecaire nue/lumia-landing/node_modules/.bin/next", "dev", "-p", "3001"],
+      "port": 3001,
+      "autoPort": false
+    }
+  ]
+}
