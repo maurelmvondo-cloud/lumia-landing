@@ -4,7 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, CheckCircle2, AlertCircle, XCircle, Sparkles, Loader2, Menu, X } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
-import LumiaAnimation, { HeroAnimation } from "@/components/LumiaAnimation";
+import LumiaAnimation, { HeroAnimation, useCurrentFrame } from "@/components/LumiaAnimation";
+import { FakeChatInterface } from "@/components/FakeChatInterface";
 
 
 // ─── Global Styles ────────────────────────────────────────────────────────────
@@ -23,6 +24,15 @@ const GLOBAL_STYLES = `
     display: none;
   }
 
+  .claude-chat-layer {
+    position: absolute;
+    top: -150px;
+    left: 80px;
+    right: -180px;
+    bottom: 130px;
+    z-index: 0;
+  }
+
   @media (max-width: 768px) {
     .hero-title {
       white-space: normal !important;
@@ -31,6 +41,12 @@ const GLOBAL_STYLES = `
     }
     .mobile-break {
       display: block;
+    }
+    .claude-chat-layer {
+      top: 20px !important;
+      left: 0px !important;
+      right: 0px !important;
+      bottom: 80px !important;
     }
   }
 
@@ -1078,6 +1094,8 @@ function ConsultantSection() {
 // ─── How It Works ─────────────────────────────────────────────────────────────
 function HowItWorksSection() {
   const [activeStep, setActiveStep] = useState(0);
+  // Single shared frame drives both FakeChatInterface and LumiaAnimation in lockstep
+  const frame = useCurrentFrame(30, 720);
 
   useEffect(() => {
     // Cycle every 8s to loosely match the 24s animation loop
@@ -1133,10 +1151,17 @@ function HowItWorksSection() {
             </div>
           </div>
 
-          {/* Animation */}
+          {/* Animation — chat interface sits behind Lumia overlay */}
           <div className="reveal" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ width: "100%", maxWidth: 460 }}>
-              <LumiaAnimation />
+            <div style={{ width: "100%", maxWidth: 460, position: "relative" }}>
+              {/* Layer 0 — Claude interface: desktop shifts up+right; mobile stays in flow */}
+              <div className="claude-chat-layer">
+                <FakeChatInterface frame={frame} />
+              </div>
+              {/* Layer 1 — Lumia overlay (sets container height via paddingBottom, transparent bg) */}
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <LumiaAnimation frame={frame} />
+              </div>
             </div>
           </div>
         </div>
@@ -1637,6 +1662,108 @@ function FrictionCalculator() {
   );
 }
 
+// ─── Founder Section ──────────────────────────────────────────────────────────
+function FounderSection() {
+  return (
+    <section style={{
+      padding: "96px clamp(20px, 5vw, 80px)",
+      background: "#0D0B18",
+    }}>
+      <style>{`
+        .founder-link {
+          color: rgba(255,255,255,0.35);
+          text-decoration: none;
+          font-size: 0.875rem;
+          font-family: 'DM Sans', sans-serif;
+          transition: color 0.2s ease;
+        }
+        .founder-link:hover { color: #567EFC; }
+        @media (max-width: 640px) {
+          .founder-layout { flex-direction: column !important; align-items: center !important; text-align: center !important; }
+          .founder-photo-wrap { margin-bottom: 28px !important; margin-right: 0 !important; }
+        }
+      `}</style>
+      <div style={{ maxWidth: 640, margin: "0 auto" }}>
+        <div className="founder-layout" style={{ display: "flex", alignItems: "flex-start", gap: 36 }}>
+
+          {/* Photo */}
+          <div className="founder-photo-wrap" style={{ flexShrink: 0 }}>
+            <img
+              src="/founder.jpg"
+              alt="Rosly, founder of Lumia"
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "2px solid rgba(86,126,252,0.30)",
+                display: "block",
+              }}
+            />
+          </div>
+
+          {/* Text */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {/* Eyebrow */}
+            <p style={{
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              color: "rgba(255,255,255,0.30)",
+              marginBottom: 10,
+              fontFamily: "DM Sans, sans-serif",
+            }}>The Founder</p>
+
+            {/* Name line */}
+            <p style={{
+              fontSize: "1.125rem",
+              fontWeight: 600,
+              color: "rgba(255,255,255,0.92)",
+              marginBottom: 20,
+              fontFamily: "var(--font-bricolage), sans-serif",
+              letterSpacing: "-0.3px",
+            }}>Rosly, 19 — Industrial Engineering student at Polytechnique Montréal.</p>
+
+            {/* Origin story */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <p style={{ fontSize: "0.9375rem", lineHeight: 1.7, color: "rgba(255,255,255,0.45)", margin: 0, fontFamily: "DM Sans, sans-serif" }}>
+                I built Lumia because I kept breaking my own workflow trying to fix it. I connected NotebookLM to Gemini — too much context, the model choked. I tried a vector database on Supabase with Telegram bots — it worked, but I lost Claude&apos;s canvas, ChatGPT&apos;s artifacts, every native UI feature I actually rely on.
+              </p>
+              <p style={{ fontSize: "0.9375rem", lineHeight: 1.7, color: "rgba(255,255,255,0.45)", margin: 0, fontFamily: "DM Sans, sans-serif" }}>
+                Every fix forced a tradeoff. So I stopped replacing tools and built a layer on top instead.
+              </p>
+              <p style={{ fontSize: "0.9375rem", lineHeight: 1.7, color: "rgba(255,255,255,0.45)", margin: 0, fontFamily: "DM Sans, sans-serif" }}>
+                I send 50+ prompts a day. I don&apos;t want to learn prompt engineering — I want quality, fast. Lumia is what I built for myself first.
+              </p>
+            </div>
+
+            {/* Closing line */}
+            <p style={{
+              fontSize: "0.875rem",
+              color: "#567EFC",
+              fontStyle: "italic",
+              marginTop: 20,
+              marginBottom: 20,
+              fontFamily: "DM Sans, sans-serif",
+            }}>Built in Montréal. Vibe-coded into existence.</p>
+
+            {/* Social links */}
+            <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+              <a href="https://x.com/_r0sly_" target="_blank" rel="noopener noreferrer" className="founder-link">
+                → Twitter / X
+              </a>
+              <a href="https://www.linkedin.com/in/maurel-rosly-mvondo-10862a324/" target="_blank" rel="noopener noreferrer" className="founder-link">
+                → LinkedIn
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Pricing Section ──────────────────────────────────────────────────────────
 function PricingSection() {
   const barRef = useRef<HTMLDivElement>(null);
@@ -1988,6 +2115,7 @@ export default function Home() {
         <MadeForYouSection />
         <ConsultantSection />
         <TweetMarquee />
+        <FounderSection />
         <PricingSection />
         <Footer />
       </div>

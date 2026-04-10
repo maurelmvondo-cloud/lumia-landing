@@ -37,6 +37,8 @@ const lp = (f: number, [a, b]: number[], [x, y]: number[]) => x + (y - x) * clam
 const fadeIn  = (f: number, s: number, d = 14) => clamp((f - s) / d, 0, 1);
 const fadeOut = (f: number, e: number, d = 14) => clamp((e - f) / d, 0, 1);
 const xfade   = (f: number, [s, e]: number[], d = 14) => Math.min(fadeIn(f, s, d), fadeOut(f, e, d));
+// spring() maxes at ~0.777 (1 - exp(-1.5)), never reaches 1 — normalize for Y positions
+const ns = (v: number) => Math.min(v / 0.777, 1);
 
 // ─── Reference sizes (at 400px container width) ─────────────────────────────────
 const REF_W = 400;
@@ -199,7 +201,7 @@ const QuestionCard: React.FC<{ yesSelected: boolean; answer: string; organicSele
 const PROMPT = 'Roadmap to take my SaaS to 1K MRR';
 const ANSWER  = '100 for 20$ MRR';
 
-const useCurrentFrame = (fps: number, totalFrames: number) => {
+export const useCurrentFrame = (fps: number, totalFrames: number) => {
   const [frame, setFrame] = useState(0);
   const startRef = useRef(0);
   useEffect(() => {
@@ -222,10 +224,11 @@ const useCurrentFrame = (fps: number, totalFrames: number) => {
 // Scale sizes proportionally to container width
 const scale = (v: number, refW: number, actualW: number) => Math.round(v * (actualW / refW));
 
-export const LumiaAnimation: React.FC = () => {
+export const LumiaAnimation: React.FC<{ frame?: number }> = ({ frame: frameProp }) => {
   const [containerW, setContainerW] = useState(REF_W);
   const containerRef = useRef<HTMLDivElement>(null);
-  const frame = useCurrentFrame(30, TOTAL_FRAMES);
+  const internalFrame = useCurrentFrame(30, TOTAL_FRAMES);
+  const frame = frameProp !== undefined ? frameProp : internalFrame;
   const caretOn  = Math.floor(frame / 14) % 2 === 0;
   const kbActive = frame >= T.expand[0];
 
@@ -259,14 +262,14 @@ export const LumiaAnimation: React.FC = () => {
   // Positions - all centered vertically
   const centerY = 0;
   const ctrlAlpha = fadeIn(frame, 0, 20);
-  const ctrlY = Math.round(lp(spring({ frame }), [0, 1], [p(14), 0]));
+  const ctrlY = Math.round(lp(ns(spring({ frame })), [0, 1], [p(14), 0]));
   const barProg = frame >= T.expand[0] ? spring({ frame: frame - T.expand[0] }) : 0;
   const barAlpha = (() => {
     if (frame < T.expand[0]) return 0;
-    if (frame < T.think1[0]) return barProg;
+    if (frame < T.think1[0]) return fadeIn(frame, T.expand[0], 14);
     return fadeOut(frame, T.think1[0] + 16, 16);
   })();
-  const barY = Math.round(lp(barProg, [0, 1], [p(14), 0]));
+  const barY = Math.round(lp(ns(barProg), [0, 1], [p(14), 0]));
   const charIdx = frame < T.typing[0] ? 0 : frame >= T.typing[1] ? PROMPT.length : Math.round(lp(frame, T.typing, [0, PROMPT.length]));
   const typedText = PROMPT.slice(0, charIdx);
   const showSend = charIdx >= 5 && barAlpha > 0.05 && frame < T.think1[0];
@@ -274,9 +277,9 @@ export const LumiaAnimation: React.FC = () => {
   const formProg = frame >= T.formIn[0] ? spring({ frame: frame - T.formIn[0] }) : 0;
   const formAlpha = (() => {
     if (frame < T.formIn[0] || frame >= T.think2[0]) return 0;
-    return Math.min(formProg, fadeOut(frame, T.think2[0] + 8, 16));
+    return Math.min(fadeIn(frame, T.formIn[0], 18), fadeOut(frame, T.think2[0] + 8, 16));
   })();
-  const formY = Math.round(lp(formProg, [0, 1], [p(20), 0]));
+  const formY = Math.round(lp(ns(formProg), [0, 1], [p(20), 0]));
   const yesSelected = frame >= T.act1[0] + 5;
   const answerFocused = frame >= T.act2[0] - 4 && frame < T.act3[0];
   const ansCharIdx = frame < T.act2[0] ? 0 : frame >= T.act2[1] ? ANSWER.length : Math.round(lp(frame, T.act2, [0, ANSWER.length]));
@@ -284,8 +287,8 @@ export const LumiaAnimation: React.FC = () => {
   const organicSelected = frame >= T.act3[0] + 5;
   const th2Alpha = (frame >= T.think2[0] && frame < T.toast[0]) ? xfade(frame, T.think2, 16) : 0;
   const toastProg = frame >= T.toast[0] ? spring({ frame: frame - T.toast[0] }) : 0;
-  const toastAlpha = frame >= T.toast[0] ? toastProg : 0;
-  const toastY = Math.round(lp(toastProg, [0, 1], [p(12), 0]));
+  const toastAlpha = frame >= T.toast[0] ? fadeIn(frame, T.toast[0], 14) : 0;
+  const toastY = Math.round(lp(ns(toastProg), [0, 1], [p(12), 0]));
   // ControlBar sits at the bottom; ChatBar/pills/form appear ABOVE it
   const ctrlBottom = p(18);
   const ctrlTotalH = s.btn + s.ctrlVGap + s.handleH; // buttons row + gap + handle
@@ -402,15 +405,15 @@ export const HeroAnimation: React.FC = () => {
   };
 
   const ctrlAlpha = fadeIn(frame, 0, 20);
-  const ctrlY = Math.round(lp(spring({ frame }), [0, 1], [p(14), 0]));
+  const ctrlY = Math.round(lp(ns(spring({ frame })), [0, 1], [p(14), 0]));
 
   const barProg  = frame >= HERO_T.barIn[0] ? spring({ frame: frame - HERO_T.barIn[0] }) : 0;
   const barAlpha = (() => {
     if (frame < HERO_T.barIn[0]) return 0;
-    if (frame < HERO_T.think[0]) return barProg;
+    if (frame < HERO_T.think[0]) return fadeIn(frame, HERO_T.barIn[0], 14);
     return fadeOut(frame, HERO_T.think[0], 16);
   })();
-  const barY = Math.round(lp(barProg, [0, 1], [p(14), 0]));
+  const barY = Math.round(lp(ns(barProg), [0, 1], [p(14), 0]));
 
   const charIdx   = frame < HERO_T.typing[0] ? 0
     : frame >= HERO_T.typing[1] ? HERO_PROMPT.length
@@ -423,8 +426,8 @@ export const HeroAnimation: React.FC = () => {
 
   const toastProg  = frame >= HERO_T.toast[0] ? spring({ frame: frame - HERO_T.toast[0] }) : 0;
   const toastAlpha = frame >= HERO_T.toast[0]
-    ? Math.min(toastProg, fadeOut(frame, HERO_T.hold[1] - 15, 15)) : 0;
-  const toastY = Math.round(lp(toastProg, [0, 1], [p(12), 0]));
+    ? Math.min(fadeIn(frame, HERO_T.toast[0], 14), fadeOut(frame, HERO_T.hold[1] - 15, 15)) : 0;
+  const toastY = Math.round(lp(ns(toastProg), [0, 1], [p(12), 0]));
 
   const barW        = Math.round(W * 0.95);
   const ctrlBottom  = p(18);
