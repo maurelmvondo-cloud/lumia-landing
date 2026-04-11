@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, CheckCircle2, AlertCircle, XCircle, Sparkles, Loader2, Menu, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertCircle, XCircle, Sparkles, Loader2, Menu, X, ShieldCheck, Clock, AlertTriangle } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import LumiaAnimation, { HeroAnimation, useCurrentFrame } from "@/components/LumiaAnimation";
 import { FakeChatInterface } from "@/components/FakeChatInterface";
@@ -586,7 +586,7 @@ function Navbar() {
           className="btn-spring hidden md:flex"
           style={{ alignItems: "center", gap: 8, background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, padding: "10px 18px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap" }}>
           <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#EF4444", display: "inline-block", animation: "pulse-dot 1.5s infinite" }} />
-          41 spots left — $99 lifetime
+          Founding member — $99 lifetime
         </button>
 
         {/* Mobile burger */}
@@ -607,7 +607,7 @@ function Navbar() {
             <button onClick={() => scrollTo("pricing")}
               style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, padding: "14px 24px", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15, cursor: "pointer", marginTop: 4 }}>
               <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#EF4444", display: "inline-block", animation: "pulse-dot 1.5s infinite" }} />
-              41 spots left — $99 lifetime
+              Founding member — $99 lifetime
             </button>
           </motion.div>
         )}
@@ -637,13 +637,13 @@ function HeroSection() {
 
         {/* H1 */}
         <h1 className="hero-title" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: "clamp(64px, 9.5vw, 120px)", letterSpacing: "-4px", lineHeight: 1.0, color: "var(--text)", margin: "0 auto 28px", animation: "fadeUp 0.7s 0.08s ease both" }}>
-          Don&apos;t prompt, <br className="mobile-break" />
-          <span style={{ background: "linear-gradient(90deg, #567EFC, #C2AED4, #FF7769)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>just pilot.</span>
+          Vibe prompting <br />
+          <span style={{ background: "linear-gradient(90deg, #567EFC, #C2AED4, #FF7769)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>starts here.</span>
         </h1>
 
         {/* Subtitle */}
-        <p style={{ fontFamily: "DM Sans, sans-serif", fontStyle: "italic", fontWeight: 300, fontSize: "clamp(16px, 2.5vw, 20px)", color: "var(--text-2)", maxWidth: 520, margin: "0 auto 0", lineHeight: 1.6, animation: "fadeUp 0.7s 0.15s ease both" }}>
-          A Mac overlay that floats over your AI tools. Give it a raw intention — it knows your context, crafts the perfect prompt, and pastes it for you.
+        <p style={{ fontFamily: "DM Sans, sans-serif", fontStyle: "normal", fontWeight: 500, fontSize: "clamp(1.125rem, 1.5vw, 1.375rem)", color: "rgba(30,24,48,0.75)", maxWidth: 520, margin: "24px auto 32px", lineHeight: 1.6, animation: "fadeUp 0.7s 0.15s ease both", textAlign: "center" }}>
+          Lumia floats over any AI you use. Drop your intention — and it turns it into a prompt that ships.
         </p>
 
         {/* Hero Animation */}
@@ -662,7 +662,7 @@ function HeroSection() {
             </button>
           </div>
           <p style={{ fontSize: 12, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", margin: 0 }}>
-            Mac at launch · 41 founding spots remaining
+            Mac · Private beta Q3 2026 · Public launch Q4 2026
           </p>
           <p style={{ fontSize: 11, fontWeight: 500, color: "var(--text-2)", opacity: 0.7, fontFamily: "DM Sans, sans-serif", marginTop: 4, letterSpacing: "0.02em" }}>
             No extension. No copy-paste. One shortcut.
@@ -771,57 +771,6 @@ function PainSection() {
   );
 }
 
-// ─── Tweet Marquee ────────────────────────────────────────────────────────────
-const TWEETS = [
-  { handle: "@KeepItFLOSSY", name: "KeepItFLOSSY", avatar: "KeepItFLOSSY.jpg", text: "The AI just <strong>drops all the important details mid-project</strong>. Context compaction is genuinely one of the most frustrating things right now." },
-  { handle: "@sharaff", name: "sharaff", avatar: "sharaff.jpg", text: "The fact we even have to <strong>save entire chats to git</strong> just so the AI doesn't forget is exhausting. We're basically doing memory management manually." },
-  { handle: "@VVoluspa", name: "VÖLUSPÁ", avatar: "VVoluspa.jpg", text: "About halfway in the AI <strong>forgets the whole setup</strong>. I spend more time correcting it than actually working." },
-  { handle: "@swyx", name: "swyx", avatar: "RIF4Kt7U_400x400.jpg", text: "Hot take: <strong>prompt engineering is just compensating for bad tooling</strong>. We shouldn't have to structure context manually every single time." },
-  { handle: "@levelsio", name: "levelsio", avatar: "vycHz0uG_400x400.jpg", text: "I probably spend 30% of my AI time just <strong>re-explaining my product</strong> to the model. That's insane when you think about it." },
-  { handle: "@tibo_maker", name: "Tibo", avatar: "59z_ZFKm_400x400.jpg", text: "Tried a new AI tool today. First thing I had to do: <strong>write a 600-word brief about my company</strong>. Why does every tool start from zero?" },
-  { handle: "@marc_louvion", name: "Marc Lou", avatar: "9k7PqDTA_400x400.jpg", text: "The best prompt engineers I know all have <strong>the same trick: they just have better context files</strong>. That's literally it. The model isn't the difference." },
-];
-
-function TweetMarquee() {
-  const doubled = [...TWEETS, ...TWEETS];
-
-  return (
-    <section style={{ background: "#fff", borderTop: "0.5px solid var(--border)", borderBottom: "0.5px solid var(--border)", padding: "72px 0", overflow: "hidden" }}>
-      <div style={{ textAlign: "center", marginBottom: 48 }}>
-        <p style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>You&apos;re not alone</p>
-        <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(28px, 5vw, 48px)", letterSpacing: "-1.5px", color: "var(--text)", margin: "0 auto", maxWidth: 600, lineHeight: 1.1 }}>
-          Everyone re-explains everything.<br /><span style={{ color: "var(--text-2)" }}>Every. Single. Session.</span>
-        </h2>
-      </div>
-
-      <div className="marquee-mask" style={{ overflow: "hidden" }}>
-        <div style={{ display: "flex", gap: 16, width: "max-content", animation: "marquee-scroll 32s linear infinite" }}>
-          {doubled.map((tweet, i) => (
-            <div key={i} style={{ width: 280, flexShrink: 0, background: "#fff", border: "0.5px solid var(--border)", borderRadius: 16, padding: "20px", boxShadow: "var(--shadow-card)", transition: "transform 0.2s, box-shadow 0.2s", cursor: "default" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "var(--shadow-lg)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "var(--shadow-card)"; }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                {tweet.avatar ? (
-                  <img src={tweet.avatar} alt={tweet.name} style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
-                ) : (
-                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: "var(--gradient)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
-                    {tweet.name[0]}
-                  </div>
-                )}
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{tweet.name}</div>
-                  <div style={{ fontSize: 12, color: "var(--text-3)" }}>{tweet.handle}</div>
-                </div>
-                <span style={{ marginLeft: "auto", fontSize: 16, opacity: 0.2 }}>𝕏</span>
-              </div>
-              <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.55, margin: 0 }} dangerouslySetInnerHTML={{ __html: tweet.text }} />
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // ─── Dashboard Mockup ─────────────────────────────────────────────────────────
 function DashboardMockup() {
@@ -849,7 +798,7 @@ function DashboardMockup() {
           {[
             { value: "50", label: "Prompts generated", color: "var(--violet)", bg: "var(--violet-soft)" },
             { value: "19,949", label: "Words saved", color: "#EF4444", bg: "#FEF2F2" },
-            { value: "+40%", label: "Precision gained", color: "#22C55E", bg: "#F0FDF4" },
+            { value: "4h", label: "Hours saved", color: "#22C55E", bg: "#F0FDF4" },
           ].map(stat => (
             <div key={stat.label} style={{ background: stat.bg, borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
               <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 18, color: stat.color, letterSpacing: "-0.5px" }}>{stat.value}</div>
@@ -989,8 +938,8 @@ function ConsultantSection() {
                           <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.3, marginTop: 3 }}>Words saved</div>
                         </div>
                         <div style={{ background: "#F0FDF4", borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
-                          <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 22, color: "#22C55E", letterSpacing: "-0.5px" }}>+40%</div>
-                          <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.3, marginTop: 3 }}>Precision gained</div>
+                          <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 22, color: "#22C55E", letterSpacing: "-0.5px" }}>4h</div>
+                          <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.3, marginTop: 3 }}>Hours saved</div>
                         </div>
                       </div>
                       <p style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-3)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>Prompt history</p>
@@ -1766,23 +1715,10 @@ function FounderSection() {
 
 // ─── Pricing Section ──────────────────────────────────────────────────────────
 function PricingSection() {
-  const barRef = useRef<HTMLDivElement>(null);
-  const [animated, setAnimated] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setAnimated(true); observer.disconnect(); }
-    }, { threshold: 0.3 });
-    if (barRef.current) observer.observe(barRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  const features = [
-    "Priority beta access — skip the queue",
-    "Lifetime price — never pay monthly",
-    "Shape the product — direct founder access",
-    "All features, unlimited Vault",
-    "Works on Claude, ChatGPT, Gemini, Perplexity",
+  const founderExtras = [
+    "20 pre-built optimized prompt templates — exclusive to founders",
+    "Feature vote — your top 3 picks ship first",
+    "Direct email access to the founder",
   ];
 
   return (
@@ -1792,6 +1728,24 @@ function PricingSection() {
           <p className="reveal" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--violet)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>Founding access</p>
           <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(30px, 5vw, 52px)", letterSpacing: "-1.5px", color: "var(--text)", marginBottom: 8, lineHeight: 1.1 }}>Lock in before it&apos;s gone.</h2>
           <p className="reveal" style={{ fontSize: 16, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif" }}>One-time payment. Locked forever.</p>
+        </div>
+
+        {/* Timeline block */}
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <p style={{ fontSize: "0.9375rem", fontWeight: 500, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif", marginBottom: 6 }}>
+            Private beta: Q3 2026{" "}
+            <span style={{ color: "var(--text-3)" }}>·</span>
+            {" "}Public launch: Q4 2026
+          </p>
+          <p style={{ fontSize: "0.8125rem", color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", margin: 0 }}>
+            Follow live updates →{" "}
+            <a href="https://x.com/_r0sly_" target="_blank" rel="noopener noreferrer"
+              style={{ color: "var(--text-3)", textDecoration: "underline" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#567EFC")}
+              onMouseLeave={e => (e.currentTarget.style.color = "var(--text-3)")}>
+              x.com/_r0sly_
+            </a>
+          </p>
         </div>
 
         {/* Side-by-side cards */}
@@ -1805,29 +1759,35 @@ function PricingSection() {
               <span style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 56, color: "#fff", letterSpacing: "-2px", lineHeight: 1 }}>$99</span>
               <span style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", fontFamily: "DM Sans, sans-serif" }}>once</span>
             </div>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", fontFamily: "DM Sans, sans-serif", marginBottom: 28 }}>
-              <s style={{ opacity: 0.6 }}>then $19/mo</s> · Save $130+/year · Locked forever
+            <p style={{ fontSize: "0.8125rem", color: "#F59E0B", fontWeight: 500, fontFamily: "DM Sans, sans-serif", marginBottom: 20 }}>
+              Price increases at public launch.
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
-              {features.map((f, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg, #567EFC, #EB5E5E)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <div style={{ borderTop: "0.5px solid rgba(255,255,255,0.08)", paddingTop: 14, marginBottom: 16 }}>
+              <p style={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#A78BFA", fontFamily: "DM Sans, sans-serif", marginBottom: 12 }}>Founder-only extras</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {founderExtras.map((f, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg, #567EFC, #EB5E5E)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </div>
+                    <span style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", fontFamily: "DM Sans, sans-serif" }}>{f}</span>
                   </div>
-                  <span style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", fontFamily: "DM Sans, sans-serif" }}>{f}</span>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+            <div style={{ borderLeft: "2px solid #567EFC", background: "rgba(86,126,252,0.05)", borderRadius: "0 var(--radius-sm, 6px) var(--radius-sm, 6px) 0", padding: "8px 12px", marginBottom: 12 }}>
+              <p style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.55)", fontFamily: "DM Sans, sans-serif", margin: 0, lineHeight: 1.5 }}>
+                We personally onboard every founding member — reviewing your Vault setup and prompt templates with you in a 1:1 session.
+              </p>
+            </div>
+            <div style={{ borderLeft: "2px solid #22C55E", background: "rgba(34,197,94,0.08)", borderRadius: "0 var(--radius-sm, 6px) var(--radius-sm, 6px) 0", padding: "10px 14px", marginBottom: 20, display: "flex", alignItems: "flex-start", gap: 8 }}>
+              <ShieldCheck size={16} color="#22C55E" style={{ flexShrink: 0, marginTop: 1 }} />
+              <p style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.55)", fontFamily: "DM Sans, sans-serif", margin: 0, lineHeight: 1.5 }}>
+                If Lumia doesn&apos;t ship by Q4 2026, we refund your founding fee in full.{" "}
+                <span style={{ fontWeight: 600, color: "#22C55E" }}>No questions asked.</span>
+              </p>
             </div>
             <PricingPaidForm />
-            <div ref={barRef} style={{ marginTop: 24 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,0.5)", fontFamily: "DM Sans, sans-serif", marginBottom: 8 }}>
-                <span>9 / 50 spots taken</span>
-                <span style={{ color: "#4ADE80", fontWeight: 600 }}>41 remaining</span>
-              </div>
-              <div style={{ height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 999, overflow: "hidden" }}>
-                <div style={{ height: "100%", background: "linear-gradient(90deg, #567EFC, #EB5E5E)", borderRadius: 999, width: animated ? "18%" : "0%", transition: "width 1.2s cubic-bezier(0.34,1.1,0.64,1)" }} />
-              </div>
-            </div>
           </div>
 
           {/* Free waitlist card — light */}
@@ -1839,28 +1799,22 @@ function PricingSection() {
             <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 22, color: "var(--text)", marginBottom: 12 }}>Free waitlist</h3>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
               <span style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 56, color: "var(--text)", letterSpacing: "-2px", lineHeight: 1 }}>$0</span>
-              <span style={{ fontSize: 14, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>forever</span>
             </div>
             <p style={{ fontSize: 13, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", marginBottom: 28 }}>
               No payment needed · Access when we open
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
-              {[
-                { text: "Access when public beta opens", type: "check" },
-                { text: "All core features included", type: "check" },
-                { text: "Works on Claude, ChatGPT, Gemini, Perplexity", type: "check" },
-                { text: "No priority queue", type: "warning" },
-                { text: "Price not locked — may change", type: "warning" },
-              ].map((item, i) => (
+              {([
+                { text: "Access when public beta opens", type: "clock" },
+                { text: "Price may increase at launch — not locked", type: "alert" },
+              ] as { text: string; type: "clock" | "alert" }[]).map((item, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 18, height: 18, borderRadius: "50%", background: item.type === "warning" ? "#F5F5F7" : "var(--violet-soft)", border: item.type === "warning" ? "1px solid var(--border)" : "1.5px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    {item.type === "warning" ? (
-                      <span style={{ fontSize: 10, color: "var(--text-3)", fontWeight: 700, lineHeight: 1 }}>—</span>
-                    ) : (
-                      <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#567EFC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    )}
-                  </div>
-                  <span style={{ fontSize: 14, color: item.type === "warning" ? "var(--text-3)" : "var(--text-2)", fontFamily: "DM Sans, sans-serif" }}>{item.text}</span>
+                  {item.type === "clock" ? (
+                    <Clock size={18} color="var(--text-3)" style={{ flexShrink: 0 }} />
+                  ) : (
+                    <AlertTriangle size={18} color="#F59E0B" style={{ flexShrink: 0 }} />
+                  )}
+                  <span style={{ fontSize: 14, color: item.type === "alert" ? "#92400E" : "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>{item.text}</span>
                 </div>
               ))}
             </div>
@@ -1868,6 +1822,9 @@ function PricingSection() {
           </div>
 
         </div>
+        <p style={{ fontSize: "0.875rem", color: "var(--text-3)", textAlign: "center", marginTop: 24, fontFamily: "DM Sans, sans-serif" }}>
+          Free users get access — founders shape what ships next.
+        </p>
       </div>
     </section>
   );
@@ -1885,6 +1842,10 @@ function Footer() {
         <span style={{ fontSize: 13, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>Building in public</span>
         <a href="https://x.com/_r0sly_" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "var(--violet)", fontWeight: 600, textDecoration: "none", fontFamily: "DM Sans, sans-serif" }}>@_r0sly_ on X ↗</a>
         <span style={{ fontSize: 13, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>© 2026 Lumia</span>
+        <span style={{ fontSize: "0.75rem", color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>
+          Questions about your purchase?{" "}
+          <a href="mailto:hello@getlumia.ca" style={{ color: "var(--text-3)", textDecoration: "underline" }}>hello@getlumia.ca</a>
+        </span>
       </div>
     </footer>
   );
@@ -2114,7 +2075,6 @@ export default function Home() {
         <FrictionCalculator />
         <MadeForYouSection />
         <ConsultantSection />
-        <TweetMarquee />
         <FounderSection />
         <PricingSection />
         <Footer />
