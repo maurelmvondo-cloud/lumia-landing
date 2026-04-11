@@ -2070,11 +2070,11 @@ export default function Home() {
         <Navbar />
         <HeroSection />
         <HowItWorksSection />
+        <ConsultantSection />
         <WorksOnTopOfSection />
         <ComparisonSection />
         <FrictionCalculator />
         <MadeForYouSection />
-        <ConsultantSection />
         <FounderSection />
         <PricingSection />
         <Footer />
