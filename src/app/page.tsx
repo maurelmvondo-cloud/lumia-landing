@@ -6,6 +6,8 @@ import { ArrowRight, CheckCircle2, AlertCircle, XCircle, Sparkles, Loader2, Menu
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import LumiaAnimation, { HeroAnimation, useCurrentFrame } from "@/components/LumiaAnimation";
 import { FakeChatInterface } from "@/components/FakeChatInterface";
+import { useAuth } from "@/context/AuthContext";
+import { AuthModal } from "@/components/AuthModal";
 
 
 // ─── Global Styles ────────────────────────────────────────────────────────────
@@ -423,6 +425,18 @@ const AI_LOGOS = [
   { src: "/grok-icon.webp",          name: "Grok" },
 ];
 
+// ─── Skills Data ──────────────────────────────────────────────────────────────
+const SKILLS_DATA = {
+  Content:  ["TikTok Video Script", "LinkedIn Post", "Newsletter", "YouTube Script", "Instagram Reel", "X Thread", "Podcast Script", "Blog Post Outline"],
+  Business: ["Cold Email", "Landing Page Copy", "Facebook Ad", "Email Sequence", "Case Study", "User Persona", "Pitch Deck Narrative", "Product Launch Brief"],
+  Code:     ["Code Review", "API Documentation", "Refactor Plan", "Bug Report", "Tech Spec", "PR Description", "Test Coverage Plan"],
+  Creative: ["Short Story Hook", "Brand Naming", "Ad Concept", "Tagline Generator", "Creative Brief", "Mood Board Copy"],
+  Personal: ["Weekly Review", "Goal Setting", "Decision Framework", "Learning Plan"],
+  Research: ["Competitive Analysis", "Market Overview", "Literature Summary"],
+} as const;
+type SkillCategory = keyof typeof SKILLS_DATA;
+const SKILL_CATEGORIES = Object.keys(SKILLS_DATA) as SkillCategory[];
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 type QualityKey = "short" | "mid" | "struct";
 
@@ -542,6 +556,10 @@ function PricingPaidForm() {
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showResourcesMenu, setShowResourcesMenu] = useState(false);
+  const { user, username, signOut, loading } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -575,19 +593,94 @@ function Navbar() {
         </a>
 
         {/* Desktop nav */}
-        <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", alignItems: "center", gap: 36 }} className="hidden md:flex">
+        <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", alignItems: "center", gap: 28 }} className="hidden md:flex">
           {[["How it works", "how"], ["Compare", "compare"], ["Pricing", "pricing"]].map(([label, id]) => (
             <button key={id} className="nav-link" onClick={() => scrollTo(id)}>{label}</button>
           ))}
+          {/* Resources dropdown */}
+          <div style={{ position: "relative" }}
+            onMouseEnter={() => setShowResourcesMenu(true)}
+            onMouseLeave={() => setShowResourcesMenu(false)}>
+            <button className="nav-link" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              Resources
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ opacity: 0.5, marginTop: 1 }}>
+                <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            <AnimatePresence>
+              {showResourcesMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.12 }}
+                  style={{ position: "absolute", top: "calc(100% + 12px)", left: "50%", transform: "translateX(-50%)", background: "#fff", border: "0.5px solid rgba(86,126,252,0.12)", borderRadius: 16, boxShadow: "0 8px 32px rgba(0,0,0,0.10)", minWidth: 180, overflow: "hidden", zIndex: 200 }}>
+                  {[
+                    { href: "/faq", label: "FAQ", icon: "💬" },
+                    { href: "/bugs", label: "Bug Tracker", icon: "🐛" },
+                    { href: "/contact", label: "Contact", icon: "✉️" },
+                    { href: "/privacy", label: "Privacy Policy", icon: "🔒" },
+                    { href: "/terms", label: "Terms of Service", icon: "📄" },
+                  ].map(({ href, label, icon }) => (
+                    <a key={href} href={href}
+                      style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", textDecoration: "none", fontSize: 13, fontWeight: 500, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif", transition: "background 0.15s" }}
+                      onMouseEnter={e => (e.currentTarget.style.background = "#F3F4FF")}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <span style={{ fontSize: 14 }}>{icon}</span>
+                      {label}
+                    </a>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
-        {/* Desktop CTA */}
-        <button onClick={() => scrollTo("pricing")}
-          className="btn-spring hidden md:flex"
-          style={{ alignItems: "center", gap: 8, background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, padding: "10px 18px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap" }}>
-          <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#EF4444", display: "inline-block", animation: "pulse-dot 1.5s infinite" }} />
-          Founding member — $99 lifetime
-        </button>
+        {/* Desktop right side */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }} className="hidden md:flex">
+          {!loading && (
+            user ? (
+              <div style={{ position: "relative" }}>
+                <button onClick={() => setShowUserMenu(!showUserMenu)}
+                  style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(86,126,252,0.08)", border: "0.5px solid rgba(86,126,252,0.18)", borderRadius: 999, padding: "7px 14px", cursor: "pointer", fontFamily: "DM Sans, sans-serif", fontSize: 13, fontWeight: 600, color: "var(--text)" }}>
+                  <div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg, #567EFC, #EB5E5E)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#fff" }}>
+                    {(username ?? user.email ?? "?")[0].toUpperCase()}
+                  </div>
+                  {username ?? user.email?.split("@")[0]}
+                </button>
+                <AnimatePresence>
+                  {showUserMenu && (
+                    <>
+                      <div style={{ position: "fixed", inset: 0, zIndex: 98 }} onClick={() => setShowUserMenu(false)} />
+                      <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.15 }}
+                        style={{ position: "absolute", right: 0, top: "calc(100% + 8px)", zIndex: 99, background: "#fff", border: "0.5px solid rgba(86,126,252,0.12)", borderRadius: 14, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", minWidth: 180, overflow: "hidden" }}>
+                        <div style={{ padding: "10px 16px 8px", borderBottom: "0.5px solid rgba(86,126,252,0.08)" }}>
+                          <p style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", margin: 0 }}>Signed in as</p>
+                          <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", fontFamily: "DM Sans, sans-serif", margin: "2px 0 0" }}>@{username ?? user.email?.split("@")[0]}</p>
+                        </div>
+                        <button onClick={() => { signOut(); setShowUserMenu(false); }}
+                          style={{ width: "100%", textAlign: "left", padding: "10px 16px", background: "none", border: "none", fontSize: 13, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif", cursor: "pointer" }}>
+                          Sign out
+                        </button>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <button onClick={() => setShowAuthModal(true)} className="nav-link"
+                style={{ fontWeight: 600, padding: "7px 14px", borderRadius: 999, border: "0.5px solid rgba(86,126,252,0.25)", color: "var(--violet)" }}>
+                Sign in
+              </button>
+            )
+          )}
+          <button onClick={() => scrollTo("pricing")}
+            className="btn-spring"
+            style={{ display: "flex", alignItems: "center", gap: 8, background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, padding: "10px 18px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap" }}>
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#EF4444", display: "inline-block", animation: "pulse-dot 1.5s infinite" }} />
+            Founding member — $99 lifetime
+          </button>
+        </div>
 
         {/* Mobile burger */}
         <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden"
@@ -604,6 +697,23 @@ function Navbar() {
             {[["How it works", "how"], ["Compare", "compare"], ["Pricing", "pricing"]].map(([label, id]) => (
               <button key={id} onClick={() => scrollTo(id)} style={{ textAlign: "left", background: "none", border: "none", fontSize: 17, fontWeight: 500, color: "var(--text)", cursor: "pointer", fontFamily: "DM Sans, sans-serif", padding: "4px 0" }}>{label}</button>
             ))}
+            <div style={{ height: "0.5px", background: "var(--border)", margin: "4px 0" }} />
+            {[
+              { href: "/faq", label: "FAQ" },
+              { href: "/bugs", label: "Bug Tracker" },
+              { href: "/contact", label: "Contact" },
+              { href: "/privacy", label: "Privacy Policy" },
+              { href: "/terms", label: "Terms of Service" },
+            ].map(({ href, label }) => (
+              <a key={href} href={href} onClick={() => setMenuOpen(false)}
+                style={{ textAlign: "left", fontSize: 15, fontWeight: 500, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif", padding: "2px 0", textDecoration: "none" }}>{label}</a>
+            ))}
+            {!loading && !user && (
+              <button onClick={() => { setShowAuthModal(true); setMenuOpen(false); }}
+                style={{ textAlign: "left", background: "none", border: "none", fontSize: 17, fontWeight: 600, color: "var(--violet)", cursor: "pointer", fontFamily: "DM Sans, sans-serif", padding: "4px 0" }}>
+                Sign in
+              </button>
+            )}
             <button onClick={() => scrollTo("pricing")}
               style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, padding: "14px 24px", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15, cursor: "pointer", marginTop: 4 }}>
               <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#EF4444", display: "inline-block", animation: "pulse-dot 1.5s infinite" }} />
@@ -612,6 +722,8 @@ function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
     </>
   );
 }
@@ -637,13 +749,13 @@ function HeroSection() {
 
         {/* H1 */}
         <h1 className="hero-title" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: "clamp(64px, 9.5vw, 120px)", letterSpacing: "-4px", lineHeight: 1.0, color: "var(--text)", margin: "0 auto 28px", animation: "fadeUp 0.7s 0.08s ease both" }}>
-          Vibe prompting <br />
-          <span style={{ background: "linear-gradient(90deg, #567EFC, #C2AED4, #FF7769)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>starts here.</span>
+          Your AI remembers <br />
+          <span style={{ background: "linear-gradient(90deg, #567EFC, #C2AED4, #FF7769)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>everything now.</span>
         </h1>
 
         {/* Subtitle */}
         <p style={{ fontFamily: "DM Sans, sans-serif", fontStyle: "normal", fontWeight: 500, fontSize: "clamp(1.125rem, 1.5vw, 1.375rem)", color: "rgba(30,24,48,0.75)", maxWidth: 520, margin: "24px auto 32px", lineHeight: 1.6, animation: "fadeUp 0.7s 0.15s ease both", textAlign: "center" }}>
-          Lumia floats over any AI you use. Drop your intention — and it turns it into a prompt that ships.
+          Lumia gives Claude, ChatGPT, and Gemini persistent memory. Drop a thought — it injects your full context and builds the prompt. One shortcut.
         </p>
 
         {/* Hero Animation */}
@@ -666,6 +778,9 @@ function HeroSection() {
           </p>
           <p style={{ fontSize: 11, fontWeight: 500, color: "var(--text-2)", opacity: 0.7, fontFamily: "DM Sans, sans-serif", marginTop: 4, letterSpacing: "0.02em" }}>
             No extension. No copy-paste. One shortcut.
+          </p>
+          <p style={{ fontSize: 12, fontWeight: 600, color: "var(--violet)", fontFamily: "DM Sans, sans-serif", marginTop: 2, opacity: 0.85, letterSpacing: "0.01em" }}>
+            100+ built-in skills · Works with every major AI
           </p>
         </div>
       </div>
@@ -842,7 +957,7 @@ function ConsultantSection() {
   }, [isPaused]);
 
   const featureCards = [
-    { icon: "📊", title: "Track your stats", desc: "Words Lumia added for you · Precision gained in your prompts · Prompts generated · Time saved", accent: "#FF7769" },
+    { icon: "⚡", title: "100+ Skills built-in", desc: "TikTok scripts, cold emails, landing pages, code reviews — Lumia auto-detects what you need and applies the right expert prompt template. Zero setup.", accent: "#567EFC" },
     { icon: "🗂️", title: "Knows your project", desc: "Your Vault stores docs, tone, past decisions. Lumia pulls the right context automatically — no briefing needed.", accent: "#567EFC" },
     { icon: "🔁", title: "Follows you across every AI", desc: "Claude, ChatGPT, Gemini, Perplexity — your consultant doesn\'t lose context on switch.", accent: "#C2AED4" },
     { icon: "👁️", title: "Full transparency, no black box", desc: "See exactly which context was used. Override anything before it fires.", accent: "#FF7769" },
@@ -1844,7 +1959,7 @@ function Footer() {
         <span style={{ fontSize: 13, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>© 2026 Lumia</span>
         <span style={{ fontSize: "0.75rem", color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>
           Questions about your purchase?{" "}
-          <a href="mailto:hello@getlumia.ca" style={{ color: "var(--text-3)", textDecoration: "underline" }}>hello@getlumia.ca</a>
+          <a href="mailto:oria.agency.ai@gmail.com" style={{ color: "var(--text-3)", textDecoration: "underline" }}>oria.agency.ai@gmail.com</a>
         </span>
       </div>
     </footer>
@@ -1855,7 +1970,10 @@ function Footer() {
 function WorksOnTopOfSection() {
   return (
     <section style={{ borderTop: "0.5px solid var(--border)", borderBottom: "0.5px solid var(--border)", background: "#fff", padding: "40px 0" }}>
-      <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--text-3)", marginBottom: 14, fontFamily: "DM Sans, sans-serif", textAlign: "center" }}>Works on top of</p>
+      <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--text-3)", marginBottom: 8, fontFamily: "DM Sans, sans-serif", textAlign: "center" }}>Works on top of</p>
+      <p style={{ fontSize: 14, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif", textAlign: "center", marginBottom: 24, fontWeight: 400, lineHeight: 1.5 }}>
+        Your memory layer for every AI you already use — no switching, no re-briefing.
+      </p>
       <div style={{ overflow: "hidden" }} className="marquee-mask">
         <div className="ai-marquee" style={{ display: "flex", alignItems: "center", width: "max-content" }}>
           {[0, 1, 2, 3, 4, 5].map(copyIdx => (
@@ -2021,6 +2139,180 @@ function MadeForYouSection() {
   );
 }
 
+// ─── Skills Section ───────────────────────────────────────────────────────────
+function SkillsSection() {
+  const FEATURED_SKILLS = [
+    { cat: "Content",  skills: ["TikTok Script", "LinkedIn Post", "Newsletter", "YouTube Script", "Instagram Reel", "X Thread"] },
+    { cat: "Business", skills: ["Cold Email", "Landing Page", "Facebook Ad", "Email Sequence", "Case Study", "User Persona"] },
+    { cat: "Code",     skills: ["Code Review", "API Docs", "Refactor Plan", "Bug Report", "Tech Spec", "PR Description"] },
+  ];
+  const TEMPLATE_ITEMS = [
+    { icon: "📄", name: "Target Audience — Lumia", tag: "#audience", color: "#567EFC" },
+    { icon: "📝", name: "Brand Voice Guide",        tag: "#voice",    color: "#C2AED4" },
+    { icon: "🎯", name: "Ideal Customer Profile",   tag: "#icp",      color: "#FF7769" },
+    { icon: "⚙️", name: "Tech Stack & Constraints", tag: "#stack",    color: "#567EFC" },
+  ];
+  const MODEL_LOGOS = [
+    { src: "/claude-ai-icon.webp", name: "Claude" },
+    { src: "/chatgpt-icon.webp", name: "ChatGPT" },
+    { src: "/google-gemini-icon.webp", name: "Gemini" },
+    { src: "/perplexity-ai-icon.webp", name: "Perplexity" },
+    { src: "/grok-icon.webp", name: "Grok" },
+  ];
+  // FloatingQuestionCard — single-choice chips (B2B SaaS selected)
+  const AUDIENCE_OPTS = ["B2B SaaS", "Freelancers", "Agencies", "Founders"];
+
+  return (
+    <section style={{ padding: "96px clamp(20px, 5vw, 72px)", background: "#F8F7FF", borderTop: "0.5px solid rgba(86,126,252,0.06)" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", flexDirection: "column", gap: 80 }}>
+
+        {/* Header */}
+        <div style={{ textAlign: "center" }}>
+          <p className="reveal" style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--violet)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>What&apos;s inside</p>
+          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(28px, 4vw, 46px)", letterSpacing: "-1.5px", color: "var(--text)", lineHeight: 1.1, maxWidth: 640, margin: "0 auto" }}>
+            Built for every AI you already use
+          </h2>
+        </div>
+
+        {/* ── Block 1: Skills — dark card left, text right ── */}
+        <div className="reveal" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 440px), 1fr))", gap: 48, alignItems: "center" }}>
+          <div style={{ background: "#0F0A1E", border: "0.5px solid rgba(86,126,252,0.18)", borderRadius: 24, padding: 32, overflow: "hidden", position: "relative" }}>
+            <div style={{ position: "absolute", top: -60, right: -60, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, rgba(86,126,252,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
+            <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(86,126,252,0.6)", marginBottom: 20, fontFamily: "DM Sans, sans-serif" }}>100+ Skills built-in</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {FEATURED_SKILLS.map(({ cat, skills }) => (
+                <div key={cat}>
+                  <p style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.3)", fontFamily: "DM Sans, sans-serif", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.08em" }}>{cat}</p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {skills.map(s => (
+                      <span key={s} style={{ fontSize: 11, fontWeight: 500, fontFamily: "DM Sans, sans-serif", color: "rgba(255,255,255,0.75)", background: "rgba(255,255,255,0.06)", border: "0.5px solid rgba(255,255,255,0.1)", borderRadius: 999, padding: "3px 10px", whiteSpace: "nowrap" }}>{s}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 24, paddingTop: 16, borderTop: "0.5px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", fontFamily: "DM Sans, sans-serif" }}>+ Creative · Personal · Research</span>
+              <div style={{ display: "flex", gap: 4 }}>
+                {MODEL_LOGOS.map(m => (
+                  <img key={m.name} src={m.src} alt={m.name} style={{ width: 18, height: 18, objectFit: "contain", opacity: 0.5, borderRadius: 4 }} />
+                ))}
+              </div>
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--violet)", fontFamily: "DM Sans, sans-serif" }}>Skills</p>
+            <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(24px, 3vw, 34px)", letterSpacing: "-1px", color: "var(--text)", lineHeight: 1.15, margin: 0 }}>
+              Say what you need.<br />The right skill fires.
+            </h3>
+            <p style={{ fontSize: 15, color: "var(--text-2)", lineHeight: 1.75, fontFamily: "DM Sans, sans-serif", maxWidth: 400, margin: 0 }}>
+              Type &ldquo;write a cold email&rdquo; and Lumia detects the intent, loads the right skill, and builds the prompt — tailored to Claude, ChatGPT, or Gemini. No setup. No switching.
+            </p>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--violet-soft)", border: "0.5px solid rgba(86,126,252,0.2)", borderRadius: 999, padding: "6px 14px" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--violet)", fontFamily: "DM Sans, sans-serif" }}>⚡ Auto-detected · Works on every AI</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Block 2: Templates — text left, dark card right ── */}
+        <div className="reveal" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 440px), 1fr))", gap: 48, alignItems: "center" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--violet)", fontFamily: "DM Sans, sans-serif" }}>Templates</p>
+            <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(24px, 3vw, 34px)", letterSpacing: "-1px", color: "var(--text)", lineHeight: 1.15, margin: 0 }}>
+              Your context,<br />always pre-loaded.
+            </h3>
+            <p style={{ fontSize: 15, color: "var(--text-2)", lineHeight: 1.75, fontFamily: "DM Sans, sans-serif", maxWidth: 400, margin: 0 }}>
+              Reference any saved doc with <code style={{ background: "var(--violet-soft)", color: "var(--violet)", borderRadius: 6, padding: "2px 6px", fontSize: 13 }}>@document</code> or any template with <code style={{ background: "var(--violet-soft)", color: "var(--violet)", borderRadius: 6, padding: "2px 6px", fontSize: 13 }}>#template</code>. Lumia injects exactly what&apos;s needed — nothing more.
+            </p>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--violet-soft)", border: "0.5px solid rgba(86,126,252,0.2)", borderRadius: 999, padding: "6px 14px" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--violet)", fontFamily: "DM Sans, sans-serif" }}>🗂️ Vault-powered · Precision retrieval</span>
+            </div>
+          </div>
+          <div style={{ background: "#0F0A1E", border: "0.5px solid rgba(86,126,252,0.18)", borderRadius: 24, padding: 32, overflow: "hidden", position: "relative" }}>
+            <div style={{ position: "absolute", bottom: -40, left: -40, width: 160, height: 160, borderRadius: "50%", background: "radial-gradient(circle, rgba(194,174,212,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
+            <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(194,174,212,0.6)", marginBottom: 16, fontFamily: "DM Sans, sans-serif" }}>Your Vault</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+              {TEMPLATE_ITEMS.map(item => (
+                <div key={item.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.04)", border: "0.5px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontSize: 14 }}>{item.icon}</span>
+                    <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.8)", fontFamily: "DM Sans, sans-serif" }}>{item.name}</span>
+                  </div>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: item.color, background: item.color + "22", borderRadius: 999, padding: "2px 8px", fontFamily: "DM Sans, sans-serif" }}>{item.tag}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ background: "rgba(86,126,252,0.1)", border: "0.5px solid rgba(86,126,252,0.25)", borderRadius: 10, padding: "10px 14px" }}>
+              <p style={{ fontSize: 11, color: "rgba(86,126,252,0.9)", fontFamily: "DM Sans, sans-serif", margin: 0 }}>✦ Injecting <strong>#icp</strong> + <strong>@audience</strong> into prompt...</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Block 3: Reverse Prompting — FloatingQuestionCard replica left, text right ── */}
+        <div className="reveal" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 440px), 1fr))", gap: 48, alignItems: "center" }}>
+
+          {/* FloatingQuestionCard — exact replica of the SwiftUI component */}
+          <div style={{ background: "#0F0F1A", border: "1px solid rgba(89,140,255,0.18)", borderRadius: 24, padding: "24px 20px", boxShadow: "0 8px 32px rgba(89,140,255,0.12)", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: -50, right: -50, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, rgba(89,140,255,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
+            <div style={{ position: "absolute", bottom: -30, left: -30, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,115,89,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+            {/* Model + Skill badges */}
+            <div style={{ display: "flex", gap: 6, marginBottom: 20 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(89,140,255,0.95)", background: "rgba(89,140,255,0.12)", border: "0.5px solid rgba(89,140,255,0.28)", borderRadius: 999, padding: "3px 10px", fontFamily: "DM Sans, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>Cold Email</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.06)", border: "0.5px solid rgba(255,255,255,0.14)", borderRadius: 999, padding: "3px 10px", fontFamily: "DM Sans, sans-serif", display: "flex", alignItems: "center", gap: 5 }}>
+                <img src="/claude-ai-icon.webp" alt="Claude" style={{ width: 12, height: 12, objectFit: "contain", opacity: 0.7 }} />
+                Claude
+              </span>
+            </div>
+
+            {/* Single choice: Target audience */}
+            <div style={{ marginBottom: 16 }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans, sans-serif", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Target audience</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+                {AUDIENCE_OPTS.map((opt, i) => (
+                  <span key={opt} style={{ fontSize: 12, fontWeight: i === 0 ? 600 : 400, color: i === 0 ? "#fff" : "rgba(255,255,255,0.7)", background: i === 0 ? "linear-gradient(90deg, #598CFF, #FF7359)" : "rgba(255,255,255,0.07)", border: i === 0 ? "none" : "0.5px solid rgba(255,255,255,0.18)", borderRadius: 999, padding: "6px 14px", fontFamily: "DM Sans, sans-serif", whiteSpace: "nowrap" }}>{opt}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* Toggle row: Include social proof */}
+            <div style={{ background: "#1A1A2A", borderRadius: 14, padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 600, color: "#fff", fontFamily: "DM Sans, sans-serif", margin: 0 }}>Include social proof?</p>
+                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontFamily: "DM Sans, sans-serif", margin: "2px 0 0" }}>Adds a case study or testimonial</p>
+              </div>
+              {/* Toggle ON state */}
+              <div style={{ width: 36, height: 20, background: "#598CFF", borderRadius: 999, position: "relative", flexShrink: 0, marginLeft: 12 }}>
+                <div style={{ position: "absolute", right: 3, top: 3, width: 14, height: 14, background: "#fff", borderRadius: "50%", boxShadow: "0 1px 3px rgba(0,0,0,0.3)" }} />
+              </div>
+            </div>
+
+            {/* Skip / Continue buttons */}
+            <div style={{ display: "flex", gap: 10 }}>
+              <div style={{ flex: 1, padding: "11px 0", background: "rgba(255,255,255,0.07)", border: "0.5px solid rgba(255,255,255,0.18)", borderRadius: 14, fontSize: 13, color: "rgba(255,255,255,0.45)", fontFamily: "DM Sans, sans-serif", textAlign: "center", fontWeight: 500 }}>Skip ↗</div>
+              <div style={{ flex: 1, padding: "11px 0", background: "linear-gradient(90deg, #598CFF, #FF7359)", borderRadius: 14, fontSize: 13, fontWeight: 700, color: "#fff", fontFamily: "DM Sans, sans-serif", textAlign: "center" }}>Continue →</div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--violet)", fontFamily: "DM Sans, sans-serif" }}>Reverse Prompting</p>
+            <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(24px, 3vw, 34px)", letterSpacing: "-1px", color: "var(--text)", lineHeight: 1.15, margin: 0 }}>
+              Asks before it builds —<br />for every model.
+            </h3>
+            <p style={{ fontSize: 15, color: "var(--text-2)", lineHeight: 1.75, fontFamily: "DM Sans, sans-serif", maxWidth: 400, margin: 0 }}>
+              Lumia knows exactly which context Claude, ChatGPT, or Gemini each needs. The questions it asks are specific to your skill <em>and</em> your model — so every prompt lands, regardless of which AI you use.
+            </p>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--violet-soft)", border: "0.5px solid rgba(86,126,252,0.2)", borderRadius: 999, padding: "6px 14px" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--violet)", fontFamily: "DM Sans, sans-serif" }}>🧠 Model-aware · Skill-specific</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
 // ─── Home ─────────────────────────────────────────────────────────────────────
 export default function Home() {
   const [isSuccess, setIsSuccess] = useState(false);
@@ -2071,6 +2363,7 @@ export default function Home() {
         <HeroSection />
         <HowItWorksSection />
         <ConsultantSection />
+        <SkillsSection />
         <WorksOnTopOfSection />
         <ComparisonSection />
         <FrictionCalculator />
