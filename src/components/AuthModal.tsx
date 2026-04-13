@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { X, Loader2, CheckCircle2, AlertCircle, ArrowLeft, Mail, Lock, User } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 
@@ -61,7 +61,6 @@ export function AuthModal({ onClose }: AuthModalProps) {
       return;
     }
 
-    // Check username availability
     const { data: existing } = await supabase
       .from("user_profiles")
       .select("id")
@@ -100,69 +99,198 @@ export function AuthModal({ onClose }: AuthModalProps) {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     if (error) setError(error.message);
-    else setSuccess("Password reset email sent — check your inbox.");
+    else setSuccess("Check your inbox — reset link sent.");
     setLoading(false);
   }
 
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 50,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 16,
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
         {/* Backdrop */}
         <motion.div
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "rgba(15, 10, 30, 0.6)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+          }}
           onClick={onClose}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
         />
 
         {/* Modal */}
         <motion.div
-          className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden"
-          initial={{ scale: 0.95, opacity: 0, y: 12 }}
+          style={{
+            position: "relative",
+            width: "100%",
+            maxWidth: 440,
+            borderRadius: 24,
+            overflow: "hidden",
+            background: "#fff",
+            boxShadow: "0 32px 80px rgba(0,0,0,0.28), 0 0 0 0.5px rgba(86,126,252,0.12)",
+          }}
+          initial={{ scale: 0.94, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.95, opacity: 0, y: 12 }}
-          transition={{ type: "spring", damping: 28, stiffness: 380 }}
+          exit={{ scale: 0.94, opacity: 0, y: 20 }}
+          transition={{ type: "spring", damping: 30, stiffness: 400 }}
         >
-          {/* Header gradient */}
-          <div
-            className="h-1 w-full"
-            style={{ background: "linear-gradient(90deg, #567EFC, #EB5E5E)" }}
-          />
+          {/* Dark header */}
+          <div style={{
+            background: "#0F0A1E",
+            padding: "28px 28px 24px",
+            position: "relative",
+            overflow: "hidden",
+          }}>
+            {/* Decorative glow */}
+            <div style={{
+              position: "absolute",
+              top: -40,
+              right: -40,
+              width: 140,
+              height: 140,
+              borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(86,126,252,0.25) 0%, transparent 70%)",
+              pointerEvents: "none",
+            }} />
+            <div style={{
+              position: "absolute",
+              bottom: -30,
+              left: -20,
+              width: 100,
+              height: 100,
+              borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(235,94,94,0.18) 0%, transparent 70%)",
+              pointerEvents: "none",
+            }} />
 
-          <div className="p-7">
-            {/* Close */}
+            {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-5 right-5 p-1.5 rounded-lg text-[#6B6480] hover:bg-[#F3F4FF] transition-colors"
+              style={{
+                position: "absolute",
+                top: 16,
+                right: 16,
+                width: 30,
+                height: 30,
+                borderRadius: 8,
+                background: "rgba(255,255,255,0.08)",
+                border: "none",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "rgba(255,255,255,0.5)",
+                transition: "background 0.15s, color 0.15s",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.14)";
+                (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.08)";
+                (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.5)";
+              }}
             >
-              <X size={18} />
+              <X size={15} />
             </button>
 
-            {/* Logo */}
-            <div className="mb-6">
-              <span
-                className="text-xl font-bold tracking-tight"
-                style={{ color: "#0F0A1E" }}
-              >
-                lumia
-              </span>
+            {/* Logo + wordmark */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+              <img src="/logo.png" alt="Lumia" style={{ width: 26, height: 26, objectFit: "contain" }} />
+              <span style={{
+                fontFamily: "var(--font-bricolage), sans-serif",
+                fontWeight: 700,
+                fontSize: 18,
+                color: "#fff",
+                letterSpacing: "-0.3px",
+              }}>Lumia</span>
             </div>
 
-            {/* Tabs */}
+            {/* Headline */}
+            <AnimatePresence mode="wait">
+              {tab === "reset" ? (
+                <motion.div key="reset-header"
+                  initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.18 }}>
+                  <p style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 22, color: "#fff", letterSpacing: "-0.4px", lineHeight: 1.2 }}>
+                    Reset your password
+                  </p>
+                  <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.45)", marginTop: 4 }}>
+                    We'll email you a secure link.
+                  </p>
+                </motion.div>
+              ) : tab === "signin" ? (
+                <motion.div key="signin-header"
+                  initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.18 }}>
+                  <p style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 22, color: "#fff", letterSpacing: "-0.4px", lineHeight: 1.2 }}>
+                    Welcome back.
+                  </p>
+                  <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.45)", marginTop: 4 }}>
+                    Sign in to your Lumia account.
+                  </p>
+                </motion.div>
+              ) : (
+                <motion.div key="signup-header"
+                  initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.18 }}>
+                  <p style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 22, color: "#fff", letterSpacing: "-0.4px", lineHeight: 1.2 }}>
+                    Create your account.
+                  </p>
+                  <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.45)", marginTop: 4 }}>
+                    Join Lumia and get started today.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Form body */}
+          <div style={{ padding: "24px 28px 28px" }}>
+
+            {/* Tab switcher */}
             {tab !== "reset" && (
-              <div className="flex gap-1 p-1 bg-[#F3F4FF] rounded-xl mb-6">
+              <div style={{
+                display: "flex",
+                gap: 4,
+                padding: 4,
+                background: "#F3F4FF",
+                borderRadius: 12,
+                marginBottom: 24,
+              }}>
                 {(["signin", "signup"] as const).map((t) => (
                   <button
                     key={t}
                     onClick={() => switchTab(t)}
-                    className="flex-1 py-2 text-sm font-medium rounded-lg transition-all"
                     style={{
+                      flex: 1,
+                      padding: "8px 0",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      fontFamily: "DM Sans, sans-serif",
+                      borderRadius: 9,
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "all 0.18s ease",
                       background: tab === t ? "#fff" : "transparent",
                       color: tab === t ? "#0F0A1E" : "#6B6480",
-                      boxShadow: tab === t ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
+                      boxShadow: tab === t ? "0 1px 6px rgba(0,0,0,0.09)" : "none",
                     }}
                   >
                     {t === "signin" ? "Sign in" : "Create account"}
@@ -171,156 +299,130 @@ export function AuthModal({ onClose }: AuthModalProps) {
               </div>
             )}
 
-            {/* Sign In */}
+            {/* Sign In form */}
             {tab === "signin" && (
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-[#6B6480] mb-1.5 uppercase tracking-wide">
-                    Email
-                  </label>
+              <form onSubmit={handleSignIn} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <FieldGroup icon={<Mail size={15} color="#567EFC" />} label="Email">
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={e => setEmail(e.target.value)}
                     required
                     placeholder="you@example.com"
-                    className="w-full px-4 py-3 rounded-xl border border-[#E5E5EA] text-sm outline-none focus:border-[#567EFC] focus:ring-2 focus:ring-[#567EFC]/20 transition-all"
-                    style={{ color: "#0F0A1E" }}
+                    style={inputStyle}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                   />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-[#6B6480] mb-1.5 uppercase tracking-wide">
-                    Password
-                  </label>
+                </FieldGroup>
+                <FieldGroup icon={<Lock size={15} color="#567EFC" />} label="Password">
                   <input
                     type="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={e => setPassword(e.target.value)}
                     required
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 rounded-xl border border-[#E5E5EA] text-sm outline-none focus:border-[#567EFC] focus:ring-2 focus:ring-[#567EFC]/20 transition-all"
-                    style={{ color: "#0F0A1E" }}
+                    style={inputStyle}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                   />
+                </FieldGroup>
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: -8 }}>
+                  <button
+                    type="button"
+                    onClick={() => switchTab("reset")}
+                    style={{ fontSize: 12, color: "#567EFC", background: "none", border: "none", cursor: "pointer", fontFamily: "DM Sans, sans-serif", fontWeight: 500 }}
+                  >
+                    Forgot password?
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => switchTab("reset")}
-                  className="text-xs text-[#567EFC] hover:underline"
-                >
-                  Forgot password?
-                </button>
                 <StatusMessage error={error} success={success} />
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 transition-opacity disabled:opacity-70"
-                  style={{ background: "#0F0A1E" }}
-                >
-                  {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-                  Sign in
-                </button>
+                <SubmitButton loading={loading} label="Sign in" gradient={false} />
               </form>
             )}
 
-            {/* Sign Up */}
+            {/* Sign Up form */}
             {tab === "signup" && (
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-[#6B6480] mb-1.5 uppercase tracking-wide">
-                    Username
-                  </label>
+              <form onSubmit={handleSignUp} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <FieldGroup icon={<User size={15} color="#567EFC" />} label="Username">
                   <input
                     type="text"
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={e => setUsername(e.target.value)}
                     required
-                    placeholder="cooluser42"
+                    placeholder="yourname"
                     maxLength={30}
-                    className="w-full px-4 py-3 rounded-xl border border-[#E5E5EA] text-sm outline-none focus:border-[#567EFC] focus:ring-2 focus:ring-[#567EFC]/20 transition-all"
-                    style={{ color: "#0F0A1E" }}
+                    style={inputStyle}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                   />
-                  <p className="mt-1 text-xs text-[#A89FC0]">Letters, numbers, underscores only.</p>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-[#6B6480] mb-1.5 uppercase tracking-wide">
-                    Email
-                  </label>
+                </FieldGroup>
+                <FieldGroup icon={<Mail size={15} color="#567EFC" />} label="Email">
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={e => setEmail(e.target.value)}
                     required
                     placeholder="you@example.com"
-                    className="w-full px-4 py-3 rounded-xl border border-[#E5E5EA] text-sm outline-none focus:border-[#567EFC] focus:ring-2 focus:ring-[#567EFC]/20 transition-all"
-                    style={{ color: "#0F0A1E" }}
+                    style={inputStyle}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                   />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-[#6B6480] mb-1.5 uppercase tracking-wide">
-                    Password
-                  </label>
+                </FieldGroup>
+                <FieldGroup icon={<Lock size={15} color="#567EFC" />} label="Password">
                   <input
                     type="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={e => setPassword(e.target.value)}
                     required
                     minLength={8}
                     placeholder="Min. 8 characters"
-                    className="w-full px-4 py-3 rounded-xl border border-[#E5E5EA] text-sm outline-none focus:border-[#567EFC] focus:ring-2 focus:ring-[#567EFC]/20 transition-all"
-                    style={{ color: "#0F0A1E" }}
+                    style={inputStyle}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                   />
-                </div>
+                </FieldGroup>
                 <StatusMessage error={error} success={success} />
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 transition-opacity disabled:opacity-70"
-                  style={{ background: "linear-gradient(135deg, #567EFC, #EB5E5E)" }}
-                >
-                  {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-                  Create account
-                </button>
+                <SubmitButton loading={loading} label="Create account" gradient={true} />
               </form>
             )}
 
-            {/* Reset */}
+            {/* Reset form */}
             {tab === "reset" && (
-              <form onSubmit={handleReset} className="space-y-4">
-                <div className="mb-2">
-                  <h2 className="text-lg font-bold text-[#0F0A1E]">Reset password</h2>
-                  <p className="text-sm text-[#6B6480] mt-1">
-                    Enter your email and we'll send you a reset link.
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-[#6B6480] mb-1.5 uppercase tracking-wide">
-                    Email
-                  </label>
+              <form onSubmit={handleReset} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <FieldGroup icon={<Mail size={15} color="#567EFC" />} label="Email">
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={e => setEmail(e.target.value)}
                     required
                     placeholder="you@example.com"
-                    className="w-full px-4 py-3 rounded-xl border border-[#E5E5EA] text-sm outline-none focus:border-[#567EFC] focus:ring-2 focus:ring-[#567EFC]/20 transition-all"
-                    style={{ color: "#0F0A1E" }}
+                    style={inputStyle}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                   />
-                </div>
+                </FieldGroup>
                 <StatusMessage error={error} success={success} />
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 transition-opacity disabled:opacity-70"
-                  style={{ background: "#0F0A1E" }}
-                >
-                  {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-                  Send reset link
-                </button>
+                <SubmitButton loading={loading} label="Send reset link" gradient={false} />
                 <button
                   type="button"
                   onClick={() => switchTab("signin")}
-                  className="w-full text-sm text-[#6B6480] hover:text-[#0F0A1E] transition-colors"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
+                    width: "100%",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: 13,
+                    fontFamily: "DM Sans, sans-serif",
+                    color: "#6B6480",
+                    fontWeight: 500,
+                    marginTop: -4,
+                  }}
                 >
+                  <ArrowLeft size={13} />
                   Back to sign in
                 </button>
               </form>
@@ -332,18 +434,117 @@ export function AuthModal({ onClose }: AuthModalProps) {
   );
 }
 
+// ─── Shared input style ───────────────────────────────────────────────────────
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "11px 14px",
+  borderRadius: 10,
+  border: "1.5px solid #E5E5EA",
+  fontSize: 14,
+  fontFamily: "DM Sans, sans-serif",
+  color: "#0F0A1E",
+  outline: "none",
+  background: "#FAFAFA",
+  transition: "border-color 0.15s, box-shadow 0.15s, background 0.15s",
+  boxSizing: "border-box",
+};
+
+function onFocus(e: React.FocusEvent<HTMLInputElement>) {
+  e.currentTarget.style.borderColor = "#567EFC";
+  e.currentTarget.style.background = "#fff";
+  e.currentTarget.style.boxShadow = "0 0 0 3px rgba(86,126,252,0.12)";
+}
+function onBlur(e: React.FocusEvent<HTMLInputElement>) {
+  e.currentTarget.style.borderColor = "#E5E5EA";
+  e.currentTarget.style.background = "#FAFAFA";
+  e.currentTarget.style.boxShadow = "none";
+}
+
+// ─── FieldGroup ───────────────────────────────────────────────────────────────
+function FieldGroup({ label, icon, children }: { label: string; icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+        {icon}
+        <label style={{
+          fontSize: 11,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: "0.08em",
+          color: "#6B6480",
+          fontFamily: "DM Sans, sans-serif",
+        }}>
+          {label}
+        </label>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// ─── SubmitButton ─────────────────────────────────────────────────────────────
+function SubmitButton({ loading, label, gradient }: { loading: boolean; label: string; gradient: boolean }) {
+  return (
+    <button
+      type="submit"
+      disabled={loading}
+      style={{
+        width: "100%",
+        padding: "13px 0",
+        borderRadius: 12,
+        border: "none",
+        cursor: loading ? "not-allowed" : "pointer",
+        fontSize: 14,
+        fontWeight: 700,
+        fontFamily: "DM Sans, sans-serif",
+        color: "#fff",
+        background: gradient
+          ? "linear-gradient(135deg, #567EFC 0%, #EB5E5E 100%)"
+          : "#0F0A1E",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+        opacity: loading ? 0.7 : 1,
+        transition: "opacity 0.15s, transform 0.15s",
+        boxShadow: gradient
+          ? "0 4px 20px rgba(86,126,252,0.30)"
+          : "0 4px 16px rgba(0,0,0,0.18)",
+      }}
+      onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)"; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)"; }}
+    >
+      {loading ? <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> : null}
+      {label}
+    </button>
+  );
+}
+
+// ─── StatusMessage ────────────────────────────────────────────────────────────
 function StatusMessage({ error, success }: { error: string | null; success: string | null }) {
   if (!error && !success) return null;
   return (
-    <div
-      className="flex items-start gap-2 p-3 rounded-xl text-sm"
+    <motion.div
+      initial={{ opacity: 0, y: -4 }}
+      animate={{ opacity: 1, y: 0 }}
       style={{
-        background: error ? "#FFF1F1" : "#F0FDF4",
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 8,
+        padding: "10px 14px",
+        borderRadius: 10,
+        fontSize: 13,
+        fontFamily: "DM Sans, sans-serif",
+        background: error ? "#FFF1F2" : "#F0FDF4",
         color: error ? "#DC2626" : "#16A34A",
+        border: `1px solid ${error ? "rgba(220,38,38,0.12)" : "rgba(22,163,74,0.12)"}`,
       }}
     >
-      {error ? <AlertCircle size={15} className="mt-0.5 shrink-0" /> : <CheckCircle2 size={15} className="mt-0.5 shrink-0" />}
+      {error
+        ? <AlertCircle size={14} style={{ marginTop: 1, flexShrink: 0 }} />
+        : <CheckCircle2 size={14} style={{ marginTop: 1, flexShrink: 0 }} />
+      }
       <span>{error ?? success}</span>
-    </div>
+    </motion.div>
   );
 }

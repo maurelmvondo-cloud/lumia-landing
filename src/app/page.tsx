@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, CheckCircle2, AlertCircle, XCircle, Sparkles, Loader2, Menu, X, ShieldCheck, Clock, AlertTriangle } from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertCircle, XCircle, Sparkles, Loader2, Menu, X, ShieldCheck, Clock, AlertTriangle, Download, Apple } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import LumiaAnimation, { HeroAnimation, useCurrentFrame } from "@/components/LumiaAnimation";
 import { FakeChatInterface } from "@/components/FakeChatInterface";
@@ -674,12 +674,12 @@ function Navbar() {
               </button>
             )
           )}
-          <button onClick={() => scrollTo("pricing")}
+          <a href="/api/download"
             className="btn-spring"
-            style={{ display: "flex", alignItems: "center", gap: 8, background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, padding: "10px 18px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap" }}>
-            <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#EF4444", display: "inline-block", animation: "pulse-dot 1.5s infinite" }} />
-            Founding member — $99 lifetime
-          </button>
+            style={{ display: "flex", alignItems: "center", gap: 8, background: "#0F0A1E", color: "#fff", borderRadius: 999, padding: "10px 18px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap", textDecoration: "none" }}>
+            <Download size={13} />
+            Get Lumia
+          </a>
         </div>
 
         {/* Mobile burger */}
@@ -714,11 +714,11 @@ function Navbar() {
                 Sign in
               </button>
             )}
-            <button onClick={() => scrollTo("pricing")}
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, padding: "14px 24px", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15, cursor: "pointer", marginTop: 4 }}>
-              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#EF4444", display: "inline-block", animation: "pulse-dot 1.5s infinite" }} />
-              Founding member — $99 lifetime
-            </button>
+            <a href="/api/download"
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#0F0A1E", color: "#fff", borderRadius: 999, padding: "14px 24px", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15, marginTop: 4, textDecoration: "none" }}>
+              <Download size={15} />
+              Get Lumia
+            </a>
           </motion.div>
         )}
       </AnimatePresence>
@@ -755,7 +755,7 @@ function HeroSection() {
 
         {/* Subtitle */}
         <p style={{ fontFamily: "DM Sans, sans-serif", fontStyle: "normal", fontWeight: 500, fontSize: "clamp(1.125rem, 1.5vw, 1.375rem)", color: "rgba(30,24,48,0.75)", maxWidth: 520, margin: "24px auto 32px", lineHeight: 1.6, animation: "fadeUp 0.7s 0.15s ease both", textAlign: "center" }}>
-          Lumia gives Claude, ChatGPT, and Gemini persistent memory. Drop a thought — it injects your full context and builds the prompt. One shortcut.
+          Drop a thought — Lumia injects your full context and builds the prompt for Claude, ChatGPT, or Gemini. One shortcut.
         </p>
 
         {/* Hero Animation */}
@@ -766,21 +766,23 @@ function HeroSection() {
         {/* CTA — below animation */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 0, marginBottom: 50, animation: "fadeUp 0.7s 0.5s ease both" }}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
+            <a href="/api/download"
+              className="btn-spring"
+              style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#0F0A1E", color: "#fff", borderRadius: 999, padding: "18px 40px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 18, boxShadow: "0 10px 30px rgba(0,0,0,0.15)", textDecoration: "none" }}>
+              <Download size={18} />
+              Download — Public Beta v1
+            </a>
             <button onClick={() => scrollTo("pricing")}
               className="btn-spring"
-              style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, padding: "18px 40px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 18, boxShadow: "0 10px 30px rgba(0,0,0,0.15)" }}>
-              Join the waitlist
-              <ArrowRight size={18} />
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "transparent", color: "var(--text)", border: "1.5px solid var(--border)", borderRadius: 999, padding: "18px 28px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 600, fontSize: 16 }}>
+              See plans
             </button>
           </div>
           <p style={{ fontSize: 12, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", margin: 0 }}>
-            Mac · Private beta Q3 2026 · Public launch Q4 2026
-          </p>
-          <p style={{ fontSize: 11, fontWeight: 500, color: "var(--text-2)", opacity: 0.7, fontFamily: "DM Sans, sans-serif", marginTop: 4, letterSpacing: "0.02em" }}>
-            No extension. No copy-paste. One shortcut.
+            Public Beta v1 · macOS 13+ · Free to try · No extension needed
           </p>
           <p style={{ fontSize: 12, fontWeight: 600, color: "var(--violet)", fontFamily: "DM Sans, sans-serif", marginTop: 2, opacity: 0.85, letterSpacing: "0.01em" }}>
-            100+ built-in skills · Works with every major AI
+            100+ built-in skills · Works with Claude, ChatGPT & Gemini
           </p>
         </div>
       </div>
@@ -1485,19 +1487,22 @@ function ComparisonSection() {
           <div style={{ width: 1, height: 40, background: "linear-gradient(to bottom, #567EFC, transparent)", marginBottom: 32 }} />
           <h3 style={{ fontSize: 28, fontWeight: 700, color: "#fff", marginBottom: 12, fontFamily: "var(--font-bricolage), sans-serif", letterSpacing: "-0.02em" }}>The only tool that does all of it.</h3>
           <p style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", marginBottom: 40, maxWidth: 400, lineHeight: 1.6 }}>And it sits seamlessly on top of the workflow you&apos;ve already built.</p>
-          <button onClick={() => scrollTo("pricing")} style={{ 
-            background: "var(--gradient)", 
-            color: "#fff", 
-            border: "none", 
-            borderRadius: 999, 
-            padding: "16px 40px", 
-            fontSize: 16, 
-            fontWeight: 700, 
-            cursor: "pointer", 
+          <a href="/api/download" style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 10,
+            background: "var(--gradient)",
+            color: "#fff",
+            borderRadius: 999,
+            padding: "16px 40px",
+            fontSize: 16,
+            fontWeight: 700,
+            cursor: "pointer",
             boxShadow: "0 10px 30px -5px rgba(86,126,252,0.4)",
             transition: "transform 0.2s, box-shadow 0.2s",
-            fontFamily: "DM Sans, sans-serif"
-          }} 
+            fontFamily: "DM Sans, sans-serif",
+            textDecoration: "none"
+          }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = "translateY(-2px)";
             e.currentTarget.style.boxShadow = "0 15px 40px -5px rgba(86,126,252,0.6)";
@@ -1506,8 +1511,9 @@ function ComparisonSection() {
             e.currentTarget.style.transform = "translateY(0)";
             e.currentTarget.style.boxShadow = "0 10px 30px -5px rgba(86,126,252,0.4)";
           }}>
-            Get early access {"\u2192"}
-          </button>
+            <Download size={16} />
+            Download for Mac
+          </a>
         </div>
       </div>
     </section>
@@ -1830,116 +1836,276 @@ function FounderSection() {
 
 // ─── Pricing Section ──────────────────────────────────────────────────────────
 function PricingSection() {
-  const founderExtras = [
-    "20 pre-built optimized prompt templates — exclusive to founders",
-    "Feature vote — your top 3 picks ship first",
-    "Direct email access to the founder",
+  const plans = [
+    {
+      tag: "Free",
+      tagColor: "#567EFC",
+      tagBg: "rgba(86,126,252,0.08)",
+      name: "Try Lumia",
+      price: "$0",
+      period: null,
+      dark: false,
+      featured: false,
+      features: [
+        "30 lifetime prompts",
+        "Vault documents",
+        "Conversation history",
+        "Works with Claude, ChatGPT, Gemini",
+      ],
+      cta: "Download free — public beta v1",
+      ctaStyle: "outline" as const,
+      note: "No account needed · macOS 13+",
+    },
+    {
+      tag: "Early Access",
+      tagColor: "#567EFC",
+      tagBg: "rgba(86,126,252,0.1)",
+      name: "Monthly",
+      price: "$10",
+      period: "/mo",
+      dark: false,
+      featured: false,
+      features: [
+        "Unlimited prompts",
+        "Unlimited Vault",
+        "Priority support",
+        "All updates included",
+      ],
+      cta: "Download & subscribe in-app",
+      ctaStyle: "gradient" as const,
+      note: "Beta price — increases after beta ends",
+    },
+    {
+      tag: "⚡ Founding Member",
+      tagColor: "#A78BFA",
+      tagBg: "transparent",
+      name: "Life access",
+      price: "$99",
+      period: "once",
+      dark: true,
+      featured: true,
+      features: [
+        "Unlimited prompts for life",
+        "Unlimited Vault",
+        "Priority support",
+        "All future features",
+        "Feature vote — your top 3 ship first",
+        "Direct email access to the founder",
+      ],
+      cta: "Download — Public Beta v1",
+      ctaStyle: "white" as const,
+      note: "Beta price — increases at public launch",
+    },
   ];
 
   return (
     <section id="pricing" style={{ padding: "96px clamp(20px, 5vw, 80px)", background: "var(--bg)", borderTop: "0.5px solid var(--border)" }}>
-      <div style={{ maxWidth: 960, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto" }}>
+
+        {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <p className="reveal" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--violet)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>Founding access</p>
-          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(30px, 5vw, 52px)", letterSpacing: "-1.5px", color: "var(--text)", marginBottom: 8, lineHeight: 1.1 }}>Lock in before it&apos;s gone.</h2>
-          <p className="reveal" style={{ fontSize: 16, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif" }}>One-time payment. Locked forever.</p>
-        </div>
-
-        {/* Timeline block */}
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <p style={{ fontSize: "0.9375rem", fontWeight: 500, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif", marginBottom: 6 }}>
-            Private beta: Q3 2026{" "}
-            <span style={{ color: "var(--text-3)" }}>·</span>
-            {" "}Public launch: Q4 2026
-          </p>
-          <p style={{ fontSize: "0.8125rem", color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", margin: 0 }}>
-            Follow live updates →{" "}
-            <a href="https://x.com/_r0sly_" target="_blank" rel="noopener noreferrer"
-              style={{ color: "var(--text-3)", textDecoration: "underline" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#567EFC")}
-              onMouseLeave={e => (e.currentTarget.style.color = "var(--text-3)")}>
-              x.com/_r0sly_
-            </a>
+          {/* Beta badge */}
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(34,197,94,0.08)", border: "0.5px solid rgba(34,197,94,0.25)", borderRadius: 999, padding: "5px 14px", marginBottom: 20 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E", display: "inline-block", animation: "pulse-dot 2s infinite" }} />
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#15803D", fontFamily: "DM Sans, sans-serif", letterSpacing: "0.04em" }}>
+              Public Beta v1 — Available now on macOS
+            </span>
+          </div>
+          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(30px, 5vw, 52px)", letterSpacing: "-1.5px", color: "var(--text)", marginBottom: 12, lineHeight: 1.1 }}>
+            One download.<br />Three ways in.
+          </h2>
+          <p className="reveal" style={{ fontSize: 16, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif", maxWidth: 480, margin: "0 auto" }}>
+            Start free. Upgrade inside the app whenever you're ready.
           </p>
         </div>
 
-        {/* Side-by-side cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 400px), 1fr))", gap: 20, alignItems: "start" }}>
+        {/* 3-column plan grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 16, alignItems: "stretch" }}>
+          {plans.map((plan, idx) => (
+            <div
+              key={idx}
+              className="reveal"
+              style={{
+                background: plan.dark ? "#0F0A1E" : "#fff",
+                borderRadius: 22,
+                padding: "32px 28px",
+                border: plan.featured ? "none" : "0.5px solid var(--border)",
+                boxShadow: plan.featured ? "0 20px 60px rgba(86,126,252,0.22)" : "none",
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+                gap: 0,
+              }}
+            >
+              {/* Popular badge */}
+              {plan.featured && (
+                <div style={{
+                  position: "absolute",
+                  top: -12,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "linear-gradient(90deg, #567EFC, #EB5E5E)",
+                  color: "#fff",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  fontFamily: "DM Sans, sans-serif",
+                  padding: "4px 14px",
+                  borderRadius: 999,
+                  whiteSpace: "nowrap",
+                  letterSpacing: "0.06em",
+                }}>MOST VALUE</div>
+              )}
 
-          {/* Paid card — dark */}
-          <div className="reveal" style={{ background: "#0F0A1E", borderRadius: 22, padding: "clamp(28px, 4vw, 40px)", textAlign: "left", color: "#fff" }}>
-            <div style={{ display: "inline-block", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#A78BFA", marginBottom: 16, fontFamily: "DM Sans, sans-serif" }}>⚡ Founding member</div>
-            <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 22, color: "#fff", marginBottom: 12 }}>Lumia — Life access</h3>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
-              <span style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 56, color: "#fff", letterSpacing: "-2px", lineHeight: 1 }}>$99</span>
-              <span style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", fontFamily: "DM Sans, sans-serif" }}>once</span>
-            </div>
-            <p style={{ fontSize: "0.8125rem", color: "#F59E0B", fontWeight: 500, fontFamily: "DM Sans, sans-serif", marginBottom: 20 }}>
-              Price increases at public launch.
-            </p>
-            <div style={{ borderTop: "0.5px solid rgba(255,255,255,0.08)", paddingTop: 14, marginBottom: 16 }}>
-              <p style={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#A78BFA", fontFamily: "DM Sans, sans-serif", marginBottom: 12 }}>Founder-only extras</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {founderExtras.map((f, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg, #567EFC, #EB5E5E)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              {/* Tag */}
+              <div style={{
+                display: "inline-flex",
+                alignItems: "center",
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                color: plan.tagColor,
+                background: plan.tagBg,
+                borderRadius: 999,
+                padding: plan.dark ? "0" : "3px 10px",
+                marginBottom: 16,
+                fontFamily: "DM Sans, sans-serif",
+                width: "fit-content",
+              }}>{plan.tag}</div>
+
+              {/* Name */}
+              <h3 style={{
+                fontFamily: "var(--font-bricolage), sans-serif",
+                fontWeight: 700,
+                fontSize: 20,
+                color: plan.dark ? "#fff" : "var(--text)",
+                marginBottom: 16,
+                letterSpacing: "-0.3px",
+              }}>{plan.name}</h3>
+
+              {/* Price */}
+              <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 20 }}>
+                <span style={{
+                  fontFamily: "var(--font-bricolage), sans-serif",
+                  fontWeight: 800,
+                  fontSize: 48,
+                  letterSpacing: "-2px",
+                  lineHeight: 1,
+                  color: plan.dark ? "#fff" : "var(--text)",
+                }}>{plan.price}</span>
+                {plan.period && (
+                  <span style={{
+                    fontSize: 14,
+                    color: plan.dark ? "rgba(255,255,255,0.45)" : "var(--text-3)",
+                    fontFamily: "DM Sans, sans-serif",
+                  }}>{plan.period}</span>
+                )}
+              </div>
+
+              {/* Divider */}
+              <div style={{
+                height: "0.5px",
+                background: plan.dark ? "rgba(255,255,255,0.08)" : "var(--border)",
+                marginBottom: 20,
+              }} />
+
+              {/* Features */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28, flex: 1 }}>
+                {plan.features.map((f, fi) => (
+                  <div key={fi} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                    <div style={{
+                      width: 16,
+                      height: 16,
+                      borderRadius: "50%",
+                      background: plan.dark
+                        ? "linear-gradient(135deg, #567EFC, #EB5E5E)"
+                        : "rgba(86,126,252,0.1)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      marginTop: 2,
+                    }}>
+                      <svg width="8" height="8" viewBox="0 0 9 9" fill="none">
+                        <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke={plan.dark ? "white" : "#567EFC"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
                     </div>
-                    <span style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", fontFamily: "DM Sans, sans-serif" }}>{f}</span>
+                    <span style={{
+                      fontSize: 13,
+                      lineHeight: 1.5,
+                      color: plan.dark ? "rgba(255,255,255,0.7)" : "var(--text-2)",
+                      fontFamily: "DM Sans, sans-serif",
+                    }}>{f}</span>
                   </div>
                 ))}
               </div>
-            </div>
-            <div style={{ borderLeft: "2px solid #567EFC", background: "rgba(86,126,252,0.05)", borderRadius: "0 var(--radius-sm, 6px) var(--radius-sm, 6px) 0", padding: "8px 12px", marginBottom: 12 }}>
-              <p style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.55)", fontFamily: "DM Sans, sans-serif", margin: 0, lineHeight: 1.5 }}>
-                We personally onboard every founding member — reviewing your Vault setup and prompt templates with you in a 1:1 session.
-              </p>
-            </div>
-            <div style={{ borderLeft: "2px solid #22C55E", background: "rgba(34,197,94,0.08)", borderRadius: "0 var(--radius-sm, 6px) var(--radius-sm, 6px) 0", padding: "10px 14px", marginBottom: 20, display: "flex", alignItems: "flex-start", gap: 8 }}>
-              <ShieldCheck size={16} color="#22C55E" style={{ flexShrink: 0, marginTop: 1 }} />
-              <p style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.55)", fontFamily: "DM Sans, sans-serif", margin: 0, lineHeight: 1.5 }}>
-                If Lumia doesn&apos;t ship by Q4 2026, we refund your founding fee in full.{" "}
-                <span style={{ fontWeight: 600, color: "#22C55E" }}>No questions asked.</span>
-              </p>
-            </div>
-            <PricingPaidForm />
-          </div>
 
-          {/* Free waitlist card — light */}
-          <div className="reveal" style={{ background: "#fff", border: "0.5px solid var(--border)", borderRadius: 22, padding: "clamp(28px, 4vw, 40px)", textAlign: "left" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>Free option</span>
-              <span style={{ fontSize: 11, fontWeight: 700, background: "var(--violet-soft)", color: "var(--violet)", borderRadius: 999, padding: "2px 8px", fontFamily: "DM Sans, sans-serif" }}>$0</span>
-            </div>
-            <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 22, color: "var(--text)", marginBottom: 12 }}>Free waitlist</h3>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
-              <span style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 56, color: "var(--text)", letterSpacing: "-2px", lineHeight: 1 }}>$0</span>
-            </div>
-            <p style={{ fontSize: 13, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", marginBottom: 28 }}>
-              No payment needed · Access when we open
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
-              {([
-                { text: "Access when public beta opens", type: "clock" },
-                { text: "Price may increase at launch — not locked", type: "alert" },
-              ] as { text: string; type: "clock" | "alert" }[]).map((item, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  {item.type === "clock" ? (
-                    <Clock size={18} color="var(--text-3)" style={{ flexShrink: 0 }} />
-                  ) : (
-                    <AlertTriangle size={18} color="#F59E0B" style={{ flexShrink: 0 }} />
-                  )}
-                  <span style={{ fontSize: 14, color: item.type === "alert" ? "#92400E" : "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>{item.text}</span>
-                </div>
-              ))}
-            </div>
-            <WaitlistForm variant="pricing" />
-          </div>
+              {/* CTA */}
+              <a
+                href="/api/download"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  width: "100%",
+                  padding: "13px 0",
+                  borderRadius: 12,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  fontFamily: "DM Sans, sans-serif",
+                  textDecoration: "none",
+                  transition: "opacity 0.15s, transform 0.15s",
+                  ...(plan.ctaStyle === "white"
+                    ? { background: "#fff", color: "#0F0A1E" }
+                    : plan.ctaStyle === "gradient"
+                    ? { background: "linear-gradient(135deg, #567EFC, #EB5E5E)", color: "#fff", boxShadow: "0 4px 16px rgba(86,126,252,0.25)" }
+                    : { background: "transparent", color: "var(--text)", border: "1.5px solid var(--border)" }
+                  ),
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.opacity = "0.85";
+                  (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.opacity = "1";
+                  (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(0)";
+                }}
+              >
+                <Download size={14} />
+                {plan.cta}
+              </a>
 
+              {/* Note */}
+              <p style={{
+                fontSize: 11,
+                fontFamily: "DM Sans, sans-serif",
+                textAlign: "center",
+                marginTop: 10,
+                fontWeight: plan.note.startsWith("Beta price") ? 600 : 400,
+                color: plan.note.startsWith("Beta price")
+                  ? (plan.dark ? "#F59E0B" : "#D97706")
+                  : (plan.dark ? "rgba(255,255,255,0.3)" : "var(--text-3)"),
+              }}>{plan.note}</p>
+            </div>
+          ))}
         </div>
-        <p style={{ fontSize: "0.875rem", color: "var(--text-3)", textAlign: "center", marginTop: 24, fontFamily: "DM Sans, sans-serif" }}>
-          Free users get access — founders shape what ships next.
-        </p>
+
+        {/* Bottom note */}
+        <div style={{ textAlign: "center", marginTop: 32 }}>
+          <p style={{ fontSize: 13, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", marginBottom: 6 }}>
+            Paid plans are managed directly inside the app · macOS Ventura 13.0+ · Apple Silicon &amp; Intel
+          </p>
+          <p style={{ fontSize: 12, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif" }}>
+            Follow live updates →{" "}
+            <a href="https://x.com/_r0sly_" target="_blank" rel="noopener noreferrer"
+              style={{ color: "var(--violet)", textDecoration: "none", fontWeight: 600 }}
+              onMouseEnter={e => (e.currentTarget.style.textDecoration = "underline")}
+              onMouseLeave={e => (e.currentTarget.style.textDecoration = "none")}>
+              @_r0sly_ on X
+            </a>
+          </p>
+        </div>
       </div>
     </section>
   );

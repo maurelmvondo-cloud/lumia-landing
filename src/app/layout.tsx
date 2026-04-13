@@ -14,11 +14,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://getlumia.ca"),
   title: "Lumia – AI Memory & Prompt Engine for Claude, ChatGPT & Gemini",
   description:
-    "Lumia gives Claude, ChatGPT, and Gemini persistent memory. Drop your intent — Lumia injects your context and builds the prompt. macOS · Private beta.",
+    "Lumia gives Claude, ChatGPT, and Gemini persistent memory. Drop your intent — Lumia injects your context and builds the prompt. macOS · Download free.",
   openGraph: {
     title: "Lumia – AI Memory & Prompt Engine for Claude, ChatGPT & Gemini",
     description:
-      "Lumia gives Claude, ChatGPT, and Gemini persistent memory. Drop your intent — Lumia injects your context and builds the prompt. macOS · Private beta.",
+      "Lumia gives Claude, ChatGPT, and Gemini persistent memory. Drop your intent — Lumia injects your context and builds the prompt. macOS · Download free.",
     url: "https://getlumia.ca",
     siteName: "Lumia",
     type: "website",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Lumia – AI Memory & Prompt Engine for Claude, ChatGPT & Gemini",
     description:
-      "Lumia gives Claude, ChatGPT, and Gemini persistent memory. Drop your intent — Lumia injects your context and builds the prompt. macOS · Private beta.",
+      "Lumia gives Claude, ChatGPT, and Gemini persistent memory. Drop your intent — Lumia injects your context and builds the prompt. macOS · Download free.",
     images: ["/og-image.png"],
   },
   alternates: {
