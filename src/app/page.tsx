@@ -17,10 +17,34 @@ const GLOBAL_STYLES = `
   
   .hero-title {
     white-space: nowrap;
-    text-align: center;
+    text-align: left;
     width: 100%;
-    margin-left: auto;
-    margin-right: auto;
+    font-size: clamp(40px, 5vw, 68px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.0;
+    color: #0A0A0F;
+  }
+  .accent-word {
+    background: linear-gradient(135deg, #FF7769, #FF9E52);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 80px;
+  }
+  .hero-badge-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3DCAB1;
+    animation: glow-pulse 2s infinite ease-in-out;
+    flex-shrink: 0;
   }
   .mobile-break {
     display: none;
@@ -38,8 +62,17 @@ const GLOBAL_STYLES = `
   @media (max-width: 768px) {
     .hero-title {
       white-space: normal !important;
-      font-size: clamp(48px, 14vw, 64px) !important;
-      letter-spacing: -2px !important;
+      font-size: clamp(36px, 11vw, 56px) !important;
+      letter-spacing: -0.02em !important;
+      text-align: center !important;
+    }
+    .hero-grid {
+      grid-template-columns: 1fr !important;
+      gap: 40px !important;
+    }
+    .hero-grid > div:first-child {
+      text-align: center !important;
+      align-items: center !important;
     }
     .mobile-break {
       display: block;
@@ -734,56 +767,49 @@ function HeroSection() {
 
   return (
     <>
-    <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start", textAlign: "center", padding: "clamp(100px, 13vh, 150px) clamp(20px, 5vw, 64px) 32px", position: "relative", overflow: "hidden", background: "var(--bg)" }}>
-      {/* Background glows */}
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
-        <div style={{ position: "absolute", top: "10%", left: "15%", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(86,126,252,0.10) 0%, transparent 70%)", animation: "glow-pulse 6s infinite ease-in-out" }} />
-        <div style={{ position: "absolute", bottom: "15%", right: "10%", width: 360, height: 360, borderRadius: "50%", background: "radial-gradient(circle, rgba(235,94,94,0.08) 0%, transparent 70%)", animation: "glow-pulse 6s 3s infinite ease-in-out" }} />
-      </div>
+    <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start", padding: "clamp(100px, 13vh, 150px) clamp(20px, 5vw, 64px) 64px", position: "relative", overflow: "hidden", background: "#FFFFFF", backgroundImage: "radial-gradient(ellipse at 80% 50%, rgba(255,119,105,0.06) 0%, transparent 60%)" }}>
 
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1200, width: "100%", margin: "0 auto" }}>
-        {/* Eyebrow */}
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--violet-soft)", border: "0.5px solid var(--border)", borderRadius: 999, padding: "7px 16px", marginBottom: 28, fontSize: 13, fontWeight: 600, color: "var(--violet)", letterSpacing: "0.01em", animation: "fadeUp 0.6s ease both" }}>
-          ✦ Your personal prompt consultant — always on
-        </div>
+        <div className="hero-grid">
+          {/* LEFT — text column */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 0 }}>
+            {/* Badge */}
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(61,202,177,0.08)", border: "0.5px solid rgba(61,202,177,0.25)", borderRadius: 999, padding: "7px 16px", marginBottom: 28, fontSize: 13, fontWeight: 600, color: "#2AA88A", letterSpacing: "0.01em", animation: "fadeUp 0.6s ease both" }}>
+              <span className="hero-badge-dot" />
+              Never forgets · Follows you everywhere
+            </div>
 
-        {/* H1 */}
-        <h1 className="hero-title" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: "clamp(64px, 9.5vw, 120px)", letterSpacing: "-4px", lineHeight: 1.0, color: "var(--text)", margin: "0 auto 28px", animation: "fadeUp 0.7s 0.08s ease both" }}>
-          Your AI remembers <br />
-          <span style={{ background: "linear-gradient(90deg, #567EFC, #C2AED4, #FF7769)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>everything now.</span>
-        </h1>
+            {/* H1 */}
+            <h1 className="hero-title" style={{ fontFamily: "var(--font-bricolage), sans-serif", margin: "0 0 24px", animation: "fadeUp 0.7s 0.08s ease both" }}>
+              Type lazy.<br />
+              <span className="accent-word">Prompt like a pro.</span>
+            </h1>
 
-        {/* Subtitle */}
-        <p style={{ fontFamily: "DM Sans, sans-serif", fontStyle: "normal", fontWeight: 500, fontSize: "clamp(1.125rem, 1.5vw, 1.375rem)", color: "rgba(30,24,48,0.75)", maxWidth: 520, margin: "24px auto 32px", lineHeight: 1.6, animation: "fadeUp 0.7s 0.15s ease both", textAlign: "center" }}>
-          Drop a thought — Lumia injects your full context and builds the prompt for Claude, ChatGPT, or Gemini. One shortcut.
-        </p>
+            {/* Subtitle */}
+            <p style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 500, fontSize: "clamp(1rem, 1.4vw, 1.2rem)", color: "rgba(10,10,15,0.55)", maxWidth: 460, margin: "0 0 36px", lineHeight: 1.65, animation: "fadeUp 0.7s 0.15s ease both" }}>
+              Lumia <strong style={{ color: "rgba(10,10,15,0.85)", fontWeight: 700 }}>never forgets your project</strong> — and follows you across Claude, ChatGPT, and Gemini. Drop a thought, get a ready-to-paste prompt.
+            </p>
 
-        {/* Hero Animation */}
-        <div style={{ width: "100%", maxWidth: 480, margin: "48px auto 32px", animation: "fadeUp 0.8s 0.4s ease both" }}>
-          <HeroAnimation />
-        </div>
-
-        {/* CTA — below animation */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 0, marginBottom: 50, animation: "fadeUp 0.7s 0.5s ease both" }}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
-            <a href="/api/download"
-              className="btn-spring"
-              style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#0F0A1E", color: "#fff", borderRadius: 999, padding: "18px 40px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 18, boxShadow: "0 10px 30px rgba(0,0,0,0.15)", textDecoration: "none" }}>
-              <Download size={18} />
-              Download — Public Beta v1
-            </a>
-            <button onClick={() => scrollTo("pricing")}
-              className="btn-spring"
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "transparent", color: "var(--text)", border: "1.5px solid var(--border)", borderRadius: 999, padding: "18px 28px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 600, fontSize: 16 }}>
-              See plans
-            </button>
+            {/* CTAs */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, animation: "fadeUp 0.7s 0.22s ease both" }}>
+              <a href="/api/download"
+                className="btn-spring"
+                style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#0F0A1E", color: "#fff", borderRadius: 999, padding: "16px 36px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 17, boxShadow: "0 10px 30px rgba(0,0,0,0.12)", textDecoration: "none" }}>
+                <Download size={17} />
+                Download — Public Beta v1
+              </a>
+              <button onClick={() => scrollTo("how-it-works")}
+                className="btn-spring"
+                style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "transparent", color: "#0A0A0F", border: "1.5px solid rgba(10,10,15,0.12)", borderRadius: 999, padding: "16px 28px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 600, fontSize: 15 }}>
+                See how it works
+              </button>
+            </div>
           </div>
-          <p style={{ fontSize: 12, color: "var(--text-3)", fontFamily: "DM Sans, sans-serif", margin: 0 }}>
-            Public Beta v1 · macOS 13+ · Free to try · No extension needed
-          </p>
-          <p style={{ fontSize: 12, fontWeight: 600, color: "var(--violet)", fontFamily: "DM Sans, sans-serif", marginTop: 2, opacity: 0.85, letterSpacing: "0.01em" }}>
-            100+ built-in skills · Works with Claude, ChatGPT & Gemini
-          </p>
+
+          {/* RIGHT — mockup column */}
+          <div style={{ width: "100%", animation: "fadeUp 0.8s 0.3s ease both" }}>
+            <HeroAnimation />
+          </div>
         </div>
       </div>
     </section>
