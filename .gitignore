@@ -22,6 +22,11 @@ yarn-error.log*
 # Vercel
 .vercel
 
+# Claude Cowork worktrees and helper scripts
+.claude/worktrees/
+push-to-github.command
+start-dev.command
+
 # IDE
 .idea/
 .vscode/
