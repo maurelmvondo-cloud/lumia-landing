@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 
@@ -56,6 +57,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={bricolage.variable}>
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-3YYRR6RKT3"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-3YYRR6RKT3');
+        `}</Script>
+      </head>
       <body className="font-sans antialiased">
         <AuthProvider>{children}</AuthProvider>
       </body>
