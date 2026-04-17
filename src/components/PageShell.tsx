@@ -26,14 +26,16 @@ export function PageShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="min-h-screen flex flex-col" style={{ background: "#F8F7FF" }}>
+      <div className="min-h-screen flex flex-col" style={{ background: "transparent" }}>
         {/* Nav */}
         <header
           className="sticky top-0 z-40 border-b"
           style={{
-            background: "rgba(248,247,255,0.85)",
-            backdropFilter: "blur(16px)",
+            background: "rgba(248,247,255,0.80)",
+            backdropFilter: "blur(32px) saturate(180%)",
+            WebkitBackdropFilter: "blur(32px) saturate(180%)",
             borderColor: "rgba(86,126,252,0.10)",
+            boxShadow: "0 1px 0 rgba(86,126,252,0.06), 0 4px 24px rgba(15,10,30,0.04)",
           }}
         >
           <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
@@ -59,10 +61,25 @@ export function PageShell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                  className="px-3 py-1.5 rounded-lg text-sm font-medium"
                   style={{
                     color: pathname === link.href ? "#567EFC" : "#6B6480",
-                    background: pathname === link.href ? "#EEF2FF" : "transparent",
+                    background: pathname === link.href ? "rgba(86,126,252,0.08)" : "transparent",
+                    border: pathname === link.href ? "0.5px solid rgba(86,126,252,0.18)" : "0.5px solid transparent",
+                    transition: "color 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease",
+                    boxShadow: pathname === link.href ? "0 1px 4px rgba(86,126,252,0.10)" : "none",
+                  }}
+                  onMouseEnter={e => {
+                    if (pathname !== link.href) {
+                      (e.currentTarget as HTMLAnchorElement).style.color = "#0F0A1E";
+                      (e.currentTarget as HTMLAnchorElement).style.background = "rgba(86,126,252,0.05)";
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (pathname !== link.href) {
+                      (e.currentTarget as HTMLAnchorElement).style.color = "#6B6480";
+                      (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
+                    }
                   }}
                 >
                   {link.label}
@@ -121,8 +138,11 @@ export function PageShell({ children }: { children: React.ReactNode }) {
                   ) : (
                     <button
                       onClick={() => setShowAuth(true)}
-                      className="px-4 py-1.5 rounded-full text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                      style={{ background: "#0F0A1E" }}
+                      className="btn-premium px-4 py-1.5 rounded-full text-sm font-semibold text-white"
+                      style={{
+                        background: "linear-gradient(135deg, #1a1040 0%, #0F0A1E 100%)",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,0.08)",
+                      }}
                     >
                       Sign in
                     </button>
@@ -174,11 +194,14 @@ export function PageShell({ children }: { children: React.ReactNode }) {
 
         {/* Footer */}
         <footer
-          className="border-t py-10 px-5"
-          style={{ borderColor: "rgba(86,126,252,0.10)" }}
+          className="py-10 px-5"
+          style={{
+            borderTop: "0.5px solid rgba(86,126,252,0.10)",
+            background: "linear-gradient(180deg, rgba(248,247,255,0) 0%, rgba(238,242,255,0.35) 100%)",
+          }}
         >
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="text-xl font-bold tracking-tight" style={{ color: "#0F0A1E" }}>
+            <span className="text-xl font-bold tracking-tight" style={{ color: "#0F0A1E", letterSpacing: "-0.5px" }}>
               Lumia
             </span>
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-[#6B6480]">

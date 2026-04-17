@@ -1603,6 +1603,18 @@ function FrictionCalculator() {
 
   return (
     <section style={{ padding: "96px clamp(20px, 5vw, 80px)", background: "#fff" }}>
+      <style>{`
+        .calc-grid { display: grid; grid-template-columns: 1fr; gap: 28px; }
+        .calc-results-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .calc-quality-btn { flex-direction: column; align-items: flex-start !important; gap: 4px; justify-content: flex-start !important; }
+        .calc-quality-sub { max-width: 100% !important; text-align: left !important; }
+        @media (min-width: 760px) {
+          .calc-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+          .calc-results-grid { grid-template-columns: 1fr 1fr; }
+          .calc-quality-btn { flex-direction: row; align-items: center !important; justify-content: space-between !important; }
+          .calc-quality-sub { text-align: right !important; max-width: 180px !important; }
+        }
+      `}</style>
       <div style={{ maxWidth: 960, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <p className="reveal" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", background: "var(--gradient)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>Calculator</p>
@@ -1610,7 +1622,7 @@ function FrictionCalculator() {
           <p className="reveal" style={{ fontSize: 16, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif" }}>Slide to see your real-time friction cost.</p>
         </div>
 
-        <div className="reveal" style={{ background: "#F8F7FF", borderRadius: 24, padding: "clamp(24px, 4vw, 40px)", boxShadow: "var(--shadow-card)" }}>
+        <div className="reveal" style={{ background: "#F8F7FF", borderRadius: 24, padding: "clamp(20px, 4vw, 40px)", boxShadow: "var(--shadow-card)" }}>
           {/* Mode Toggle */}
           <div style={{ display: "flex", background: "#F3F4F6", borderRadius: 999, padding: 4, marginBottom: 32, width: "fit-content" }}>
             {[["time", "Time lost"], ["money", "Money value"]].map(([m, label]) => (
@@ -1622,7 +1634,7 @@ function FrictionCalculator() {
           </div>
 
           {/* Two-column layout */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 380px), 1fr))", gap: 40 }}>
+          <div className="calc-grid">
             {/* Left: Controls */}
             <div>
               {/* Quality Selector */}
@@ -1630,10 +1642,10 @@ function FrictionCalculator() {
                 <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 12, fontFamily: "DM Sans, sans-serif" }}>How do you usually send your prompts?</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {(Object.keys(qualityLabels) as QualityKey[]).map(key => (
-                    <button key={key} onClick={() => setQuality(key)}
+                    <button key={key} onClick={() => setQuality(key)} className="calc-quality-btn"
                       style={{ padding: "12px 16px", borderRadius: 12, border: `1.5px solid ${quality === key ? "var(--violet)" : "var(--border)"}`, background: quality === key ? "var(--violet-soft)" : "#fff", cursor: "pointer", textAlign: "left", transition: "all 0.2s", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <span style={{ fontSize: 13, fontWeight: 700, color: quality === key ? "var(--violet)" : "var(--text)", fontFamily: "DM Sans, sans-serif" }}>{qualityLabels[key].title}</span>
-                      <span style={{ fontSize: 11, color: quality === key ? "var(--violet)" : "var(--text-3)", fontFamily: "DM Sans, sans-serif", textAlign: "right", maxWidth: 180, lineHeight: 1.3 }}>{qualityLabels[key].sub}</span>
+                      <span className="calc-quality-sub" style={{ fontSize: 11, color: quality === key ? "var(--violet)" : "var(--text-3)", fontFamily: "DM Sans, sans-serif", textAlign: "right", maxWidth: 180, lineHeight: 1.3 }}>{qualityLabels[key].sub}</span>
                     </button>
                   ))}
                 </div>
@@ -1675,7 +1687,7 @@ function FrictionCalculator() {
 
             {/* Right: Results */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div className="calc-results-grid">
                 {/* Lost/day */}
                 <div style={{ background: "var(--bg)", borderRadius: 14, padding: "20px 16px", textAlign: "center" }}>
                   <div style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 26, color: "var(--text)", letterSpacing: "-0.5px" }}>
