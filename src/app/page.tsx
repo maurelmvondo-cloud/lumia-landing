@@ -728,6 +728,9 @@ const GLOBAL_STYLES = `
     .works-grid h2 {
       text-align: center;
     }
+    .works-row-2 {
+      margin-left: 52px !important;
+    }
   }
 
   /* ── Persona cards ────────────────────────────────────────────────── */
@@ -2855,30 +2858,39 @@ function FrictionCalculator() {
             grid-template-rows: auto auto;
             gap: 16px;
           }
-          .calc-card-results { grid-row: span 2; }
+          .calc-card-quality  { grid-column: 1; grid-row: 1; }
+          .calc-card-sliders  { grid-column: 1; grid-row: 2; }
+          .calc-card-results  { grid-column: 2; grid-row: 1 / span 2; }
           @media (max-width: 700px) {
             .calc-cards-wrapper {
               display: flex;
-              overflow-x: scroll;
-              scroll-snap-type: x mandatory;
-              -webkit-overflow-scrolling: touch;
-              gap: 12px;
-              padding-bottom: 8px;
-              scrollbar-width: none;
+              flex-direction: column;
+              gap: 14px;
             }
-            .calc-cards-wrapper::-webkit-scrollbar { display: none; }
             .calc-glass-card {
-              min-width: calc(100vw - 56px) !important;
-              scroll-snap-align: start;
-              flex-shrink: 0;
+              width: 100%;
+              padding: 24px !important;
+              border-radius: 24px !important;
             }
             .calc-card-results { grid-row: unset; }
+            .calc-stats-grid {
+              grid-template-columns: 1fr 1fr !important;
+              gap: 10px !important;
+            }
+            .calc-stats-grid > div {
+              height: 130px !important;
+              padding: 16px 10px !important;
+            }
+            .calc-stats-grid > div > div:first-child {
+              font-size: 19px !important;
+              letter-spacing: -0.3px !important;
+            }
           }
         `}</style>
         <div className="reveal calc-cards-wrapper" id="calc-cards-wrapper">
 
           {/* Card 1 — Quality selector */}
-          <div className="calc-glass-card" style={{
+          <div className="calc-glass-card calc-card-quality" style={{
             background: "rgba(255,255,255,0.12)",
             backdropFilter: "blur(60px) saturate(180%)",
             WebkitBackdropFilter: "blur(60px) saturate(180%)",
@@ -2923,7 +2935,7 @@ function FrictionCalculator() {
           </div>
 
           {/* Card 2 — Sliders (Prompts per day) — shown before results on mobile */}
-          <div className="calc-glass-card" style={{
+          <div className="calc-glass-card calc-card-sliders" style={{
             background: "rgba(255,255,255,0.12)",
             backdropFilter: "blur(60px) saturate(180%)",
             WebkitBackdropFilter: "blur(60px) saturate(180%)",
@@ -2973,7 +2985,7 @@ function FrictionCalculator() {
           }}>
             <p style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(255,255,255,0.60)", margin: "0 0 4px", fontFamily: "DM Sans, sans-serif" }}>Your friction cost</p>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <div className="calc-stats-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {/* Lost/day */}
               <div style={{
                 background: "rgba(255,255,255,0.08)",
@@ -3104,8 +3116,6 @@ function FrictionCalculator() {
 
         </div>
 
-        {/* Mobile scroll dots */}
-        <MobileCalcDots wrapperId="calc-cards-wrapper" count={3} />
       </div>
     </section>
   );
@@ -3579,7 +3589,7 @@ function WorksOnTopOfSection() {
   ];
   // Extended set per row for the "infinite" feel with fade mask
   const row1 = [...allLogos, ...allLogos].slice(0, 10);
-  const row2 = [...allLogos, ...allLogos].slice(4, 14);
+  const row2 = [...allLogos, ...allLogos].slice(3, 13);
 
   const cardStyle: React.CSSProperties = {
     width: 88, height: 88, borderRadius: 22,
@@ -3592,8 +3602,8 @@ function WorksOnTopOfSection() {
   };
 
   const maskStyle: React.CSSProperties = {
-    WebkitMaskImage: "linear-gradient(90deg, transparent 0%, black 12%, black 88%, transparent 100%)",
-    maskImage: "linear-gradient(90deg, transparent 0%, black 12%, black 88%, transparent 100%)",
+    WebkitMaskImage: "linear-gradient(90deg, transparent 0%, black 18%, black 82%, transparent 100%)",
+    maskImage: "linear-gradient(90deg, transparent 0%, black 18%, black 82%, transparent 100%)",
   };
 
   return (
@@ -3640,7 +3650,7 @@ function WorksOnTopOfSection() {
           </div>
 
           {/* Row 2 — offset for natural feel */}
-          <div style={{ display: "flex", gap: 16, justifyContent: "flex-start", marginLeft: 52 }}>
+          <div className="works-row-2" style={{ display: "flex", gap: 16, justifyContent: "flex-start", marginLeft: 52 }}>
             {row2.map((logo, i) => (
               <div key={`r2-${i}`} style={cardStyle}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = "translateY(-3px)"; el.style.borderColor = "rgba(255,255,255,0.22)"; el.style.background = "rgba(255,255,255,0.11)"; }}
