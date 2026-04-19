@@ -13,31 +13,22 @@ const bricolage = Bricolage_Grotesque({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://getlumia.ca"),
-  title: "Lumia – AI Memory & Prompt Engine for Claude, ChatGPT & Gemini",
+  title: "Lumia — Think once. Execute everywhere.",
   description:
     "Lumia gives Claude, ChatGPT, and Gemini persistent memory. Drop your intent — Lumia injects your context and builds the prompt. macOS · Download free.",
   openGraph: {
-    title: "Lumia – AI Memory & Prompt Engine for Claude, ChatGPT & Gemini",
+    title: "Lumia — Think once. Execute everywhere.",
     description:
       "Lumia gives Claude, ChatGPT, and Gemini persistent memory. Drop your intent — Lumia injects your context and builds the prompt. macOS · Download free.",
     url: "https://getlumia.ca",
     siteName: "Lumia",
     type: "website",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Lumia – AI Memory & Prompt Engine",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Lumia – AI Memory & Prompt Engine for Claude, ChatGPT & Gemini",
+    title: "Lumia — Think once. Execute everywhere.",
     description:
       "Lumia gives Claude, ChatGPT, and Gemini persistent memory. Drop your intent — Lumia injects your context and builds the prompt. macOS · Download free.",
-    images: ["/og-image.png"],
   },
   alternates: {
     canonical: "https://getlumia.ca",

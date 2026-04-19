@@ -212,7 +212,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
             {/* Logo + wordmark */}
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-              <img src="/logo.png" alt="Lumia" style={{ width: 26, height: 26, objectFit: "contain" }} />
+              <img src="/lumia-logo-white.png" alt="Lumia" style={{ width: 26, height: 26, objectFit: "contain" }} />
               <span style={{
                 fontFamily: "var(--font-bricolage), sans-serif",
                 fontWeight: 700,
