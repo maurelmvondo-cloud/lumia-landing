@@ -4020,8 +4020,7 @@ function VideoBg() {
         ref={videoRef}
         muted
         playsInline
-        // @ts-expect-error - iOS Safari needs this for inline scrub
-        webkit-playsinline="true"
+        {...({ "webkit-playsinline": "true" } as Record<string, string>)}
         preload="auto"
         poster="/bg-poster.jpg"
         style={{
