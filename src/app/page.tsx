@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { ArrowRight, CheckCircle2, AlertCircle, XCircle, Sparkles, Loader2, Menu, X, ShieldCheck, Clock, AlertTriangle, Download, Apple, Zap, FolderOpen, Repeat, Eye, Lightbulb, Target } from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertCircle, XCircle, Sparkles, Loader2, Menu, X, ShieldCheck, Clock, AlertTriangle, Apple, Zap, FolderOpen, Repeat, Eye, Lightbulb, Target } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import LumiaAnimation, { HeroAnimation, useCurrentFrame } from "@/components/LumiaAnimation";
 import { FakeChatInterface } from "@/components/FakeChatInterface";
@@ -65,36 +65,36 @@ const GLOBAL_STYLES = `
     --text-1: #0F0A1E;
     --text-2: #6B6480;
     --text-3: #A89FC0;
-    --border: rgba(86,126,252,0.12);
-    --border-2: rgba(86,126,252,0.06);
+    --border: rgba(255,255,255,0.12);
+    --border-2: rgba(255,255,255,0.06);
     --gradient: linear-gradient(135deg, #567EFC 0%, #C2AED4 50%, #EB5E5E 100%);
 
     /* Multi-layer depth shadows */
     --shadow-card:
-      0 1px 2px rgba(15,10,30,0.04),
-      0 4px 16px rgba(86,126,252,0.08),
-      0 0 0 0.5px rgba(86,126,252,0.06);
+      0 1px 2px rgba(0,0,0,0.08),
+      0 4px 16px rgba(0,0,0,0.10),
+      0 0 0 0.5px rgba(255,255,255,0.06);
     --shadow-lg:
-      0 2px 4px rgba(15,10,30,0.06),
-      0 8px 24px rgba(86,126,252,0.14),
-      0 24px 64px rgba(86,126,252,0.10),
-      0 0 0 0.5px rgba(86,126,252,0.08);
+      0 2px 4px rgba(0,0,0,0.12),
+      0 8px 24px rgba(0,0,0,0.18),
+      0 24px 64px rgba(0,0,0,0.14),
+      0 0 0 0.5px rgba(255,255,255,0.08);
     --shadow-dark:
       0 2px 8px rgba(0,0,0,0.20),
       0 8px 32px rgba(0,0,0,0.28),
       0 24px 72px rgba(0,0,0,0.36),
       inset 0 1px 0 rgba(255,255,255,0.06);
     --shadow-glow:
-      0 0 0 1px rgba(86,126,252,0.20),
-      0 4px 24px rgba(86,126,252,0.20),
-      0 16px 56px rgba(86,126,252,0.12);
+      0 0 0 0.5px rgba(255,255,255,0.15),
+      0 4px 24px rgba(0,0,0,0.20),
+      0 16px 56px rgba(0,0,0,0.12);
   }
 
   html { scroll-behavior: smooth; }
 
   body {
     font-family: 'DM Sans', sans-serif;
-    background: #000;
+    background: #fff;
     color: var(--text);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
@@ -220,6 +220,12 @@ const GLOBAL_STYLES = `
     justify-content: center;
     width: 100%;
   }
+  .hero-sticker { display: block; }
+  @media (max-width: 767px) {
+    .hero-sticker { display: none !important; }
+    section:has(.hero-sticker) { cursor: auto !important; }
+  }
+
   .hero-orbital-text {
     text-align: center;
     width: 100%;
@@ -236,12 +242,9 @@ const GLOBAL_STYLES = `
     height: 520px;
   }
 
-  /* Accent gradient word — matches logo gradient */
+  /* Accent word — solid white */
   .accent-word {
-    background: linear-gradient(135deg, #567EFC 0%, #C2AED4 50%, #EB5E5E 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #fff;
   }
 
   /* Badge pulse dot */
@@ -287,8 +290,8 @@ const GLOBAL_STYLES = `
   }
   .pain-header-rule {
     width: 40px;
-    height: 1.5px;
-    background: linear-gradient(90deg, #567EFC, #C2AED4, #FF7769);
+    height: 0.5px;
+    background: rgba(255,255,255,0.25);
     margin: 24px auto 0;
   }
   .pain-cards-grid {
@@ -548,16 +551,16 @@ const GLOBAL_STYLES = `
   /* ── Dark Zone — noise gradient background ─────────────────────────── */
   .dark-zone {
     position: relative;
-    background: transparent;
+    background: #fff;
     background-attachment: scroll;
 
-    --text-1: #F0EDE6;
-    --text-2: rgba(240,237,230,0.55);
-    --text-3: rgba(240,237,230,0.30);
-    --border: rgba(255,255,255,0.07);
-    --border-hover: rgba(255,255,255,0.13);
-    --bg-card: rgba(255,255,255,0.04);
-    --bg-elevated: rgba(255,255,255,0.07);
+    --text-1: #0A0A0F;
+    --text-2: rgba(10,10,15,0.60);
+    --text-3: rgba(10,10,15,0.35);
+    --border: rgba(0,0,0,0.07);
+    --border-hover: rgba(0,0,0,0.12);
+    --bg-card: rgba(0,0,0,0.03);
+    --bg-elevated: rgba(0,0,0,0.05);
   }
 
   .noise-overlay {
@@ -565,7 +568,7 @@ const GLOBAL_STYLES = `
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.35;
+    opacity: 0;
     mix-blend-mode: soft-light;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='1.8' intercept='-0.3'/%3E%3CfeFuncG type='linear' slope='1.8' intercept='-0.3'/%3E%3CfeFuncB type='linear' slope='1.8' intercept='-0.3'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-repeat: repeat;
@@ -586,7 +589,7 @@ const GLOBAL_STYLES = `
   .dark-zone .stat-number,
   .dark-zone h2,
   .dark-zone h3 {
-    color: #F0EDE6;
+    color: #0A0A0F;
   }
 
   .dark-zone .section-subtitle,
@@ -596,7 +599,7 @@ const GLOBAL_STYLES = `
   .dark-zone .footer-copy,
   .dark-zone .footer-links a,
   .dark-zone .trust-logo-item {
-    color: rgba(240,237,230,0.55);
+    color: rgba(10,10,15,0.55);
   }
 
   .dark-zone .section-overline {
@@ -971,10 +974,10 @@ function WaitlistForm({ variant = "hero" }: { variant?: "hero" | "pricing" }) {
         <input
           type="email" required value={email} onChange={e => setEmail(e.target.value)}
           placeholder="your@email.com"
-          style={{ flex: 1, minWidth: 200, padding: "12px 16px", borderRadius: 999, border: "1.5px solid var(--border)", background: "#fff", fontSize: 14, fontFamily: "DM Sans, sans-serif", color: "var(--text)", outline: "none" }}
+          style={{ flex: 1, minWidth: 200, padding: "12px 16px", borderRadius: 14, border: "1.5px solid var(--border)", background: "#fff", fontSize: 14, fontFamily: "DM Sans, sans-serif", color: "var(--text)", outline: "none" }}
         />
         <button type="submit" disabled={status === "loading"}
-          style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 20px", borderRadius: 999, background: "var(--gradient)", color: "#fff", border: "none", cursor: "pointer", fontWeight: 700, fontSize: 14, whiteSpace: "nowrap" }}>
+          style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 20px", borderRadius: 14, background: "#000", color: "#fff", border: "0.5px solid rgba(255,255,255,0.2)", cursor: "pointer", fontWeight: 700, fontSize: 14, whiteSpace: "nowrap" }}>
           {status === "loading" ? <Loader2 size={16} className="animate-spin" /> : <>Join waitlist <ArrowRight size={14} /></>}
         </button>
       </form>
@@ -1022,11 +1025,11 @@ function PricingPaidForm() {
         <input
           type="email" required value={email} onChange={e => setEmail(e.target.value)}
           placeholder="your@email.com"
-          style={{ width: "100%", padding: "13px 18px", borderRadius: 999, border: "1.5px solid rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.1)", color: "#fff", fontSize: 14, fontFamily: "DM Sans, sans-serif", outline: "none" }}
+          style={{ width: "100%", padding: "13px 18px", borderRadius: 14, border: "1.5px solid rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.1)", color: "#fff", fontSize: 14, fontFamily: "DM Sans, sans-serif", outline: "none" }}
         />
         <button type="submit" disabled={status === "loading"}
           className="btn-spring"
-          style={{ width: "100%", padding: "14px 24px", borderRadius: 999, background: "#fff", color: "#0F0A1E", border: "none", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+          style={{ width: "100%", padding: "14px 24px", borderRadius: 14, background: "#fff", color: "#0F0A1E", border: "none", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
           {status === "loading" ? <Loader2 size={16} className="animate-spin" /> : <>Become a founding member <ArrowRight size={15} /></>}
         </button>
       </form>
@@ -1086,7 +1089,7 @@ function Navbar() {
               : "rgba(255,255,255,0.10)",
             backdropFilter: "blur(48px) saturate(200%) brightness(1.08)",
             WebkitBackdropFilter: "blur(48px) saturate(200%) brightness(1.08)",
-            borderRadius: 999,
+            borderRadius: 14,
             border: "1px solid rgba(255,255,255,0.22)",
             boxShadow: scrolled
               ? "inset 0 1px 0 rgba(255,255,255,0.40), inset 0 -1px 0 rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10)"
@@ -1179,7 +1182,7 @@ function Navbar() {
               user ? (
                 <div style={{ position: "relative" }}>
                   <button onClick={() => setShowUserMenu(!showUserMenu)}
-                    style={{ display: "flex", alignItems: "center", gap: 8, background: scrolled ? "rgba(86,126,252,0.15)" : "rgba(86,126,252,0.08)", border: "0.5px solid rgba(86,126,252,0.18)", borderRadius: 999, padding: "6px 12px", cursor: "pointer", fontFamily: "DM Sans, sans-serif", fontSize: 13, fontWeight: 600, color: scrolled ? "rgba(255,255,255,0.85)" : "var(--text)", transition: "all 0.3s" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 8, background: scrolled ? "rgba(86,126,252,0.15)" : "rgba(86,126,252,0.08)", border: "0.5px solid rgba(86,126,252,0.18)", borderRadius: 14, padding: "6px 12px", cursor: "pointer", fontFamily: "DM Sans, sans-serif", fontSize: 13, fontWeight: 600, color: scrolled ? "rgba(255,255,255,0.85)" : "var(--text)", transition: "all 0.3s" }}>
                     <div style={{ width: 20, height: 20, borderRadius: "50%", background: "linear-gradient(135deg, #567EFC, #EB5E5E)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#fff" }}>
                       {(username ?? user.email ?? "?")[0].toUpperCase()}
                     </div>
@@ -1206,18 +1209,17 @@ function Navbar() {
                 </div>
               ) : (
                 <button onClick={() => setShowAuthModal(true)}
-                  style={{ fontFamily: "DM Sans, sans-serif", fontSize: 14, fontWeight: 600, padding: "9px 18px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.90)", cursor: "pointer", transition: "all 0.25s", letterSpacing: "-0.2px" }}
+                  style={{ fontFamily: "DM Sans, sans-serif", fontSize: 14, fontWeight: 600, padding: "9px 18px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.90)", cursor: "pointer", transition: "all 0.25s", letterSpacing: "-0.2px" }}
                   onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.15)"; e.currentTarget.style.color = "#fff"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = "rgba(255,255,255,0.90)"; }}>
                   Sign in
                 </button>
               )
             )}
-            <a href="/api/download"
+            <a href="#waitlist"
               className="btn-spring"
-              style={{ display: "flex", alignItems: "center", gap: 8, background: "#0A0A0F", color: "#fff", borderRadius: 999, padding: "11px 20px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 14, whiteSpace: "nowrap", textDecoration: "none", letterSpacing: "-0.2px", boxShadow: "0 4px 14px rgba(0,0,0,0.18)" }}>
-              <Download size={14} />
-              Get Lumia
+              style={{ display: "flex", alignItems: "center", gap: 8, background: "#0A0A0F", color: "#fff", borderRadius: 14, padding: "11px 20px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 14, whiteSpace: "nowrap", textDecoration: "none", letterSpacing: "-0.2px", boxShadow: "0 4px 14px rgba(0,0,0,0.18)", border: "0.5px solid rgba(255,255,255,0.18)" }}>
+              Join waitlist
             </a>
           </div>
 
@@ -1255,10 +1257,9 @@ function Navbar() {
                 Sign in
               </button>
             )}
-            <a href="/api/download"
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#0F0A1E", color: "#fff", borderRadius: 999, padding: "14px 24px", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15, marginTop: 4, textDecoration: "none" }}>
-              <Download size={15} />
-              Get Lumia
+            <a href="#waitlist"
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#000", color: "#fff", borderRadius: 14, padding: "14px 24px", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15, marginTop: 4, textDecoration: "none", border: "0.5px solid rgba(255,255,255,0.18)" }}>
+              Join waitlist
             </a>
           </motion.div>
         )}
@@ -1270,10 +1271,31 @@ function Navbar() {
 }
 
 // ─── Hero Section ─────────────────────────────────────────────────────────────
+interface ErrorSticker { id: number; x: number; y: number; opacity: number; }
+
 function HeroSection() {
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   const [showDemo, setShowDemo] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [stickers, setStickers] = useState<ErrorSticker[]>([]);
+  const lastSpawnRef = useRef(0);
+  const counterRef = useRef(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const now = Date.now();
+    if (now - lastSpawnRef.current < 50) return; // ~20 stickers / sec
+    lastSpawnRef.current = now;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const id = ++counterRef.current;
+    setStickers(prev => [...prev.slice(-9), { id, x, y, opacity: 1 }]);
+    // fade out after 0.75s
+    setTimeout(() => {
+      setStickers(prev => prev.map(s => s.id === id ? { ...s, opacity: 0 } : s));
+      setTimeout(() => setStickers(prev => prev.filter(s => s.id !== id)), 300);
+    }, 750);
+  };
 
   // Close modal on Escape + prevent body scroll when open
   useEffect(() => {
@@ -1290,15 +1312,66 @@ function HeroSection() {
 
   return (
     <>
-    <section style={{
-      minHeight: "100vh",
-      display: "flex",
-      alignItems: "center",
-      padding: "120px clamp(20px, 5vw, 64px) 80px",
-      position: "relative",
-      overflow: "hidden",
-      background: "transparent",
-    }}>
+    <section
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        padding: "120px clamp(20px, 5vw, 64px) 80px",
+        position: "relative",
+        overflow: "hidden",
+        background: "transparent",
+      }}
+      onMouseMove={handleMouseMove}
+    >
+
+      {/* Error sticker trail — desktop only */}
+      {stickers.map(s => (
+        <div key={s.id} className="hero-sticker" style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          transform: `translate(${s.x + 12}px, ${s.y + 12}px)`,
+          pointerEvents: "none",
+          zIndex: 10,
+          opacity: s.opacity,
+          transition: "opacity 0.35s ease",
+          userSelect: "none",
+          fontFamily: "'Arial', sans-serif",
+          fontSize: 11,
+        }}>
+          {/* Windows 98 error popup */}
+          <div style={{ width: 200, boxShadow: "2px 2px 0 #000, inset 1px 1px 0 #fff, inset -1px -1px 0 #808080", border: "1px solid #000", background: "#c0c0c0" }}>
+            {/* Title bar */}
+            <div style={{ background: "linear-gradient(90deg, #000080, #1084d0)", padding: "3px 4px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span style={{ color: "#fff", fontWeight: 700, fontSize: 11, letterSpacing: 0 }}>Error</span>
+              <div style={{ width: 16, height: 14, background: "#c0c0c0", border: "1px solid #000", boxShadow: "inset 1px 1px 0 #fff, inset -1px -1px 0 #808080", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, lineHeight: 1 }}>✕</div>
+            </div>
+            {/* Body */}
+            <div style={{ padding: "10px 12px 8px", display: "flex", alignItems: "flex-start", gap: 8 }}>
+              <span style={{ fontSize: 22, lineHeight: 1 }}>🚨</span>
+              <p style={{ margin: 0, fontSize: 11, lineHeight: 1.4, color: "#000" }}>Your AI is prompting<br />without your vision.</p>
+            </div>
+            {/* Button */}
+            <div style={{ padding: "0 12px 10px", textAlign: "center" }}>
+              <div style={{ display: "inline-block", background: "#c0c0c0", border: "1px solid #000", boxShadow: "inset 1px 1px 0 #fff, inset -1px -1px 0 #808080", padding: "3px 20px", fontSize: 11, cursor: "default" }}>WTF</div>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {/* Hero bg — clipped to this section */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden", pointerEvents: "none" }}>
+        <picture style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
+          <source media="(min-width: 768px)" srcSet="/hero-bg-desktop.jpg" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/hero-bg.jpg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
+        </picture>
+        {/* dark scrim */}
+        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.38)" }} />
+        {/* fade to white at bottom */}
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "20%", background: "linear-gradient(to bottom, transparent, #fff)" }} />
+      </div>
 
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1200, width: "100%", margin: "0 auto" }}>
         <div className="hero-orbital-grid">
@@ -1306,32 +1379,31 @@ function HeroSection() {
           {/* ── LEFT: text ─────────────────────────────────────────────── */}
           <div className="hero-orbital-text">
 
-            {/* Badge */}
-            <div style={{ position: "relative", display: "inline-flex", marginBottom: 28, animation: "fadeUp 0.6s ease both" }}>
-              <div style={{ position: "absolute", inset: -1, borderRadius: 999, background: "linear-gradient(90deg, rgba(86,126,252,0.5), rgba(194,174,212,0.4), rgba(255,119,105,0.4), rgba(86,126,252,0.5))", backgroundSize: "200% 100%", animation: "shimmer-sweep 3s linear infinite", filter: "blur(2px)" }} />
-              <div style={{ position: "relative", display: "inline-flex", alignItems: "center", gap: 8, background: "#0A0A0F", backdropFilter: "blur(12px)", border: "0.5px solid rgba(255,255,255,0.10)", borderRadius: 999, padding: "7px 18px", fontSize: 13, fontWeight: 600, color: "#fff", letterSpacing: "0.01em", zIndex: 1 }}>
-                The overlay that makes your AI actually smart.
-              </div>
-            </div>
-
             {/* H1 */}
-            <h1 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(44px, 5vw, 72px)", letterSpacing: "-2.5px", lineHeight: 0.96, color: "#fff", margin: "0 0 24px", animation: "fadeUp 0.7s 0.08s ease both" }}>
-              Think once.<br />
-              <span className="accent-word">Execute everywhere.</span>
+            <h1 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(40px, 4.5vw, 68px)", letterSpacing: "-2.5px", lineHeight: 0.96, color: "#fff", margin: "0 0 24px", animation: "fadeUp 0.7s 0.08s ease both" }}>
+              Because you&apos;re supposed<br />to DREAM it.<br /><span style={{ position: "relative", display: "inline-block" }}>
+                  Not prompt it.
+                  <svg viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true" style={{ position: "absolute", left: "-2%", width: "104%", top: "52%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+                    <path d="M 4,7 C 40,4.5 80,9.5 130,7 C 180,4.5 230,9 296,7" stroke="#d4ff01" strokeWidth="4" strokeLinecap="round" fill="none" />
+                  </svg>
+                </span>
             </h1>
 
             {/* Subtitle */}
             <p style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 500, fontSize: "clamp(1rem, 1.15vw, 1.15rem)", color: "rgba(255,255,255,0.80)", margin: "0 0 36px", lineHeight: 1.65, animation: "fadeUp 0.7s 0.15s ease both", maxWidth: 440 }}>
-              Raw idea in. <strong style={{ fontWeight: 700, color: "#fff" }}>Expert prompt out.</strong> Your context is already loaded — across Claude, ChatGPT, and Gemini.
+              <strong style={{ fontWeight: 700, color: "#fff" }}>Raw idea in. Expert prompt out.</strong> — meet the overlay designed to hold your vision and make sure your AI tools never drift from it.
             </p>
 
             {/* CTAs */}
-            <div className="hero-cta-row" style={{ display: "flex", flexWrap: "wrap", gap: 12, animation: "fadeUp 0.7s 0.25s ease both" }}>
-              <a href="/api/download" className="btn-spring" style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "linear-gradient(135deg, #1a1040 0%, #0F0A1E 100%)", color: "#fff", borderRadius: 999, padding: "15px 32px", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 16, textDecoration: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.20), 0 8px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08)", letterSpacing: "-0.3px" }}>
-                <Download size={16} /> Download — Public Beta v1
+            <div className="hero-cta-row" style={{ display: "flex", flexWrap: "wrap", gap: 28, animation: "fadeUp 0.7s 0.25s ease both", alignItems: "center" }}>
+              <a href="#waitlist" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: "clamp(15px, 1.1vw, 17px)", color: "#fff", textDecoration: "none", letterSpacing: "-0.2px", borderBottom: "1.5px solid transparent", paddingBottom: 2, transition: "border-color 0.15s ease" }}
+                onMouseEnter={e => (e.currentTarget.style.borderBottomColor = "#fff")}
+                onMouseLeave={e => (e.currentTarget.style.borderBottomColor = "transparent")}>
+                Join the waitlist
               </a>
-              <button onClick={() => setShowDemo(true)} className="btn-spring" style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", color: "var(--text)", border: "0.5px solid rgba(86,126,252,0.22)", borderRadius: 999, padding: "15px 24px", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 600, fontSize: 15, boxShadow: "0 2px 12px rgba(86,126,252,0.10)" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              <button onClick={() => { document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' }) }} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 600, fontSize: "clamp(14px, 1vw, 16px)", color: "rgba(255,255,255,0.70)", letterSpacing: "-0.2px", borderBottom: "1.5px solid transparent", paddingBottom: 2, transition: "border-color 0.15s ease, color 0.15s ease" }}
+                onMouseEnter={e => { e.currentTarget.style.borderBottomColor = "rgba(255,255,255,0.70)"; e.currentTarget.style.color = "#fff"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderBottomColor = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.70)"; }}>
                 See how it works
               </button>
             </div>
@@ -1394,7 +1466,7 @@ function HeroSection() {
                 zIndex: 3,
                 width: 40,
                 height: 40,
-                borderRadius: 999,
+                borderRadius: 14,
                 background: "rgba(255,255,255,0.12)",
                 backdropFilter: "blur(12px) saturate(140%)",
                 WebkitBackdropFilter: "blur(12px) saturate(140%)",
@@ -1522,23 +1594,23 @@ function HeroSection() {
 
               {/* CTA row */}
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 24, flexWrap: "wrap" }}>
-                <a href="/api/download" className="btn-spring" style={{
+                <a href="#waitlist" className="btn-spring" style={{
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 8,
-                  background: "linear-gradient(135deg, #567EFC, #EB5E5E)",
+                  background: "#000",
                   color: "#fff",
-                  borderRadius: 999,
+                  borderRadius: 14,
                   padding: "12px 24px",
                   fontFamily: "var(--font-bricolage), sans-serif",
                   fontWeight: 700,
                   fontSize: 14,
                   textDecoration: "none",
-                  boxShadow: "0 6px 20px rgba(86,126,252,0.30)",
+                  border: "0.5px solid rgba(255,255,255,0.25)",
                   letterSpacing: "-0.2px",
                 }}>
-                  <Download size={14} />
-                  Download — Public Beta v1
+                  <ArrowRight size={14} />
+                  Join the waitlist
                 </a>
                 <span style={{ fontSize: 12, color: "rgba(255,255,255,0.40)", fontFamily: "DM Sans, sans-serif" }}>
                   macOS 13+ · Free to try · No extension needed
@@ -1692,7 +1764,7 @@ function DashboardMockup() {
         ].map((row, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: "var(--bg)", borderRadius: 10, marginBottom: 6 }}>
             <span style={{ fontSize: 12, color: "var(--text-2)", fontFamily: "DM Sans, sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginRight: 10 }}>{row.text}</span>
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#22C55E", background: "#F0FDF4", padding: "2px 8px", borderRadius: 999, flexShrink: 0 }}>{row.gain}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#22C55E", background: "#F0FDF4", padding: "2px 8px", borderRadius: 14, flexShrink: 0 }}>{row.gain}</span>
           </div>
         ))}
       </div>
@@ -1800,10 +1872,10 @@ function ConsultantSection() {
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <h2 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(32px, 4.5vw, 52px)", letterSpacing: "-2px", color: "#fff", lineHeight: 1.1, margin: "0 0 16px" }}>
+          <h2 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(32px, 4.5vw, 52px)", letterSpacing: "-2px", color: "#0A0A0F", lineHeight: 1.1, margin: "0 0 16px" }}>
             One shortcut. Full context.<br />Every AI.
           </h2>
-          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.45)", fontFamily: "DM Sans, sans-serif", maxWidth: 460, margin: "0 auto" }}>
+          <p style={{ fontSize: 16, color: "rgba(10,10,15,0.45)", fontFamily: "DM Sans, sans-serif", maxWidth: 460, margin: "0 auto" }}>
             Your consultant, always on call.
           </p>
         </div>
@@ -1896,7 +1968,7 @@ function ConsultantSection() {
               <span style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0F", fontFamily: "DM Sans, sans-serif" }}>Lumia AI</span>
             </div>
             {/* Center: pill tabs */}
-            <div className="showcase-tabs" style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.70)", border: "1px solid rgba(0,0,0,0.06)", borderRadius: 999, padding: 3, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.90)" }}>
+            <div className="showcase-tabs" style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.70)", border: "1px solid rgba(0,0,0,0.06)", borderRadius: 14, padding: 3, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.90)" }}>
               {CONSULTANT_TABS.map(tab => (
                 <button key={tab} onClick={() => { setActiveTab(tab); setIsPaused(true); }} style={{
                   padding: "6px 16px",
@@ -1905,7 +1977,7 @@ function ConsultantSection() {
                   color: activeTab === tab ? "#0A0A0F" : "rgba(10,10,15,0.45)",
                   background: activeTab === tab ? "#fff" : "transparent",
                   border: "none",
-                  borderRadius: 999,
+                  borderRadius: 14,
                   cursor: "pointer",
                   fontFamily: "DM Sans, sans-serif",
                   transition: "all 0.2s",
@@ -2063,12 +2135,12 @@ function ConsultantSection() {
                         background: pill.active ? "rgba(86,126,252,0.12)" : "#fff",
                         border: pill.active ? "1px solid rgba(86,126,252,0.22)" : "1px solid rgba(0,0,0,0.06)",
                         padding: "5px 12px",
-                        borderRadius: 999,
+                        borderRadius: 14,
                         fontFamily: "DM Sans, sans-serif",
                         boxShadow: pill.active ? "none" : "0 1px 2px rgba(0,0,0,0.03)",
                       }}>{pill.label}</span>
                     ))}
-                    <div style={{ width: 26, height: 26, borderRadius: 999, background: "rgba(86,126,252,0.12)", border: "1px solid rgba(86,126,252,0.22)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: 26, height: 26, borderRadius: 14, background: "rgba(86,126,252,0.12)", border: "1px solid rgba(86,126,252,0.22)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#567EFC" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
                         <line x1="12" y1="11" x2="12" y2="17" />
@@ -2154,7 +2226,7 @@ function ConsultantSection() {
                           <p style={{ fontSize: 13, fontWeight: 700, color: "#0A0A0F", fontFamily: "DM Sans, sans-serif", margin: "0 0 2px", letterSpacing: "-0.2px" }}>{tpl.label}</p>
                           <span style={{ fontSize: 11, color: tpl.color, fontFamily: "DM Sans, sans-serif", fontWeight: 500 }}>{tpl.tag}</span>
                         </div>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(10,10,15,0.55)", fontFamily: "DM Sans, sans-serif", background: "rgba(0,0,0,0.04)", padding: "4px 10px", borderRadius: 999, flexShrink: 0 }}>Used {tpl.uses}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(10,10,15,0.55)", fontFamily: "DM Sans, sans-serif", background: "rgba(0,0,0,0.04)", padding: "4px 10px", borderRadius: 14, flexShrink: 0 }}>Used {tpl.uses}</span>
                       </div>
                     ))}
                   </div>
@@ -2234,7 +2306,7 @@ function HowItWorksSection() {
                   <div style={{ paddingTop: 8 }}>
                     <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 17, color: activeStep === i ? "#8BA8FD" : "rgba(255,255,255,0.70)", marginBottom: 6, transition: "color 0.3s" }}>{step.title}</h3>
                     <p style={{ fontSize: 14, color: "rgba(255,255,255,0.40)", lineHeight: 1.6, marginBottom: 10, fontFamily: "DM Sans, sans-serif" }}>{step.desc}</p>
-                    <span style={{ display: "inline-block", fontSize: 12, fontWeight: 600, background: activeStep === i ? "rgba(86,126,252,0.15)" : "rgba(255,255,255,0.06)", color: activeStep === i ? "#8BA8FD" : "rgba(255,255,255,0.30)", padding: "4px 10px", borderRadius: 999, transition: "all 0.3s" }}>{step.tag}</span>
+                    <span style={{ display: "inline-block", fontSize: 12, fontWeight: 600, background: activeStep === i ? "rgba(86,126,252,0.15)" : "rgba(255,255,255,0.06)", color: activeStep === i ? "#8BA8FD" : "rgba(255,255,255,0.30)", padding: "4px 10px", borderRadius: 14, transition: "all 0.3s" }}>{step.tag}</span>
                   </div>
                 </div>
               ))}
@@ -2242,7 +2314,7 @@ function HowItWorksSection() {
             {/* Step dots */}
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 24, paddingLeft: 4 }}>
               {[0, 1, 2].map(i => (
-                <div key={i} onClick={() => setActiveStep(i)} style={{ height: 6, borderRadius: 999, background: activeStep === i ? "var(--gradient)" : "rgba(255,255,255,0.12)", width: activeStep === i ? 28 : 6, transition: "all 0.3s ease", cursor: "pointer" }} />
+                <div key={i} onClick={() => setActiveStep(i)} style={{ height: 6, borderRadius: 14, background: activeStep === i ? "var(--gradient)" : "rgba(255,255,255,0.12)", width: activeStep === i ? 28 : 6, transition: "all 0.3s ease", cursor: "pointer" }} />
               ))}
             </div>
           </div>
@@ -2353,10 +2425,10 @@ function ComparisonSection() {
 
         {/* Header — centered, clean */}
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(36px, 5vw, 56px)", letterSpacing: "-1.5px", color: "#fff", lineHeight: 1.1, margin: "0 0 18px" }}>
+          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(36px, 5vw, 56px)", letterSpacing: "-1.5px", color: "#0A0A0F", lineHeight: 1.1, margin: "0 0 18px" }}>
             Same prompt.<br />Wildly different result.
           </h2>
-          <p className="reveal" style={{ fontSize: 16, color: "rgba(255,255,255,0.55)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.6, maxWidth: 480, margin: "0 auto" }}>
+          <p className="reveal" style={{ fontSize: 16, color: "rgba(10,10,15,0.55)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.6, maxWidth: 480, margin: "0 auto" }}>
             See what changes when Lumia sits between you and your AI.
           </p>
         </div>
@@ -2367,7 +2439,7 @@ function ComparisonSection() {
           background: "rgba(255,255,255,0.10)",
           backdropFilter: "blur(30px) saturate(180%)",
           WebkitBackdropFilter: "blur(30px) saturate(180%)",
-          borderRadius: 999,
+          borderRadius: 14,
           padding: 5,
           marginBottom: 36,
           border: "1px solid rgba(255,255,255,0.18)",
@@ -2376,7 +2448,7 @@ function ComparisonSection() {
           {(["before", "after"] as const).map(v => (
             <button key={v} onClick={() => setView(v)} style={{
               padding: "10px 26px",
-              borderRadius: 999,
+              borderRadius: 14,
               border: "none",
               cursor: "pointer",
               fontSize: 14,
@@ -2438,7 +2510,7 @@ function ComparisonSection() {
                   background: "rgba(255,255,255,0.08)",
                   border: "1px solid rgba(255,255,255,0.14)",
                   padding: "4px 12px",
-                  borderRadius: 999,
+                  borderRadius: 14,
                   fontFamily: "DM Sans, sans-serif",
                   whiteSpace: "nowrap",
                 }}>
@@ -2520,7 +2592,7 @@ function ComparisonSection() {
                     color: "#0F0A1E",
                     background: "#fff",
                     border: "none",
-                    borderRadius: 999,
+                    borderRadius: 14,
                     padding: "6px 14px",
                     cursor: "pointer",
                     fontFamily: "DM Sans, sans-serif",
@@ -2536,26 +2608,25 @@ function ComparisonSection() {
 
         {/* Bottom CTA — aligned with page aesthetic */}
         <div className="reveal" style={{ textAlign: "center", marginTop: 48, display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <h3 style={{ fontSize: "clamp(24px, 3vw, 32px)", fontWeight: 800, color: "#fff", marginBottom: 10, fontFamily: "var(--font-bricolage), sans-serif", letterSpacing: "-0.6px" }}>The only tool that does all of it.</h3>
-          <p style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", marginBottom: 28, maxWidth: 420, lineHeight: 1.6, fontFamily: "DM Sans, sans-serif" }}>Sits seamlessly on top of the workflow you&apos;ve already built.</p>
-          <a href="/api/download" className="btn-spring" style={{
+          <h3 style={{ fontSize: "clamp(24px, 3vw, 32px)", fontWeight: 800, color: "#0A0A0F", marginBottom: 10, fontFamily: "var(--font-bricolage), sans-serif", letterSpacing: "-0.6px" }}>The only tool that does all of it.</h3>
+          <p style={{ fontSize: 15, color: "rgba(10,10,15,0.55)", marginBottom: 28, maxWidth: 420, lineHeight: 1.6, fontFamily: "DM Sans, sans-serif" }}>Sits on top of the workflow you've already built.</p>
+          <a href="#waitlist" className="btn-spring" style={{
             display: "inline-flex",
             alignItems: "center",
             gap: 10,
-            background: "#fff",
-            color: "#0F0A1E",
-            borderRadius: 999,
+            background: "#000",
+            color: "#fff",
+            borderRadius: 14,
             padding: "14px 32px",
             fontSize: 15,
             fontWeight: 700,
             cursor: "pointer",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.18)",
+            border: "0.5px solid rgba(255,255,255,0.35)",
             fontFamily: "var(--font-bricolage), sans-serif",
             textDecoration: "none",
             letterSpacing: "-0.2px",
           }}>
-            <Download size={15} />
-            Download for Mac
+            Join the waitlist <ArrowRight size={15} />
           </a>
         </div>
       </div>
@@ -2629,7 +2700,7 @@ function MobileCalcDots({ wrapperId, count }: { wrapperId: string; count: number
       {Array.from({ length: count }).map((_, i) => (
         <button key={i} onClick={() => scrollTo(i)} style={{
           width: i === active ? 22 : 8, height: 8,
-          borderRadius: 999, border: "none", cursor: "pointer",
+          borderRadius: 14, border: "none", cursor: "pointer",
           background: i === active ? "#fff" : "rgba(255,255,255,0.35)",
           transition: "all 0.25s ease", padding: 0,
         }} />
@@ -2681,8 +2752,8 @@ function FrictionCalculator() {
     <section style={{ padding: "40px clamp(20px, 5vw, 80px) 96px", background: "transparent", position: "relative", overflow: "hidden" }}>
       <div style={{ maxWidth: 960, margin: "0 auto", position: "relative", zIndex: 1 }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(36px, 5vw, 56px)", letterSpacing: "-1.5px", color: "#fff", marginBottom: 18, lineHeight: 1.1 }}>How much are you losing each week?</h2>
-          <p className="reveal" style={{ fontSize: 16, color: "rgba(255,255,255,0.55)", fontFamily: "DM Sans, sans-serif", maxWidth: 480, margin: "0 auto" }}>Slide to see your real-time friction cost.</p>
+          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(36px, 5vw, 56px)", letterSpacing: "-1.5px", color: "#0A0A0F", marginBottom: 18, lineHeight: 1.1 }}>How much are you losing each week?</h2>
+          <p className="reveal" style={{ fontSize: 16, color: "rgba(10,10,15,0.55)", fontFamily: "DM Sans, sans-serif", maxWidth: 480, margin: "0 auto" }}>Slide to see your real-time friction cost.</p>
         </div>
 
         {/* Mode Toggle — liquid glass pill */}
@@ -2691,7 +2762,7 @@ function FrictionCalculator() {
           background: "rgba(255,255,255,0.10)",
           backdropFilter: "blur(30px) saturate(180%)",
           WebkitBackdropFilter: "blur(30px) saturate(180%)",
-          borderRadius: 999,
+          borderRadius: 14,
           padding: 5,
           marginBottom: 24,
           width: "fit-content",
@@ -2702,7 +2773,7 @@ function FrictionCalculator() {
             <button key={m} onClick={() => setMode(m as "time" | "money")}
               style={{
                 padding: "10px 26px",
-                borderRadius: 999,
+                borderRadius: 14,
                 border: "none",
                 cursor: "pointer",
                 fontSize: 14,
@@ -2816,7 +2887,7 @@ function FrictionCalculator() {
             <div style={{ marginBottom: mode === "money" ? 28 : 0 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <label style={{ fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: "DM Sans, sans-serif", letterSpacing: "-0.2px" }}>Prompts per day</label>
-                <span style={{ fontSize: 15, fontWeight: 700, color: "#fff", fontFamily: "var(--font-bricolage), sans-serif", background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.25)", padding: "5px 14px", borderRadius: 999, letterSpacing: "-0.3px" }}>{prompts}/day</span>
+                <span style={{ fontSize: 15, fontWeight: 700, color: "#fff", fontFamily: "var(--font-bricolage), sans-serif", background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.25)", padding: "5px 14px", borderRadius: 14, letterSpacing: "-0.3px" }}>{prompts}/day</span>
               </div>
               <input type="range" min={5} max={150} step={5} value={prompts} onChange={e => setPrompts(+e.target.value)} className="glass-slider" />
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,0.55)", fontFamily: "DM Sans, sans-serif", marginTop: 10, fontWeight: 500 }}>
@@ -2828,7 +2899,7 @@ function FrictionCalculator() {
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                   <label style={{ fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: "DM Sans, sans-serif", letterSpacing: "-0.2px" }}>Your hourly rate</label>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: "#fff", fontFamily: "var(--font-bricolage), sans-serif", background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.25)", padding: "5px 14px", borderRadius: 999, letterSpacing: "-0.3px" }}>${hourlyRate}/h</span>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: "#fff", fontFamily: "var(--font-bricolage), sans-serif", background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.25)", padding: "5px 14px", borderRadius: 14, letterSpacing: "-0.3px" }}>${hourlyRate}/h</span>
                 </div>
                 <input type="range" min={25} max={400} step={25} value={hourlyRate} onChange={e => setHourlyRate(+e.target.value)} className="glass-slider" />
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,0.55)", fontFamily: "DM Sans, sans-serif", marginTop: 10, fontWeight: 500 }}>
@@ -3105,306 +3176,159 @@ function FounderSection() {
 
 // ─── Pricing Section ──────────────────────────────────────────────────────────
 function PricingSection() {
-  const plans = [
-    {
-      tag: "Free",
-      tagColor: "#567EFC",
-      tagBg: "rgba(86,126,252,0.08)",
-      name: "Start here.",
-      price: "$0",
-      period: null,
-      dark: false,
-      featured: false,
-      features: [
-        "30 lifetime prompts",
-        "Vault documents",
-        "Conversation history",
-        "Works with Claude, ChatGPT, Gemini",
-      ],
-      cta: "Download free — public beta v1",
-      ctaStyle: "outline" as const,
-      note: "No account needed · macOS 13+",
-    },
-    {
-      tag: "Early Access",
-      tagColor: "#567EFC",
-      tagBg: "rgba(86,126,252,0.1)",
-      name: "Go unlimited.",
-      price: "$10",
-      period: "/mo",
-      dark: false,
-      featured: false,
-      features: [
-        "Unlimited prompts",
-        "Unlimited Vault",
-        "Priority support",
-        "All updates included",
-      ],
-      cta: "Download & subscribe in-app",
-      ctaStyle: "gradient" as const,
-      note: "Beta price — increases after beta ends",
-    },
-    {
-      tag: "⚡ Founding Member",
-      tagColor: "#A78BFA",
-      tagBg: "transparent",
-      name: "Own it forever.",
-      price: "$99",
-      period: "once",
-      dark: true,
-      featured: true,
-      features: [
-        "Unlimited prompts for life",
-        "Unlimited Vault",
-        "Priority support",
-        "All future features",
-        "Feature vote — your top 3 ship first",
-        "Direct email access to the founder",
-      ],
-      cta: "Download — Public Beta v1",
-      ctaStyle: "white" as const,
-      note: "Beta price — increases at public launch",
-    },
+  const waitlistFeatures = [
+    "First access when the public beta opens",
+    "Founder updates, straight from me",
+    "No card, no commitment",
+  ];
+  const founderFeatures = [
+    "Instant access to the MVP today",
+    "Unlimited prompts for life",
+    "Unlimited Vault",
+    "Every future feature included",
+    "Feature vote — your top 3 ship first",
+    "Direct email line to the founder",
   ];
 
   return (
     <section id="pricing" style={{ padding: "96px clamp(20px, 5vw, 80px)", background: "transparent", position: "relative", overflow: "hidden" }}>
-      <div style={{ maxWidth: 1080, margin: "0 auto", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: 960, margin: "0 auto", position: "relative", zIndex: 1 }}>
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(36px, 5vw, 56px)", letterSpacing: "-1.5px", color: "#fff", margin: "0 0 18px", lineHeight: 1.1 }}>
-            One download.<br />Three ways in.
+          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(36px, 5vw, 56px)", letterSpacing: "-1.5px", color: "#0A0A0F", margin: "0 0 18px", lineHeight: 1.1 }}>
+            MVP stage.<br />Two ways in.
           </h2>
-          <p className="reveal" style={{ fontSize: 16, color: "rgba(255,255,255,0.70)", fontFamily: "DM Sans, sans-serif", maxWidth: 480, margin: "0 auto" }}>
-            Start free. Upgrade inside the app whenever you&apos;re ready.
+          <p className="reveal" style={{ fontSize: 16, color: "rgba(10,10,15,0.70)", fontFamily: "DM Sans, sans-serif", maxWidth: 520, margin: "0 auto" }}>
+            To use the MVP today, become a Founder. Everyone else — join the waitlist.
           </p>
         </div>
 
-        {/* 3-column plan grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 18, alignItems: "stretch" }}>
-          {plans.map((plan, idx) => {
-            const isFeatured = plan.featured;
+        {/* 2-column plan grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 18, alignItems: "stretch" }}>
 
-            // Featured = deep dark card with violet glow accent; others = liquid glass
-            const cardBg = isFeatured
-              ? "radial-gradient(120% 100% at 0% 0%, rgba(86,126,252,0.22) 0%, rgba(15,10,30,0.96) 55%), #0A0712"
-              : "rgba(255,255,255,0.10)";
-            const cardBorder = isFeatured
-              ? "1px solid rgba(134,160,255,0.28)"
-              : "1px solid rgba(255,255,255,0.18)";
-            const cardShadow = isFeatured
-              ? "0 32px 80px rgba(86,126,252,0.28), 0 8px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)"
-              : "0 8px 32px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(255,255,255,0.06)";
-            const backdrop = isFeatured ? "none" : "blur(60px) saturate(180%)";
+          {/* Waitlist card — secondary */}
+          <div id="waitlist" className="reveal" style={{
+            background: "rgba(10,8,24,0.92)",
+            borderRadius: 28,
+            padding: "32px 28px",
+            border: "1px solid rgba(255,255,255,0.10)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+            position: "relative",
+            display: "flex",
+            flexDirection: "column",
+          }}>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700,
+              textTransform: "uppercase", letterSpacing: "0.1em", color: "#fff",
+              background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.18)",
+              borderRadius: 14, padding: "4px 12px", marginBottom: 18,
+              fontFamily: "DM Sans, sans-serif", width: "fit-content",
+            }}>Waitlist</div>
 
-            const textPrimary = "#fff";
-            const textSecondary = isFeatured ? "rgba(255,255,255,0.78)" : "rgba(255,255,255,0.75)";
-            const textMuted = isFeatured ? "rgba(255,255,255,0.52)" : "rgba(255,255,255,0.55)";
-            const divider = isFeatured ? "rgba(134,160,255,0.18)" : "rgba(255,255,255,0.12)";
+            <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 22, color: "#fff", margin: "0 0 18px", letterSpacing: "-0.4px" }}>
+              Not ready yet?
+            </h3>
 
-            const tagColor = isFeatured ? "#B3C5FF" : "#fff";
-            const tagBg = isFeatured ? "rgba(86,126,252,0.18)" : "rgba(255,255,255,0.10)";
-            const tagBorder = isFeatured ? "1px solid rgba(134,160,255,0.32)" : "1px solid rgba(255,255,255,0.18)";
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 22 }}>
+              <span style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 52, letterSpacing: "-2.5px", lineHeight: 1, color: "#fff" }}>Free</span>
+            </div>
 
-            const checkBg = isFeatured
-              ? "linear-gradient(135deg, #567EFC, #EB5E5E)"
-              : "rgba(255,255,255,0.14)";
-            const checkBorder = isFeatured ? "none" : "1px solid rgba(255,255,255,0.20)";
+            <div style={{ height: 1, background: "rgba(255,255,255,0.12)", marginBottom: 22 }} />
 
-            return (
-              <div
-                key={idx}
-                className="reveal"
-                style={{
-                  background: cardBg,
-                  backdropFilter: backdrop,
-                  WebkitBackdropFilter: backdrop,
-                  borderRadius: 28,
-                  padding: "32px 28px",
-                  border: cardBorder,
-                  boxShadow: cardShadow,
-                  position: "relative",
-                  display: "flex",
-                  flexDirection: "column",
-                  transition: "transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s ease",
-                  cursor: "default",
-                  transform: isFeatured ? "scale(1.02)" : undefined,
-                  zIndex: isFeatured ? 2 : 1,
-                }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLDivElement;
-                  el.style.transform = isFeatured ? "scale(1.02) translateY(-4px)" : "translateY(-4px)";
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLDivElement;
-                  el.style.transform = isFeatured ? "scale(1.02)" : "";
-                }}
-              >
-                {/* MOST VALUE badge */}
-                {isFeatured && (
-                  <div style={{
-                    position: "absolute",
-                    top: -14,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    background: "linear-gradient(90deg, #567EFC, #EB5E5E)",
-                    color: "#fff",
-                    fontSize: 11,
-                    fontWeight: 700,
-                    fontFamily: "DM Sans, sans-serif",
-                    padding: "5px 16px",
-                    borderRadius: 999,
-                    whiteSpace: "nowrap",
-                    letterSpacing: "0.08em",
-                    boxShadow: "0 4px 16px rgba(86,126,252,0.35)",
-                  }}>MOST VALUE</div>
-                )}
-
-                {/* Tag */}
-                <div style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                  color: tagColor,
-                  background: tagBg,
-                  border: tagBorder,
-                  borderRadius: 999,
-                  padding: "4px 12px",
-                  marginBottom: 18,
-                  fontFamily: "DM Sans, sans-serif",
-                  width: "fit-content",
-                }}>{plan.tag}</div>
-
-                {/* Name */}
-                <h3 style={{
-                  fontFamily: "var(--font-bricolage), sans-serif",
-                  fontWeight: 700,
-                  fontSize: 22,
-                  color: textPrimary,
-                  margin: "0 0 18px",
-                  letterSpacing: "-0.4px",
-                }}>{plan.name}</h3>
-
-                {/* Price */}
-                <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 22 }}>
-                  <span style={{
-                    fontFamily: "var(--font-bricolage), sans-serif",
-                    fontWeight: 800,
-                    fontSize: 52,
-                    letterSpacing: "-2.5px",
-                    lineHeight: 1,
-                    color: textPrimary,
-                  }}>{plan.price}</span>
-                  {plan.period && (
-                    <span style={{
-                      fontSize: 15,
-                      color: textMuted,
-                      fontFamily: "DM Sans, sans-serif",
-                      fontWeight: 500,
-                    }}>{plan.period}</span>
-                  )}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28, flex: 1 }}>
+              {waitlistFeatures.map((f, fi) => (
+                <div key={fi} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                  <div style={{ width: 18, height: 18, borderRadius: "50%", background: "rgba(255,255,255,0.14)", border: "1px solid rgba(255,255,255,0.20)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
+                    <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                      <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <span style={{ fontSize: 14, lineHeight: 1.5, color: "rgba(255,255,255,0.75)", fontFamily: "DM Sans, sans-serif" }}>{f}</span>
                 </div>
+              ))}
+            </div>
 
-                {/* Divider */}
-                <div style={{
-                  height: 1,
-                  background: divider,
-                  marginBottom: 22,
-                }} />
+            <WaitlistForm variant="pricing" />
 
-                {/* Features */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28, flex: 1 }}>
-                  {plan.features.map((f, fi) => (
-                    <div key={fi} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                      <div style={{
-                        width: 18,
-                        height: 18,
-                        borderRadius: "50%",
-                        background: checkBg,
-                        border: checkBorder,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                        marginTop: 1,
-                      }}>
-                        <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                          <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </div>
-                      <span style={{
-                        fontSize: 14,
-                        lineHeight: 1.5,
-                        color: textSecondary,
-                        fontFamily: "DM Sans, sans-serif",
-                      }}>{f}</span>
-                    </div>
-                  ))}
+            <p style={{ fontSize: 12, fontFamily: "DM Sans, sans-serif", textAlign: "center", marginTop: 12, marginBottom: 0, color: "rgba(255,255,255,0.55)" }}>
+              We'll email you when the public beta opens.
+            </p>
+          </div>
+
+          {/* Founder Pack — featured, pay-to-access */}
+          <div className="reveal" style={{
+            background: "radial-gradient(120% 100% at 0% 0%, rgba(86,126,252,0.22) 0%, rgba(15,10,30,0.96) 55%), #0A0712",
+            borderRadius: 28,
+            padding: "32px 28px",
+            border: "1px solid rgba(134,160,255,0.28)",
+            boxShadow: "0 32px 80px rgba(86,126,252,0.28), 0 8px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)",
+            position: "relative",
+            display: "flex",
+            flexDirection: "column",
+            transform: "scale(1.02)",
+            zIndex: 2,
+          }}>
+            <div style={{
+              position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)",
+              background: "#fff", color: "#000",
+              fontSize: 11, fontWeight: 700, fontFamily: "DM Sans, sans-serif",
+              padding: "5px 16px", borderRadius: 3, whiteSpace: "nowrap",
+              letterSpacing: "0.1em", border: "0.5px solid rgba(0,0,0,0.15)",
+            }}>LIMITED — BETA</div>
+
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700,
+              textTransform: "uppercase", letterSpacing: "0.1em", color: "#B3C5FF",
+              background: "rgba(86,126,252,0.18)", border: "1px solid rgba(134,160,255,0.32)",
+              borderRadius: 14, padding: "4px 12px", marginBottom: 18,
+              fontFamily: "DM Sans, sans-serif", width: "fit-content",
+            }}>Founder Pack</div>
+
+            <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 22, color: "#fff", margin: "0 0 18px", letterSpacing: "-0.4px" }}>
+              Get in today. Own it forever.
+            </h3>
+
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 22 }}>
+              <span style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 52, letterSpacing: "-2.5px", lineHeight: 1, color: "#fff" }}>$99</span>
+              <span style={{ fontSize: 15, color: "rgba(255,255,255,0.52)", fontFamily: "DM Sans, sans-serif", fontWeight: 500 }}>once</span>
+            </div>
+
+            <div style={{ height: 1, background: "rgba(134,160,255,0.18)", marginBottom: 22 }} />
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28, flex: 1 }}>
+              {founderFeatures.map((f, fi) => (
+                <div key={fi} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                  <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg, #567EFC, #EB5E5E)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
+                    <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                      <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <span style={{ fontSize: 14, lineHeight: 1.5, color: "rgba(255,255,255,0.82)", fontFamily: "DM Sans, sans-serif" }}>{f}</span>
                 </div>
+              ))}
+            </div>
 
-                {/* CTA */}
-                <a
-                  href="/api/download"
-                  className="btn-spring"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 8,
-                    width: "100%",
-                    padding: "14px 0",
-                    borderRadius: 999,
-                    fontSize: 14,
-                    fontWeight: 700,
-                    fontFamily: "DM Sans, sans-serif",
-                    textDecoration: "none",
-                    letterSpacing: "-0.2px",
-                    ...(isFeatured
-                      ? {
-                          background: "linear-gradient(135deg, #567EFC, #EB5E5E)",
-                          color: "#fff",
-                          boxShadow: "0 8px 24px rgba(86,126,252,0.35), 0 2px 6px rgba(235,94,94,0.25)",
-                          border: "none",
-                        }
-                      : {
-                          background: "rgba(255,255,255,0.14)",
-                          color: "#fff",
-                          border: "1px solid rgba(255,255,255,0.22)",
-                          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.15)",
-                        }
-                    ),
-                  }}
-                >
-                  <Download size={15} />
-                  {plan.cta}
-                </a>
+            <PricingPaidForm />
 
-                {/* Note */}
-                <p style={{
-                  fontSize: 12,
-                  fontFamily: "DM Sans, sans-serif",
-                  textAlign: "center",
-                  marginTop: 12,
-                  marginBottom: 0,
-                  fontWeight: plan.note.startsWith("Beta price") ? 600 : 400,
-                  color: plan.note.startsWith("Beta price")
-                    ? "#FBBF24"
-                    : textMuted,
-                }}>{plan.note}</p>
-              </div>
-            );
-          })}
+            <p style={{ fontSize: 12, fontFamily: "DM Sans, sans-serif", textAlign: "center", marginTop: 12, marginBottom: 0, fontWeight: 600, color: "#FBBF24" }}>
+              MVP price — increases at public launch.
+            </p>
+          </div>
+        </div>
+
+        {/* FM Promise */}
+        <div style={{ maxWidth: 580, margin: "32px auto 0", textAlign: "center", padding: "20px 24px", border: "0.5px solid rgba(255,255,255,0.12)", borderRadius: 12 }}>
+          <p style={{ fontSize: 12, fontWeight: 700, fontFamily: "DM Sans, sans-serif", color: "rgba(255,255,255,0.9)", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 10px" }}>The FM Promise</p>
+          <p style={{ fontSize: 13, fontFamily: "DM Sans, sans-serif", color: "rgba(255,255,255,0.65)", margin: "0 0 6px", lineHeight: 1.6 }}>Lifetime access to the core product. No feature stripping. Ever.</p>
+          <p style={{ fontSize: 13, fontFamily: "DM Sans, sans-serif", color: "rgba(255,255,255,0.65)", margin: "0 0 6px", lineHeight: 1.6 }}>After beta, non-FMs pay ~$15–20/mo.</p>
+          <p style={{ fontSize: 13, fontFamily: "DM Sans, sans-serif", color: "rgba(255,255,255,0.65)", margin: 0, lineHeight: 1.6 }}>Advanced add-ons may come later — FMs get discount.</p>
         </div>
 
         {/* Bottom note */}
         <div style={{ textAlign: "center", marginTop: 40 }}>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.60)", fontFamily: "DM Sans, sans-serif", margin: "0 0 6px" }}>
-            Paid plans are managed directly inside the app · macOS Ventura 13.0+ · Apple Silicon &amp; Intel
+            One-time payment · macOS Ventura 13.0+ · Apple Silicon &amp; Intel
           </p>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", fontFamily: "DM Sans, sans-serif", margin: 0 }}>
             Follow live updates →{" "}
@@ -3509,7 +3433,7 @@ function Footer() {
         <span style={{ fontSize: 13, color: "rgba(255,255,255,0.25)", fontFamily: "DM Sans, sans-serif" }}>© 2026 Lumia</span>
         <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.25)", fontFamily: "DM Sans, sans-serif" }}>
           Questions about your purchase?{" "}
-          <a href="mailto:oria.agency.ai@gmail.com" style={{ color: "rgba(255,255,255,0.35)", textDecoration: "underline" }}>oria.agency.ai@gmail.com</a>
+          <a href="mailto:rosly@getlumia.ca" style={{ color: "rgba(255,255,255,0.35)", textDecoration: "underline" }}>rosly@getlumia.ca</a>
         </span>
       </div>
     </footer>
@@ -3598,7 +3522,7 @@ function WorksOnTopOfSection() {
           fontWeight: 800,
           fontSize: "clamp(32px, 4vw, 48px)",
           letterSpacing: "-1.5px",
-          color: "#fff",
+          color: "#0A0A0F",
           lineHeight: 1.1,
           margin: 0,
         }}>
@@ -3624,60 +3548,19 @@ function WorksOnTopOfSection() {
 // ─── Made For You Section ─────────────────────────────────────────────────────
 const PERSONAS = [
   {
-    label: "Solo Entrepreneurs",
-    lines: ["SOLO", "ENTRE", "PRE", "NEUR"],
-    title: "Lumia for Solo Entrepreneurs",
-    short: "One vault, every AI",
-    desc: "You run 4 AIs. Lumia runs your context across all of them.",
+    label: "The Builder",
+    title: "The Builder",
+    desc: "You ship at 2am. Your stack is Cursor + Claude + ChatGPT.\nYour vision doesn't fit in a prompt box. Lumia carries it.",
   },
   {
-    label: "Content Creators",
-    lines: ["CON", "TENT", "CREA", "TORS"],
-    title: "Lumia for Content Creators",
-    short: "Your voice, on tap",
-    desc: "Your voice, your pillars, your cadence — loaded before you type.",
+    label: "The Creator",
+    title: "The Creator",
+    desc: "Your brand voice. Your tone. Your references.\nLumia knows them before you type.",
   },
   {
-    label: "Students",
-    lines: ["STU", "DENT", "S"],
-    title: "Lumia for Students",
-    short: "Every class, remembered",
-    desc: "Every class vaulted. Every professor's framework remembered.",
-  },
-  {
-    label: "Freelancers",
-    lines: ["LANCERS", "FREE"],
-    title: "Lumia for Freelancers",
-    short: "Every client, vaulted",
-    desc: "Every client, every constraint, every preference — one shortcut away.",
-  },
-  {
-    label: "Vibe Coders",
-    lines: ["VIBE", "CODERS"],
-    title: "Lumia for Vibe Coders",
-    short: "Stack-aware, always",
-    desc: "Your stack, your repo, your architecture — injected everywhere you code.",
-  },
-  {
-    label: "E-commerce",
-    lines: ["E-COM", "MERCE"],
-    title: "Lumia for E-commerce Operators",
-    short: "Launch in one session",
-    desc: "40 descriptions, 8 email sequences, one brand voice. Loaded instantly.",
-  },
-  {
-    label: "Marketers",
-    lines: ["MAR", "KE", "TERS"],
-    title: "Lumia for Marketers",
-    short: "Brand-ready, prompt one",
-    desc: "4 brands, 4 tones, 4 ICPs. Lumia loads the right one before you type.",
-  },
-  {
-    label: "Power Users",
-    lines: ["POWER", "USERS"],
-    title: "Lumia for Power Users",
-    short: "The persistent layer",
-    desc: "Claude, Perplexity, Cursor, ChatGPT — one persistent layer across all of them.",
+    label: "The Founder",
+    title: "The Founder",
+    desc: "Your startup. Your customers. Your numbers.\nLumia makes sure every AI knows the full story.",
   },
 ];
 
@@ -3687,87 +3570,55 @@ function MadeForYouSection() {
       <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 1 }}>
         {/* Header — centered */}
         <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <p className="reveal" style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(255,255,255,0.55)", marginBottom: 14, fontFamily: "DM Sans, sans-serif" }}>Who it&apos;s for</p>
-          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(36px, 5vw, 56px)", color: "#fff", letterSpacing: "-1.5px", lineHeight: 1.1, margin: "0 0 18px" }}>
+          <p className="reveal" style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(10,10,15,0.55)", marginBottom: 14, fontFamily: "DM Sans, sans-serif" }}>Who it&apos;s for</p>
+          <h2 className="reveal" style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(36px, 5vw, 56px)", color: "#0A0A0F", letterSpacing: "-1.5px", lineHeight: 1.1, margin: "0 0 18px" }}>
             Built for people who build.
           </h2>
-          <p className="reveal" style={{ fontSize: 16, color: "rgba(255,255,255,0.55)", fontFamily: "DM Sans, sans-serif", maxWidth: 540, margin: "0 auto" }}>
+          <p className="reveal" style={{ fontSize: 16, color: "rgba(10,10,15,0.55)", fontFamily: "DM Sans, sans-serif", maxWidth: 540, margin: "0 auto" }}>
             Whatever your workflow — Lumia keeps your full context one shortcut away.
           </p>
         </div>
 
-        {/* Persona grid — 4×2 on desktop */}
+        {/* Persona grid — 3 tiles */}
         <div className="persona-grid" style={{
           display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
+          gridTemplateColumns: "repeat(3, 1fr)",
           gap: 16,
         }}>
           {PERSONAS.map(p => (
             <div key={p.label} className="persona-card" style={{
               position: "relative",
-              aspectRatio: "3 / 4",
-              borderRadius: 28,
+              borderRadius: 20,
               overflow: "hidden",
-              cursor: "pointer",
-              background: "rgba(255,255,255,0.08)",
-              backdropFilter: "blur(40px) saturate(160%)",
-              WebkitBackdropFilter: "blur(40px) saturate(160%)",
-              border: "1px solid rgba(255,255,255,0.16)",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.18)",
-              transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), background 0.4s ease, border-color 0.4s ease",
+              cursor: "default",
+              background: "#000",
+              border: "0.5px solid rgba(255,255,255,0.18)",
+              padding: "36px 32px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+              transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease",
             }}>
-              {/* Typography fill */}
-              <div className="persona-type" style={{
-                position: "absolute",
-                inset: 0,
-                padding: "22px 20px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "flex-start",
-                gap: 0,
-                transition: "opacity 0.35s ease",
+              <h3 style={{
+                fontFamily: "var(--font-bricolage), sans-serif",
+                fontWeight: 800,
+                fontSize: "clamp(28px, 3vw, 32px)",
+                letterSpacing: "-1px",
+                color: "#fff",
+                margin: 0,
+                lineHeight: 1.1,
               }}>
-                {p.lines.map((line, i) => (
-                  <span key={i} style={{
-                    fontFamily: "var(--font-bricolage), sans-serif",
-                    fontWeight: 800,
-                    fontSize: "clamp(34px, 4.5vw, 54px)",
-                    lineHeight: 0.9,
-                    letterSpacing: "-0.04em",
-                    textTransform: "uppercase",
-                    color: "#fff",
-                    display: "block",
-                  }}>
-                    {line}
-                  </span>
-                ))}
-              </div>
-
-              {/* Hover overlay — liquid glass with details */}
-              <div className="persona-hover" style={{
-                position: "absolute",
-                inset: 0,
-                background: "linear-gradient(180deg, rgba(10,8,24,0.25) 0%, rgba(10,8,24,0.85) 55%, rgba(10,8,24,0.92) 100%)",
-                backdropFilter: "blur(4px)",
-                WebkitBackdropFilter: "blur(4px)",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-end",
-                padding: 22,
-                opacity: 0,
-                transition: "opacity 0.35s ease",
+                {p.title}
+              </h3>
+              <p style={{
+                fontSize: 14,
+                color: "rgba(255,255,255,0.65)",
+                lineHeight: 1.65,
+                fontFamily: "DM Sans, sans-serif",
+                margin: 0,
               }}>
-                <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(255,255,255,0.55)", margin: "0 0 8px", fontFamily: "DM Sans, sans-serif" }}>
-                  {p.short}
-                </p>
-                <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 20, color: "#fff", letterSpacing: "-0.5px", margin: "0 0 12px", lineHeight: 1.15 }}>
-                  {p.title}
-                </h3>
-                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.78)", lineHeight: 1.55, fontFamily: "DM Sans, sans-serif", margin: 0 }}>
-                  {p.desc}
-                </p>
-              </div>
+                {p.desc.split('\n').map((line, i) => <span key={i}>{line}{i < p.desc.split('\n').length - 1 && <br />}</span>)}
+              </p>
             </div>
           ))}
         </div>
@@ -3808,9 +3659,12 @@ function SkillsSection() {
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <h2 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(32px, 4vw, 50px)", letterSpacing: "-2px", color: "#fff", lineHeight: 1.1, margin: 0 }}>
-            It knows what you need<br />before you ask.
+          <h2 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(32px, 4vw, 50px)", letterSpacing: "-2px", color: "#0A0A0F", lineHeight: 1.1, margin: "0 0 16px" }}>
+            Your context. Pre-loaded.
           </h2>
+          <p style={{ fontSize: 16, color: "rgba(10,10,15,0.55)", fontFamily: "DM Sans, sans-serif", maxWidth: 520, margin: "0 auto", lineHeight: 1.65 }}>
+            Lumia doesn&apos;t give you templates. It remembers your stack, your projects, your voice — and builds the prompt for you. You just think out loud.
+          </p>
         </div>
 
         {/* ── Feature rows — alternating mockup/text ── */}
@@ -3818,22 +3672,22 @@ function SkillsSection() {
 
           {/* Row 1 — Skills: mockup left, text right */}
           <div className="reveal skills-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center" }}>
-            <div style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(32px) saturate(150%)", WebkitBackdropFilter: "blur(32px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 24, padding: "28px", overflow: "hidden", position: "relative", boxShadow: "0 4px 24px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.10)" }}>
+            <div style={{ background: "rgba(0,0,0,0.04)", backdropFilter: "blur(32px) saturate(150%)", WebkitBackdropFilter: "blur(32px) saturate(150%)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 24, padding: "28px", overflow: "hidden", position: "relative", boxShadow: "0 4px 24px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.10)" }}>
               <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "#8BA8FD", fontFamily: "DM Sans, sans-serif", margin: "0 0 16px" }}>100+ Skills built-in</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {FEATURED_SKILLS.map(({ cat, skills }) => (
                   <div key={cat}>
-                    <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans, sans-serif", marginBottom: 7, textTransform: "uppercase", letterSpacing: "0.1em" }}>{cat}</p>
+                    <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(10,10,15,0.45)", fontFamily: "DM Sans, sans-serif", marginBottom: 7, textTransform: "uppercase", letterSpacing: "0.1em" }}>{cat}</p>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                       {skills.map(s => (
-                        <span key={s} style={{ fontSize: 11, fontWeight: 500, fontFamily: "DM Sans, sans-serif", color: "rgba(255,255,255,0.80)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 999, padding: "4px 12px", whiteSpace: "nowrap" }}>{s}</span>
+                        <span key={s} style={{ fontSize: 11, fontWeight: 500, fontFamily: "DM Sans, sans-serif", color: "rgba(10,10,15,0.75)", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 14, padding: "4px 12px", whiteSpace: "nowrap" }}>{s}</span>
                       ))}
                     </div>
                   </div>
                 ))}
               </div>
-              <div style={{ marginTop: 20, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans, sans-serif" }}>+ Creative · Personal · Research</span>
+              <div style={{ marginTop: 20, paddingTop: 14, borderTop: "1px solid rgba(0,0,0,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 11, color: "rgba(10,10,15,0.45)", fontFamily: "DM Sans, sans-serif" }}>+ Creative · Personal · Research</span>
                 <div style={{ display: "flex", gap: 4 }}>
                   {MODEL_LOGOS.map(m => (
                     <img key={m.name} src={m.src} alt={m.name} style={{ width: 16, height: 16, objectFit: "contain", opacity: 0.6, borderRadius: 3 }} />
@@ -3843,9 +3697,9 @@ function SkillsSection() {
             </div>
             <div>
               <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.10em", color: "#8BA8FD", fontFamily: "DM Sans, sans-serif", margin: "0 0 14px" }}>Skills</p>
-              <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(26px, 3vw, 36px)", letterSpacing: "-1px", color: "#fff", margin: "0 0 16px", lineHeight: 1.15 }}>Say what you need.<br />The right skill fires.</h3>
-              <p style={{ fontSize: 15, color: "rgba(255,255,255,0.50)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.7, margin: "0 0 24px" }}>Type &quot;write a cold email&quot; and Lumia detects the intent, loads the right skill, and builds the prompt — tailored to Claude, ChatGPT, or Gemini. No setup. No switching.</p>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(86,126,252,0.10)", border: "1px solid rgba(86,126,252,0.20)", borderRadius: 999, padding: "7px 16px" }}>
+              <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(26px, 3vw, 36px)", letterSpacing: "-1px", color: "#0A0A0F", margin: "0 0 16px", lineHeight: 1.15 }}>Say what you need.<br />The right skill fires.</h3>
+              <p style={{ fontSize: 15, color: "rgba(10,10,15,0.50)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.7, margin: "0 0 24px" }}>Type &quot;write a cold email&quot; and Lumia detects the intent, loads the right skill, and builds the prompt — tailored to Claude, ChatGPT, or Gemini. No setup. No switching.</p>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(86,126,252,0.10)", border: "1px solid rgba(86,126,252,0.20)", borderRadius: 14, padding: "7px 16px" }}>
                 <span style={{ fontSize: 13 }}>⚡</span>
                 <span style={{ fontSize: 12, color: "#8BA8FD", fontFamily: "DM Sans, sans-serif", fontWeight: 600 }}>Auto-detected · Works on every AI</span>
               </div>
@@ -3856,23 +3710,23 @@ function SkillsSection() {
           <div className="reveal skills-row skills-row-reversed" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center" }}>
             <div>
               <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.10em", color: "#C2AED4", fontFamily: "DM Sans, sans-serif", margin: "0 0 14px" }}>Templates</p>
-              <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(26px, 3vw, 36px)", letterSpacing: "-1px", color: "#fff", margin: "0 0 16px", lineHeight: 1.15 }}>Your context,<br />always pre-loaded.</h3>
-              <p style={{ fontSize: 15, color: "rgba(255,255,255,0.50)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.7, margin: "0 0 24px" }}>Reference any saved doc with <span style={{ fontFamily: "monospace", background: "rgba(255,255,255,0.10)", borderRadius: 4, padding: "2px 7px", color: "#C2AED4", fontSize: 13 }}>@document</span> or any template with <span style={{ fontFamily: "monospace", background: "rgba(255,255,255,0.10)", borderRadius: 4, padding: "2px 7px", color: "#C2AED4", fontSize: 13 }}>#template</span>. Lumia injects exactly what&apos;s needed — nothing more.</p>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(194,174,212,0.10)", border: "1px solid rgba(194,174,212,0.20)", borderRadius: 999, padding: "7px 16px" }}>
+              <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(26px, 3vw, 36px)", letterSpacing: "-1px", color: "#0A0A0F", margin: "0 0 16px", lineHeight: 1.15 }}>Your context,<br />always pre-loaded.</h3>
+              <p style={{ fontSize: 15, color: "rgba(10,10,15,0.50)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.7, margin: "0 0 24px" }}>Reference any saved doc with <span style={{ fontFamily: "monospace", background: "rgba(194,174,212,0.12)", borderRadius: 4, padding: "2px 7px", color: "#C2AED4", fontSize: 13 }}>@document</span> or any template with <span style={{ fontFamily: "monospace", background: "rgba(194,174,212,0.12)", borderRadius: 4, padding: "2px 7px", color: "#C2AED4", fontSize: 13 }}>#template</span>. Lumia injects exactly what&apos;s needed — nothing more.</p>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(194,174,212,0.10)", border: "1px solid rgba(194,174,212,0.20)", borderRadius: 14, padding: "7px 16px" }}>
                 <span style={{ fontSize: 13 }}>📦</span>
                 <span style={{ fontSize: 12, color: "#C2AED4", fontFamily: "DM Sans, sans-serif", fontWeight: 600 }}>Vault-powered · Precision retrieval</span>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(32px) saturate(150%)", WebkitBackdropFilter: "blur(32px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 24, padding: "28px", overflow: "hidden", position: "relative", boxShadow: "0 4px 24px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.10)" }}>
-              <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(255,255,255,0.45)", fontFamily: "DM Sans, sans-serif", margin: "0 0 14px" }}>Your Vault</p>
+            <div style={{ background: "rgba(0,0,0,0.04)", backdropFilter: "blur(32px) saturate(150%)", WebkitBackdropFilter: "blur(32px) saturate(150%)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 24, padding: "28px", overflow: "hidden", position: "relative", boxShadow: "0 4px 24px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.10)" }}>
+              <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(10,10,15,0.45)", fontFamily: "DM Sans, sans-serif", margin: "0 0 14px" }}>Your Vault</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
                 {TEMPLATE_ITEMS.map(item => (
-                  <div key={item.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 12, padding: "10px 14px" }}>
+                  <div key={item.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 12, padding: "10px 14px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: 14 }}>{item.icon}</span>
-                      <span style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.85)", fontFamily: "DM Sans, sans-serif" }}>{item.name}</span>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: "rgba(10,10,15,0.85)", fontFamily: "DM Sans, sans-serif" }}>{item.name}</span>
                     </div>
-                    <span style={{ fontSize: 10, fontWeight: 600, color: item.color, background: item.color + "22", borderRadius: 999, padding: "3px 10px", fontFamily: "DM Sans, sans-serif", flexShrink: 0 }}>{item.tag}</span>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: item.color, background: item.color + "22", borderRadius: 14, padding: "3px 10px", fontFamily: "DM Sans, sans-serif", flexShrink: 0 }}>{item.tag}</span>
                   </div>
                 ))}
               </div>
@@ -3884,35 +3738,35 @@ function SkillsSection() {
 
           {/* Row 3 — Reverse Prompting: mockup left, text right */}
           <div className="reveal skills-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center" }}>
-            <div style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(32px) saturate(150%)", WebkitBackdropFilter: "blur(32px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 24, padding: "28px", overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.10)" }}>
+            <div style={{ background: "rgba(0,0,0,0.04)", backdropFilter: "blur(32px) saturate(150%)", WebkitBackdropFilter: "blur(32px) saturate(150%)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 24, padding: "28px", overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.10)" }}>
               <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#8BA8FD", background: "rgba(86,126,252,0.15)", border: "1px solid rgba(86,126,252,0.30)", borderRadius: 999, padding: "4px 12px", fontFamily: "DM Sans, sans-serif" }}>Cold Email</span>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 999, padding: "4px 12px", fontFamily: "DM Sans, sans-serif", display: "flex", alignItems: "center", gap: 5 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#8BA8FD", background: "rgba(86,126,252,0.15)", border: "1px solid rgba(86,126,252,0.30)", borderRadius: 14, padding: "4px 12px", fontFamily: "DM Sans, sans-serif" }}>Cold Email</span>
+                <span style={{ fontSize: 11, color: "rgba(10,10,15,0.65)", background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 14, padding: "4px 12px", fontFamily: "DM Sans, sans-serif", display: "flex", alignItems: "center", gap: 5 }}>
                   <img src="/claude-ai-icon.webp" alt="Claude" style={{ width: 12, height: 12, objectFit: "contain", opacity: 0.8 }} />Claude
                 </span>
               </div>
-              <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.40)", fontFamily: "DM Sans, sans-serif", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Target audience</p>
+              <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(10,10,15,0.50)", fontFamily: "DM Sans, sans-serif", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Target audience</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
                 {AUDIENCE_OPTS.map((opt, i) => (
-                  <span key={opt} style={{ fontSize: 12, fontWeight: i === 0 ? 600 : 400, color: i === 0 ? "#fff" : "rgba(255,255,255,0.65)", background: i === 0 ? "linear-gradient(90deg, #598CFF, #FF7359)" : "rgba(255,255,255,0.06)", border: i === 0 ? "none" : "1px solid rgba(255,255,255,0.14)", borderRadius: 999, padding: "6px 14px", fontFamily: "DM Sans, sans-serif" }}>{opt}</span>
+                  <span key={opt} style={{ fontSize: 12, fontWeight: i === 0 ? 600 : 400, color: i === 0 ? "#0A0A0F" : "rgba(10,10,15,0.65)", background: i === 0 ? "linear-gradient(90deg, #598CFF, #FF7359)" : "rgba(0,0,0,0.04)", border: i === 0 ? "none" : "1px solid rgba(0,0,0,0.08)", borderRadius: 14, padding: "6px 14px", fontFamily: "DM Sans, sans-serif" }}>{opt}</span>
                 ))}
               </div>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 12, marginBottom: 14 }}>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", fontFamily: "DM Sans, sans-serif" }}>Include social proof?</span>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 12, marginBottom: 14 }}>
+                <span style={{ fontSize: 13, color: "rgba(10,10,15,0.65)", fontFamily: "DM Sans, sans-serif" }}>Include social proof?</span>
                 <div style={{ width: 38, height: 22, borderRadius: 11, background: "linear-gradient(90deg, #598CFF, #4CABFF)", position: "relative" }}>
                   <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, right: 2, boxShadow: "0 1px 4px rgba(0,0,0,0.15)" }} />
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
-                <div style={{ flex: 1, padding: "11px 0", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, fontSize: 13, color: "rgba(255,255,255,0.50)", fontFamily: "DM Sans, sans-serif", textAlign: "center" }}>Skip ↗</div>
+                <div style={{ flex: 1, padding: "11px 0", background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 12, fontSize: 13, color: "rgba(10,10,15,0.65)", fontFamily: "DM Sans, sans-serif", textAlign: "center" }}>Skip ↗</div>
                 <div style={{ flex: 1, padding: "11px 0", background: "linear-gradient(90deg, #598CFF, #FF7359)", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", fontFamily: "DM Sans, sans-serif", textAlign: "center" }}>Continue →</div>
               </div>
             </div>
             <div>
               <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.10em", color: "#8BA8FD", fontFamily: "DM Sans, sans-serif", margin: "0 0 14px" }}>Reverse Prompting</p>
-              <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(26px, 3vw, 36px)", letterSpacing: "-1px", color: "#fff", margin: "0 0 16px", lineHeight: 1.15 }}>Asks before it builds —<br />for every model.</h3>
-              <p style={{ fontSize: 15, color: "rgba(255,255,255,0.50)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.7, margin: "0 0 24px" }}>Lumia knows exactly which context Claude, ChatGPT, or Gemini each needs. The questions it asks are specific to your skill <em style={{ color: "rgba(255,255,255,0.65)" }}>and</em> your model — so every prompt lands, regardless of which AI you use.</p>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(86,126,252,0.10)", border: "1px solid rgba(86,126,252,0.20)", borderRadius: 999, padding: "7px 16px" }}>
+              <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(26px, 3vw, 36px)", letterSpacing: "-1px", color: "#0A0A0F", margin: "0 0 16px", lineHeight: 1.15 }}>Asks before it builds —<br />for every model.</h3>
+              <p style={{ fontSize: 15, color: "rgba(10,10,15,0.50)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.7, margin: "0 0 24px" }}>Lumia knows exactly which context Claude, ChatGPT, or Gemini each needs. The questions it asks are specific to your skill <em style={{ color: "rgba(10,10,15,0.65)" }}>and</em> your model — so every prompt lands, regardless of which AI you use.</p>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(86,126,252,0.10)", border: "1px solid rgba(86,126,252,0.20)", borderRadius: 14, padding: "7px 16px" }}>
                 <span style={{ fontSize: 13 }}>🧠</span>
                 <span style={{ fontSize: 12, color: "#8BA8FD", fontFamily: "DM Sans, sans-serif", fontWeight: 600 }}>Model-aware · Skill-specific</span>
               </div>
@@ -3923,14 +3777,14 @@ function SkillsSection() {
           <div className="reveal skills-row skills-row-reversed" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center" }}>
             <div>
               <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.10em", color: "#FC9865", fontFamily: "DM Sans, sans-serif", margin: "0 0 14px" }}>Multi-AI routing</p>
-              <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(26px, 3vw, 36px)", letterSpacing: "-1px", color: "#fff", margin: "0 0 16px", lineHeight: 1.15 }}>Follows you<br />everywhere.</h3>
-              <p style={{ fontSize: 15, color: "rgba(255,255,255,0.50)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.7, margin: "0 0 24px" }}>Switch AI mid-session — Lumia re-routes your context instantly. Claude, ChatGPT, Gemini, Perplexity — your consultant doesn&apos;t lose context on switch. No re-briefing.</p>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(252,152,101,0.10)", border: "1px solid rgba(252,152,101,0.20)", borderRadius: 999, padding: "7px 16px" }}>
+              <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(26px, 3vw, 36px)", letterSpacing: "-1px", color: "#0A0A0F", margin: "0 0 16px", lineHeight: 1.15 }}>Follows you<br />everywhere.</h3>
+              <p style={{ fontSize: 15, color: "rgba(10,10,15,0.50)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.7, margin: "0 0 24px" }}>Switch AI mid-session — Lumia re-routes your context instantly. Claude, ChatGPT, Gemini, Perplexity — your consultant doesn&apos;t lose context on switch. No re-briefing.</p>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(252,152,101,0.10)", border: "1px solid rgba(252,152,101,0.20)", borderRadius: 14, padding: "7px 16px" }}>
                 <span style={{ fontSize: 13 }}>🌐</span>
                 <span style={{ fontSize: 12, color: "#FC9865", fontFamily: "DM Sans, sans-serif", fontWeight: 600 }}>Works everywhere · Zero re-briefing</span>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(32px) saturate(150%)", WebkitBackdropFilter: "blur(32px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 24, padding: "28px", overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.10)" }}>
+            <div style={{ background: "rgba(0,0,0,0.04)", backdropFilter: "blur(32px) saturate(150%)", WebkitBackdropFilter: "blur(32px) saturate(150%)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 24, padding: "28px", overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.10)" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {[
                   { logo: "/claude-ai-icon.webp", name: "Claude", status: "Active", color: "#D97706" },
@@ -3938,14 +3792,14 @@ function SkillsSection() {
                   { logo: "/google-gemini-icon.webp", name: "Gemini", status: "Ready", color: "#4285F4" },
                   { logo: "/perplexity-ai-icon.webp", name: "Perplexity", status: "Ready", color: "#6366F1" },
                 ].map((ai, i) => (
-                  <div key={ai.name} style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.06)", border: i === 0 ? "1px solid rgba(252,152,101,0.28)" : "1px solid rgba(255,255,255,0.10)", borderRadius: 12, padding: "11px 14px" }}>
+                  <div key={ai.name} style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(0,0,0,0.04)", border: i === 0 ? "1px solid rgba(252,152,101,0.28)" : "1px solid rgba(0,0,0,0.08)", borderRadius: 12, padding: "11px 14px" }}>
                     <img src={ai.logo} alt={ai.name} style={{ width: 22, height: 22, objectFit: "contain", borderRadius: 5 }} />
-                    <span style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.85)", fontFamily: "DM Sans, sans-serif", flex: 1 }}>{ai.name}</span>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: "rgba(10,10,15,0.85)", fontFamily: "DM Sans, sans-serif", flex: 1 }}>{ai.name}</span>
                     <span style={{ fontSize: 10, fontWeight: 600, color: ai.color, background: ai.color + "20", borderRadius: 99, padding: "3px 10px", fontFamily: "DM Sans, sans-serif" }}>{ai.status}</span>
                   </div>
                 ))}
               </div>
-              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.40)", fontFamily: "DM Sans, sans-serif", margin: "16px 0 0", lineHeight: 1.5, textAlign: "center" }}>
+              <p style={{ fontSize: 12, color: "rgba(10,10,15,0.55)", fontFamily: "DM Sans, sans-serif", margin: "16px 0 0", lineHeight: 1.5, textAlign: "center" }}>
                 Lumia re-routes your context instantly.
               </p>
             </div>
@@ -3959,80 +3813,25 @@ function SkillsSection() {
 
 // ─── Video Scroll-Scrub Background ───────────────────────────────────────────
 function VideoBg() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    let targetTime = 0;
-    let currentTime = 0;
-    let rafId = 0;
-
-    const onReady = () => {
-      video.pause();
-      video.currentTime = 0;
-    };
-    video.addEventListener("loadedmetadata", onReady);
-
-    const tick = () => {
-      currentTime += (targetTime - currentTime) * 0.15;
-      if (Math.abs(targetTime - currentTime) > 0.001 && video.duration) {
-        try { video.currentTime = currentTime; } catch {}
-      }
-      rafId = requestAnimationFrame(tick);
-    };
-    rafId = requestAnimationFrame(tick);
-
-    const onScroll = () => {
-      if (!video.duration) return;
-      const maxScroll = document.body.scrollHeight - window.innerHeight;
-      const progress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
-      targetTime = progress * video.duration;
-    };
-
-    // iOS unlock: play+pause on first touch so currentTime scrubbing works
-    const unlock = () => {
-      const p = video.play();
-      if (p && typeof p.then === "function") {
-        p.then(() => video.pause()).catch(() => {});
-      } else {
-        video.pause();
-      }
-      window.removeEventListener("touchstart", unlock);
-      window.removeEventListener("click", unlock);
-    };
-    window.addEventListener("touchstart", unlock, { once: true, passive: true });
-    window.addEventListener("click", unlock, { once: true });
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      cancelAnimationFrame(rafId);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("touchstart", unlock);
-      window.removeEventListener("click", unlock);
-      video.removeEventListener("loadedmetadata", onReady);
-    };
-  }, []);
-
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: -1, overflow: "hidden", pointerEvents: "none" }}>
-      <video
-        ref={videoRef}
-        muted
-        playsInline
-        {...({ "webkit-playsinline": "true" } as Record<string, string>)}
-        preload="auto"
-        poster="/bg-poster.jpg"
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-        }}
-        src="/bg-video.mp4"
-      />
-      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.15)" }} />
+      <picture style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
+        <source media="(min-width: 768px)" srcSet="/hero-bg-desktop.jpg" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/hero-bg.jpg"
+          alt=""
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center top",
+          }}
+        />
+      </picture>
+      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)" }} />
     </div>
   );
 }
@@ -4071,7 +3870,7 @@ export default function Home() {
           </div>
           <h1 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 32, color: "var(--text)", letterSpacing: "-1px" }}>Welcome, Founding Member!</h1>
           <p style={{ color: "var(--text-2)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.6 }}>Your payment was successful. You are now officially a Founding Member of Lumia. We'll be in touch shortly.</p>
-          <button onClick={() => setIsSuccess(false)} style={{ padding: "12px 28px", background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 999, fontWeight: 700, fontSize: 15, cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif" }}>Back to Home</button>
+          <button onClick={() => setIsSuccess(false)} style={{ padding: "12px 28px", background: "#0F0A1E", color: "#fff", border: "none", borderRadius: 14, fontWeight: 700, fontSize: 15, cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif" }}>Back to Home</button>
         </motion.div>
       </div>
     );
@@ -4083,7 +3882,6 @@ export default function Home() {
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
       <style dangerouslySetInnerHTML={{ __html: GLOBAL_STYLES }} />
-      <VideoBg />
       <div style={{ minHeight: "100vh", overflowX: "hidden" }}>
         <LiquidGlassNavbar onSignIn={() => setShowAuthModal(true)} />
         <HeroSection />
@@ -4099,6 +3897,15 @@ export default function Home() {
           <FounderSection />
           <PricingSection />
           <LaunchVideoSection />
+          {/* Live Beyond closing statement */}
+          <section style={{ background: "#000", padding: "120px clamp(20px, 5vw, 80px)", textAlign: "center", position: "relative" }}>
+            <h2 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "clamp(72px, 14vw, 200px)", letterSpacing: "-4px", lineHeight: 0.92, color: "#fff", margin: "0 0 48px" }}>
+              Live Beyond.
+            </h2>
+            <a href="#waitlist" className="btn-spring" style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#000", color: "#fff", borderRadius: 14, padding: "16px 36px", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 16, textDecoration: "none", border: "0.5px solid rgba(255,255,255,0.35)", letterSpacing: "-0.3px" }}>
+              Join the waitlist <ArrowRight size={15} />
+            </a>
+          </section>
           <Footer />
         </div>
       </div>
