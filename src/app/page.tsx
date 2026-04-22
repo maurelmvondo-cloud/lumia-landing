@@ -732,17 +732,37 @@ const GLOBAL_STYLES = `
     }
   }
 
+  /* ── Pillar cards ─────────────────────────────────────────────────── */
+  @media (max-width: 880px) {
+    .pillars-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+  }
+
   /* ── Persona cards ────────────────────────────────────────────────── */
+  .persona-card {
+    transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), box-shadow 0.45s ease, border-color 0.45s ease !important;
+  }
   .persona-card:hover {
     transform: translateY(-6px);
-    background: rgba(255,255,255,0.12) !important;
-    border-color: rgba(255,255,255,0.24) !important;
+    border-color: rgba(255,255,255,0.32) !important;
+    box-shadow: 0 40px 80px -20px rgba(10,10,15,0.55), 0 16px 36px -14px rgba(10,10,15,0.35), 0 2px 6px rgba(10,10,15,0.12) !important;
   }
-  .persona-card:hover .persona-type {
-    opacity: 0 !important;
+  .persona-desc {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(6px);
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.16,1,0.3,1), opacity 0.35s ease, transform 0.45s cubic-bezier(0.16,1,0.3,1);
   }
-  .persona-card:hover .persona-hover {
-    opacity: 1 !important;
+  .persona-card:hover .persona-desc {
+    max-height: 200px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .persona-title {
+    transition: transform 0.45s cubic-bezier(0.16,1,0.3,1);
+  }
+  .persona-card:hover .persona-title {
+    transform: translateY(-2px);
   }
 
   @media (max-width: 980px) {
@@ -3583,44 +3603,73 @@ function MadeForYouSection() {
         <div className="persona-grid" style={{
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 16,
+          gap: 24,
         }}>
-          {PERSONAS.map(p => (
+          {PERSONAS.map(p => {
+            const isCreator = p.label === "The Creator";
+            const isBuilder = p.label === "The Builder";
+            const isFounder = p.label === "The Founder";
+            const hasBg = isCreator || isBuilder || isFounder;
+            const bgUrl = isCreator ? "/creator-bg.jpg" : isBuilder ? "/builder-bg.jpg" : isFounder ? "/founder-bg.jpg" : null;
+            const bgPos = isCreator ? "center 20%" : isBuilder ? "center" : isFounder ? "center" : undefined;
+            return (
             <div key={p.label} className="persona-card" style={{
               position: "relative",
               borderRadius: 20,
               overflow: "hidden",
               cursor: "default",
-              background: "#000",
+              background: hasBg ? "#0A0A0F" : "#000",
+              backgroundImage: bgUrl ? `url('${bgUrl}')` : undefined,
+              backgroundSize: hasBg ? "cover" : undefined,
+              backgroundPosition: bgPos,
               border: "0.5px solid rgba(255,255,255,0.18)",
               padding: "36px 32px",
               display: "flex",
               flexDirection: "column",
               gap: 16,
+              minHeight: 380,
+              aspectRatio: "3 / 4",
+              boxShadow: "0 30px 60px -20px rgba(10,10,15,0.45), 0 12px 28px -12px rgba(10,10,15,0.30), 0 2px 6px rgba(10,10,15,0.10)",
               transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease",
             }}>
-              <h3 style={{
-                fontFamily: "var(--font-bricolage), sans-serif",
-                fontWeight: 800,
-                fontSize: "clamp(28px, 3vw, 32px)",
-                letterSpacing: "-1px",
-                color: "#fff",
-                margin: 0,
-                lineHeight: 1.1,
-              }}>
-                {p.title}
-              </h3>
-              <p style={{
-                fontSize: 14,
-                color: "rgba(255,255,255,0.65)",
-                lineHeight: 1.65,
-                fontFamily: "DM Sans, sans-serif",
-                margin: 0,
-              }}>
-                {p.desc.split('\n').map((line, i) => <span key={i}>{line}{i < p.desc.split('\n').length - 1 && <br />}</span>)}
-              </p>
+              {hasBg && (
+                <div style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0.65) 100%)",
+                  pointerEvents: "none",
+                }} />
+              )}
+              <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: 14, height: "100%" }}>
+                <h3 className="persona-title" style={{
+                  fontFamily: "var(--font-bricolage), sans-serif",
+                  fontWeight: 800,
+                  fontSize: "clamp(40px, 4.4vw, 56px)",
+                  letterSpacing: "-2px",
+                  color: "#fff",
+                  margin: 0,
+                  lineHeight: 0.95,
+                  textTransform: "uppercase",
+                  textShadow: hasBg ? "0 2px 14px rgba(0,0,0,0.55)" : undefined,
+                }}>
+                  {p.title.split(' ').map((w, i) => (
+                    <span key={i} style={{ display: "block" }}>{w}</span>
+                  ))}
+                </h3>
+                <p className="persona-desc" style={{
+                  fontSize: 14,
+                  color: hasBg ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.68)",
+                  lineHeight: 1.55,
+                  fontFamily: "DM Sans, sans-serif",
+                  margin: 0,
+                  textShadow: hasBg ? "0 1px 8px rgba(0,0,0,0.5)" : undefined,
+                }}>
+                  {p.desc.split('\n').map((line, i) => <span key={i}>{line}{i < p.desc.split('\n').length - 1 && <br />}</span>)}
+                </p>
+              </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
@@ -3836,6 +3885,112 @@ function VideoBg() {
   );
 }
 
+// ─── Pillars Section (3 cards under hero) ────────────────────────────────────
+function PillarsSection() {
+  const PILLARS = [
+    {
+      num: "01",
+      label: "WE CARRY IT",
+      title: "WE CARRY IT",
+      desc: "Anything on your mind. Anything in your drive.",
+      bg: "linear-gradient(145deg, #FFE9C7 0%, #FFD29A 55%, #FFB77A 100%)",
+      accent: "#8A3A12",
+      visual: (
+        <img src="/card1-bg.png" alt="Think it. Map it. Draft it." style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      ),
+    },
+    {
+      num: "02",
+      label: "WE ALIGN IT",
+      title: "WE ALIGN IT",
+      desc: "Messy input gets structure. Unclear gets asked. No hallucination.",
+      bg: "linear-gradient(145deg, #E9EEFF 0%, #CFD9FF 55%, #9FB1FF 100%)",
+      accent: "#2433A8",
+      visual: (
+        <img src="/card2-bg.png" alt="We align it." style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      ),
+    },
+    {
+      num: "03",
+      label: "SHIP IT",
+      title: "SHIP IT",
+      desc: "You speak your intent. We speak AI.",
+      bg: "linear-gradient(145deg, #D9F7E4 0%, #A6E9BE 55%, #6FD89A 100%)",
+      accent: "#0B6A3D",
+      visual: (
+        <div style={{ position: "relative", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#fff", borderRadius: 18, padding: "16px 18px", minWidth: 220, boxShadow: "0 24px 48px -12px rgba(11,106,61,0.32), 0 6px 16px rgba(11,106,61,0.18)", transform: "rotate(-2deg)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "#0B6A3D", background: "rgba(11,106,61,0.12)", padding: "3px 9px", borderRadius: 10, fontFamily: "DM Sans, sans-serif", letterSpacing: "0.04em" }}>SHIPPED</span>
+              <span style={{ fontSize: 10, color: "rgba(10,10,15,0.5)", fontFamily: "DM Sans, sans-serif" }}>0.8s</span>
+            </div>
+            <p style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 14, color: "#0A0A0F", lineHeight: 1.3, margin: "0 0 10px", letterSpacing: "-0.4px" }}>Cold email — B2B SaaS</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {[100, 86, 94, 70].map((w, i) => (
+                <div key={i} style={{ height: 5, width: `${w}%`, background: "rgba(10,10,15,0.12)", borderRadius: 4 }} />
+              ))}
+            </div>
+            <div style={{ marginTop: 12, display: "flex", gap: 6 }}>
+              <div style={{ flex: 1, padding: "7px 0", background: "#0A0A0F", color: "#fff", borderRadius: 10, fontSize: 11, fontWeight: 700, fontFamily: "DM Sans, sans-serif", textAlign: "center" }}>Copy</div>
+              <div style={{ flex: 1, padding: "7px 0", background: "rgba(0,0,0,0.06)", color: "rgba(10,10,15,0.7)", borderRadius: 10, fontSize: 11, fontWeight: 700, fontFamily: "DM Sans, sans-serif", textAlign: "center" }}>Send</div>
+            </div>
+          </div>
+          <div style={{ position: "absolute", top: "14%", left: "10%", transform: "rotate(-8deg)", background: "#0B6A3D", color: "#D9F7E4", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 900, fontSize: 11, padding: "6px 12px", borderRadius: 8, letterSpacing: "0.5px" }}>✓ READY</div>
+          <div style={{ position: "absolute", bottom: "16%", right: "10%", transform: "rotate(8deg)", background: "#fff", color: "#0A0A0F", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 11, padding: "6px 12px", borderRadius: 8, boxShadow: "0 6px 14px rgba(11,106,61,0.2)" }}>no edits</div>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <section style={{ background: "#EEEEEE", padding: "120px clamp(20px, 5vw, 80px) 110px", position: "relative" }}>
+      <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+        <div style={{ marginBottom: 56 }}>
+          <p className="reveal" style={{ fontSize: 14, fontWeight: 700, color: "#0A0A0F", fontFamily: "DM Sans, sans-serif", margin: "0 0 18px", letterSpacing: "-0.2px" }}>
+            One flow from thought to shipped output.
+          </p>
+          <h2 className="reveal" style={{
+            fontFamily: "var(--font-bricolage), sans-serif",
+            fontWeight: 900,
+            fontSize: "clamp(44px, 7vw, 92px)",
+            letterSpacing: "-3px",
+            lineHeight: 0.95,
+            color: "#0A0A0F",
+            margin: 0,
+          }}>
+            How Lumia carries<br />your vision.
+          </h2>
+        </div>
+
+        <div className="pillars-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
+          {PILLARS.map(p => (
+            <div key={p.num} className="pillar-item reveal">
+              <div className="pillar-card" style={{
+                background: p.bg,
+                borderRadius: 28,
+                aspectRatio: "4 / 5",
+                position: "relative",
+                overflow: "hidden",
+                transition: "transform 0.5s cubic-bezier(0.16,1,0.3,1)",
+              }}>
+                <div style={{ position: "absolute", inset: 0 }}>{p.visual}</div>
+              </div>
+              <div style={{ padding: "22px 6px 0" }}>
+                <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(20px, 2vw, 26px)", letterSpacing: "-0.8px", color: "#0A0A0F", margin: "0 0 8px", lineHeight: 1.1, whiteSpace: "pre-line" }}>
+                  {p.title}
+                </h3>
+                <p style={{ fontSize: 15, color: "rgba(10,10,15,0.6)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.55, margin: 0 }}>
+                  {p.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Home ─────────────────────────────────────────────────────────────────────
 export default function Home() {
   const [isSuccess, setIsSuccess] = useState(false);
@@ -3885,6 +4040,7 @@ export default function Home() {
       <div style={{ minHeight: "100vh", overflowX: "hidden" }}>
         <LiquidGlassNavbar onSignIn={() => setShowAuthModal(true)} />
         <HeroSection />
+        <PillarsSection />
         <div className="dark-zone">
           <div className="noise-overlay" aria-hidden="true" />
           <HowItWorksSection />

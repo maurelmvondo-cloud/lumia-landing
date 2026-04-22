@@ -1,12 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque } from "next/font/google";
+import localFont from "next/font/local";
 import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+const bricolage = localFont({
+  src: [
+    { path: "./fonts/HelveticaNowDisplay-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/HelveticaNowDisplay-RegIta.woff2",  weight: "400", style: "italic" },
+    { path: "./fonts/HelveticaNowDisplay-Medium.woff2",  weight: "500", style: "normal" },
+    { path: "./fonts/HelveticaNowDisplay-Bold.woff2",    weight: "700", style: "normal" },
+    { path: "./fonts/HelveticaNowDisplay-BoldIta.woff2", weight: "700", style: "italic" },
+    { path: "./fonts/HelveticaNowDisplay-ExtraBold.woff2", weight: "800", style: "normal" },
+    { path: "./fonts/HelveticaNowDisplay-Black.woff2",   weight: "900", style: "normal" },
+    { path: "./fonts/HelveticaNowDisplay-BlackIta.woff2",weight: "900", style: "italic" },
+  ],
   variable: "--font-bricolage",
   display: "swap",
 });
