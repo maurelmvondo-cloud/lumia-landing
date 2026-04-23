@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 
 interface LiquidGlassNavbarProps {
   onSignIn?: () => void;
@@ -42,23 +42,14 @@ export default function LiquidGlassNavbar({ onSignIn }: LiquidGlassNavbarProps) 
         transition: "background 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s ease",
       }}>
 
-        {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <Image
-            src="/lumia-logo-white.png"
-            alt="Lumia"
-            width={64}
-            height={64}
-            style={{ objectFit: "contain" }}
-          />
-          <span style={{
-            fontFamily: "var(--font-bricolage), sans-serif",
-            fontWeight: 800,
-            fontSize: 36,
-            color: "#fff",
-            letterSpacing: "-0.8px",
-          }}>Lumia</span>
-        </div>
+        {/* Wordmark */}
+        <span style={{
+          fontFamily: "var(--font-bricolage), sans-serif",
+          fontWeight: 800,
+          fontSize: 36,
+          color: "#fff",
+          letterSpacing: "-0.8px",
+        }}>Lumia</span>
 
         {/* CTA */}
         <a
@@ -66,22 +57,32 @@ export default function LiquidGlassNavbar({ onSignIn }: LiquidGlassNavbarProps) 
           style={{
             display: "inline-flex",
             alignItems: "center",
-            padding: "10px 22px",
-            borderRadius: 12,
-            background: "#fff",
-            color: "#000",
+            gap: 10,
+            padding: "8px 10px 8px 18px",
+            borderRadius: 999,
+            background: "transparent",
+            color: "#fff",
             fontSize: 14,
-            fontWeight: 700,
+            fontWeight: 600,
             fontFamily: "var(--font-bricolage), sans-serif",
             textDecoration: "none",
             letterSpacing: "-0.2px",
             whiteSpace: "nowrap",
-            transition: "opacity 0.15s ease",
           }}
-          onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
-          onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
         >
           Join waitlist
+          <span style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 28,
+            height: 28,
+            borderRadius: 999,
+            background: "#D6F23C",
+            color: "#0A0A0F",
+          }}>
+            <ArrowRight size={15} strokeWidth={2.5} />
+          </span>
         </a>
       </div>
     </nav>
