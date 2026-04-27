@@ -15,6 +15,47 @@ import LiquidGlassNavbar from "@/components/LiquidGlassNavbar";
 // Note: DM Sans is loaded via <link> tag in the Home component (not @import here)
 const GLOBAL_STYLES = `
   *, *::before, *::after { box-sizing: border-box; }
+
+  .lumia-faq-trigger { transition: background 0.2s ease; }
+  .lumia-faq-trigger:hover { background: rgba(10,10,15,0.03); }
+  .lumia-faq-trigger:focus-visible { outline: 2px solid #D4FF3A; outline-offset: -2px; }
+
+  .hero-founder-link { transition: color 0.2s ease; }
+  .hero-founder-link:hover { color: #D6F23C; }
+  .hero-founder-link__text {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    transition: background-size 0.3s ease;
+    padding-bottom: 1px;
+  }
+  .hero-founder-link:hover .hero-founder-link__text { background-size: 100% 1px; }
+  .hero-founder-link__arrow { transition: transform 0.2s ease; }
+  .hero-founder-link:hover .hero-founder-link__arrow { transform: translateX(3px); }
+
+  .lumia-video-scrub::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .lumia-video-scrub::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  .lumia-video-scrub::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    cursor: pointer;
+  }
   
   .hero-title {
     white-space: nowrap;
@@ -1395,8 +1436,8 @@ function HeroSection() {
       style={{
         minHeight: "100vh",
         display: "flex",
-        alignItems: "center",
-        padding: "120px clamp(20px, 5vw, 64px) 80px",
+        alignItems: "flex-start",
+        padding: "140px clamp(20px, 5vw, 64px) 80px",
         position: "relative",
         overflow: "hidden",
         background: "transparent",
@@ -1454,16 +1495,11 @@ function HeroSection() {
         <div className="hero-orbital-grid">
 
           {/* ── LEFT: text ─────────────────────────────────────────────── */}
-          <div className="hero-orbital-text">
+          <div className="hero-orbital-text" style={{ display: "flex", flexDirection: "column" }}>
 
             {/* H1 */}
             <h1 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(40px, 4.5vw, 68px)", letterSpacing: "-2.5px", lineHeight: 0.96, color: "#fff", margin: "0 0 24px", animation: "fadeUp 0.7s 0.08s ease both" }}>
-              Because you&apos;re supposed<br />to DREAM it.<br /><span style={{ position: "relative", display: "inline-block" }}>
-                  Not prompt it.
-                  <svg viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true" style={{ position: "absolute", left: "-2%", width: "104%", top: "52%", transform: "translateY(-50%)", pointerEvents: "none" }}>
-                    <path d="M 4,7 C 40,4.5 80,9.5 130,7 C 180,4.5 230,9 296,7" stroke="#d4ff01" strokeWidth="4" strokeLinecap="round" fill="none" />
-                  </svg>
-                </span>
+              Synced AI.<br />Crafted prompts.<br />One overlay.
             </h1>
 
             {/* Subtitle */}
@@ -1472,7 +1508,7 @@ function HeroSection() {
             </p>
 
             {/* CTAs */}
-            <div className="hero-cta-row" style={{ display: "flex", flexWrap: "wrap", gap: 28, animation: "fadeUp 0.7s 0.25s ease both", alignItems: "center" }}>
+            <div className="hero-cta-row" style={{ display: "flex", flexWrap: "wrap", gap: 28, animation: "fadeUp 0.7s 0.25s ease both", alignItems: "center", marginTop: "clamp(120px, 18vh, 260px)" }}>
               <a href="#waitlist" style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -1491,6 +1527,30 @@ function HeroSection() {
                 <ArrowRight size={18} strokeWidth={2.25} />
               </a>
             </div>
+
+            <a
+              href="#pricing"
+              className="hero-founder-link"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                marginTop: 18,
+                fontFamily: "DM Sans, sans-serif",
+                fontSize: 13.5,
+                fontWeight: 500,
+                color: "rgba(255,255,255,0.65)",
+                textDecoration: "none",
+                letterSpacing: "-0.1px",
+                animation: "fadeUp 0.7s 0.32s ease both",
+                width: "fit-content",
+              }}
+            >
+              <span className="hero-founder-link__text">
+                Or skip the line — become a founding member ($99 lifetime)
+              </span>
+              <ArrowRight size={13} strokeWidth={2.25} className="hero-founder-link__arrow" />
+            </a>
           </div>
 
         </div>
@@ -2188,6 +2248,18 @@ function FourCardsSection() {
 
   return (
     <section style={{ padding: "40px clamp(20px, 5vw, 80px) 96px", background: "transparent" }}>
+      <h2 style={{
+        fontFamily: "var(--font-bricolage), sans-serif",
+        fontWeight: 800,
+        fontSize: "clamp(28px, 3.5vw, 48px)",
+        letterSpacing: "-1.2px",
+        lineHeight: 1.1,
+        color: "#0A0A0F",
+        margin: "0 auto 48px",
+        maxWidth: 1040,
+      }}>
+        Built for what other tools miss.
+      </h2>
       <style>{`
         .four-cards-grid {
           display: grid;
@@ -2259,8 +2331,8 @@ function FourCardsSection() {
               ))}
             </div>
           </div>
-          <h3 style={titleStyle}>Jump between 5 projects without forgetting any details.</h3>
-          <p style={subStyle}>Each project has its own vault. You switch. Lumia follows.</p>
+          <h3 style={titleStyle}>Switch projects. Never re-explain.</h3>
+          <p style={subStyle}>Each project has its own vault — brand voice, decisions, sources. You change context in one click. Lumia follows.</p>
         </div>
 
         {/* Card 4 — Sources */}
@@ -2272,7 +2344,7 @@ function FourCardsSection() {
             </picture>
           </div>
           <h3 style={titleStyle}>See where every answer comes from.</h3>
-          <p style={subStyle}>See which docs, decisions, and vault entries went into every prompt. No black box.</p>
+          <p style={subStyle}>Every prompt shows its sources — which docs, which decisions, which vault entries fed in. No black box, no "trust me bro."</p>
         </div>
 
       </div>
@@ -2628,7 +2700,7 @@ function FounderSection() {
               color: "#0A0A0F",
               margin: "0 0 24px",
             }}>
-              Industrial Engineering student at Polytechnique Montréal.
+              Engineering @ Polytechnique Montréal · Builder first, student second.
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -2657,7 +2729,7 @@ function FounderSection() {
               borderRadius: 999,
               marginTop: 36,
             }}>
-              Built in Montréal. Vibe-coded into existence.
+              Built in Montréal. Shipped solo.
             </div>
 
             {/* Social links */}
@@ -2763,7 +2835,7 @@ function PricingSection() {
             }}>Waitlist</div>
 
             <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 20, color: "#0A0A0F", margin: "0 0 12px", letterSpacing: "-0.3px" }}>
-              Not ready yet?
+              Following along?
             </h3>
 
             <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 18 }}>
@@ -2938,6 +3010,500 @@ function LaunchVideoSection() {
   );
 }
 
+// ─── Hero Demo Video Section ──────────────────────────────────────────────────
+function HeroDemoVideoSection() {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [playing, setPlaying] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [hovering, setHovering] = useState(false);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const onTime = () => setProgress(v.currentTime);
+    const onMeta = () => setDuration(v.duration || 0);
+    const onPlay = () => setPlaying(true);
+    const onPause = () => setPlaying(false);
+    v.addEventListener("timeupdate", onTime);
+    v.addEventListener("loadedmetadata", onMeta);
+    v.addEventListener("play", onPlay);
+    v.addEventListener("pause", onPause);
+    return () => {
+      v.removeEventListener("timeupdate", onTime);
+      v.removeEventListener("loadedmetadata", onMeta);
+      v.removeEventListener("play", onPlay);
+      v.removeEventListener("pause", onPause);
+    };
+  }, []);
+
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) v.play();
+    else v.pause();
+  };
+
+  const onSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = videoRef.current;
+    if (!v || !duration) return;
+    const t = (parseFloat(e.target.value) / 100) * duration;
+    v.currentTime = t;
+    setProgress(t);
+  };
+
+  const fmt = (s: number) => {
+    if (!isFinite(s)) return "0:00";
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${m}:${sec.toString().padStart(2, "0")}`;
+  };
+
+  const pct = duration ? (progress / duration) * 100 : 0;
+
+  return (
+    <section
+      style={{
+        background: "#fff",
+        padding: "40px clamp(20px, 5vw, 80px) 80px",
+        position: "relative",
+      }}
+    >
+      <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+        <h3
+          style={{
+            fontFamily: "var(--font-bricolage), sans-serif",
+            fontSize: "clamp(22px, 2.4vw, 32px)",
+            fontWeight: 700,
+            letterSpacing: "-0.8px",
+            lineHeight: 1.25,
+            color: "#0A0A0F",
+            margin: "0 0 14px",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            maxWidth: 720,
+          }}
+        >
+          <span
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              background: "#D4FF3A",
+              boxShadow: "0 0 14px rgba(212,255,58,0.75)",
+              display: "inline-block",
+              flexShrink: 0,
+            }}
+          />
+          v1.0 — live, working, slightly rough on the edges.
+        </h3>
+
+        <p
+          style={{
+            fontFamily: "DM Sans, sans-serif",
+            fontSize: "clamp(15px, 1.15vw, 17px)",
+            fontWeight: 400,
+            lineHeight: 1.55,
+            color: "rgba(10,10,15,0.7)",
+            margin: "0 0 28px",
+            maxWidth: 640,
+          }}
+        >
+          Real session on my Mac. The MVP ships today — every founding member shapes what v2 looks like.
+        </p>
+        <div
+          onMouseEnter={() => setHovering(true)}
+          onMouseLeave={() => setHovering(false)}
+          style={{
+            position: "relative",
+            width: "100%",
+            aspectRatio: "16 / 9",
+            borderRadius: 24,
+            overflow: "hidden",
+            background: "#000",
+            boxShadow: "0 30px 80px rgba(10,10,15,0.18), 0 0 0 1px rgba(10,10,15,0.06)",
+            cursor: "pointer",
+          }}
+          onClick={togglePlay}
+        >
+          <video
+            ref={videoRef}
+            src="/demo-video.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          />
+
+          {/* Centered play overlay when paused */}
+          {!playing && (
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgba(0,0,0,0.25)",
+                pointerEvents: "none",
+                transition: "background 0.2s ease",
+              }}
+            >
+              <div
+                style={{
+                  width: 84,
+                  height: 84,
+                  borderRadius: "50%",
+                  background: "rgba(255,255,255,0.95)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 12px 40px rgba(0,0,0,0.35)",
+                }}
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#0A0A0F">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+            </div>
+          )}
+
+          {/* Bottom control bar */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              padding: "32px 20px 16px",
+              background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 100%)",
+              display: "flex",
+              alignItems: "center",
+              gap: 14,
+              opacity: hovering || !playing ? 1 : 0,
+              transition: "opacity 0.25s ease",
+            }}
+          >
+            <button
+              onClick={togglePlay}
+              aria-label={playing ? "Pause" : "Play"}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                border: "none",
+                background: "rgba(255,255,255,0.95)",
+                color: "#0A0A0F",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              {playing ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="5" width="4" height="14" rx="1" />
+                  <rect x="14" y="5" width="4" height="14" rx="1" />
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
+            </button>
+
+            <span
+              style={{
+                fontFamily: "DM Sans, sans-serif",
+                fontSize: 12,
+                color: "rgba(255,255,255,0.85)",
+                fontVariantNumeric: "tabular-nums",
+                minWidth: 36,
+              }}
+            >
+              {fmt(progress)}
+            </span>
+
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={0.1}
+              value={pct}
+              onChange={onSeek}
+              aria-label="Seek"
+              className="lumia-video-scrub"
+              style={{
+                flex: 1,
+                appearance: "none",
+                WebkitAppearance: "none",
+                height: 4,
+                borderRadius: 999,
+                background: `linear-gradient(to right, #fff 0%, #fff ${pct}%, rgba(255,255,255,0.25) ${pct}%, rgba(255,255,255,0.25) 100%)`,
+                outline: "none",
+                cursor: "pointer",
+              }}
+            />
+
+            <span
+              style={{
+                fontFamily: "DM Sans, sans-serif",
+                fontSize: 12,
+                color: "rgba(255,255,255,0.6)",
+                fontVariantNumeric: "tabular-nums",
+                minWidth: 36,
+              }}
+            >
+              {fmt(duration)}
+            </span>
+          </div>
+        </div>
+
+        <div
+          style={{
+            marginTop: 28,
+            display: "flex",
+            flexDirection: "column",
+            gap: 14,
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "DM Sans, sans-serif",
+              fontSize: "clamp(14px, 1.05vw, 16px)",
+              fontWeight: 400,
+              lineHeight: 1.6,
+              color: "rgba(10,10,15,0.78)",
+              margin: 0,
+            }}
+          >
+            <strong style={{ fontWeight: 700, color: "#0A0A0F" }}>Beta is capped at 30 founding members.</strong> I onboard each one personally — Loom welcome, direct line on Slack, top 3 feature votes shipped first.
+          </p>
+
+          <p
+            style={{
+              fontFamily: "DM Sans, sans-serif",
+              fontSize: "clamp(14px, 1.05vw, 16px)",
+              fontWeight: 400,
+              lineHeight: 1.6,
+              color: "rgba(10,10,15,0.78)",
+              margin: 0,
+            }}
+          >
+            <strong style={{ fontWeight: 700, color: "#0A0A0F" }}>Lifetime access for $99.</strong> After that, the next batch waits for v2.
+          </p>
+
+          <a
+            href="#pricing"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 10,
+              alignSelf: "flex-end",
+              marginTop: 8,
+              background: "#0A0A0F",
+              color: "#fff",
+              borderRadius: 999,
+              padding: "12px 22px",
+              fontFamily: "var(--font-bricolage), sans-serif",
+              fontWeight: 600,
+              fontSize: "clamp(14px, 1vw, 16px)",
+              letterSpacing: "-0.2px",
+              textDecoration: "none",
+              transition: "transform 0.2s ease, background 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#1a1a24";
+              e.currentTarget.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#0A0A0F";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
+          >
+            Become a founding member
+            <ArrowRight size={16} strokeWidth={2.25} />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── FAQ Section ──────────────────────────────────────────────────────────────
+const FAQ_ITEMS: { q: string; a: React.ReactNode }[] = [
+  {
+    q: "Is Lumia actually working today, or is this a pre-launch?",
+    a: "Lumia is live and working. Founding members get access today, not on a future date. The MVP is v1 — solid on the core flow, with rough edges I'm shipping fixes for daily. The demo on this page is the actual product, recorded on my Mac.",
+  },
+  {
+    q: "Why not just use Claude Projects or ChatGPT memory?",
+    a: "Claude Projects work — but only inside Claude. ChatGPT memory works — but only inside ChatGPT. The moment you switch tools (Claude for code, ChatGPT for drafts, Gemini for search), your context is stuck in silos. Lumia is the layer above all of them — same vault, every AI. If you only ever use one AI tool, you don't need Lumia. If you switch between 2+, that's where Lumia earns its keep.",
+  },
+  {
+    q: "Is Lumia Mac-only?",
+    a: "Yes, macOS only for now (the overlay relies on macOS-specific APIs). Windows is on the roadmap if there's enough demand from founders — vote for it once you're in.",
+  },
+  {
+    q: "$99 lifetime — what's the catch?",
+    a: "No catch. Founding members lock in $99 once, get the MVP today, and keep every feature I ship — no future paywall, no \"premium tier\" added later. The reason it's $99 and not $20/mo? I'd rather have 30 founders fully invested than 300 churning monthly. The non-FM tier ($15–20/mo) launches after public beta.",
+  },
+  {
+    q: "You're 19 and solo. What if you stop building Lumia?",
+    a: "Fair question. I don't have an investor I owe a 5-year roadmap to, but I also don't have a cofounder breaking up with me. I send 50+ prompts a day through Lumia myself — the day I stop using it is the day I stop being its target user. Worst case: founding members get a data export and the codebase becomes open source.",
+  },
+];
+
+function FAQSection() {
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+
+  return (
+    <section id="faq" style={{ padding: "72px clamp(20px, 5vw, 80px) 96px", background: "transparent", position: "relative" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        {/* Header — same DA as pricing */}
+        <div style={{ marginBottom: 36, maxWidth: 680, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <p style={{
+            fontFamily: "DM Sans, sans-serif",
+            fontSize: 12,
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.14em",
+            color: "rgba(10,10,15,0.50)",
+            margin: "0 0 14px",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 10,
+          }}>
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#D4FF3A", display: "inline-block" }} />
+            FAQ
+          </p>
+          <h2 style={{
+            fontFamily: "var(--font-bricolage), sans-serif",
+            fontWeight: 800,
+            fontSize: "clamp(32px, 3.8vw, 48px)",
+            letterSpacing: "-1.4px",
+            lineHeight: 1.05,
+            color: "#0A0A0F",
+            margin: "0 0 14px",
+          }}>
+            Questions before you commit.
+          </h2>
+          <p style={{
+            fontFamily: "DM Sans, sans-serif",
+            fontSize: "clamp(15px, 1.3vw, 17px)",
+            lineHeight: 1.55,
+            color: "rgba(10,10,15,0.60)",
+            margin: 0,
+          }}>
+            The 5 things every founder asks before becoming a Founding Member.
+          </p>
+        </div>
+
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 760,
+            borderRadius: 20,
+            background: "rgba(255,255,255,0.55)",
+            border: "1px solid rgba(10,10,15,0.08)",
+            overflow: "hidden",
+          }}
+        >
+          {FAQ_ITEMS.map((item, idx) => {
+            const isOpen = openIdx === idx;
+            return (
+              <div
+                key={idx}
+                style={{
+                  borderTop: idx === 0 ? "none" : "1px solid rgba(10,10,15,0.08)",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenIdx(isOpen ? null : idx)}
+                  aria-expanded={isOpen}
+                  className="lumia-faq-trigger"
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 24,
+                    padding: "22px clamp(18px, 2.4vw, 28px)",
+                    background: "transparent",
+                    border: "none",
+                    textAlign: "left",
+                    cursor: "pointer",
+                    fontFamily: "var(--font-bricolage), sans-serif",
+                    fontWeight: 700,
+                    fontSize: "clamp(16px, 1.35vw, 19px)",
+                    letterSpacing: "-0.4px",
+                    color: "#0A0A0F",
+                    lineHeight: 1.35,
+                  }}
+                >
+                  <span>{item.q}</span>
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      flexShrink: 0,
+                      width: 32,
+                      height: 32,
+                      borderRadius: "50%",
+                      background: isOpen ? "#D4FF3A" : "rgba(10,10,15,0.06)",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "background 0.25s ease, transform 0.25s ease",
+                      transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
+                      color: "#0A0A0F",
+                    }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M7 1.5V12.5M1.5 7H12.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </span>
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <p
+                        style={{
+                          fontFamily: "DM Sans, sans-serif",
+                          fontSize: "clamp(14px, 1.05vw, 16px)",
+                          lineHeight: 1.65,
+                          color: "rgba(10,10,15,0.72)",
+                          margin: 0,
+                          padding: "0 clamp(18px, 2.4vw, 28px) 24px",
+                          maxWidth: 680,
+                        }}
+                      >
+                        {item.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Footer ───────────────────────────────────────────────────────────────────
 function Footer() {
   return (
@@ -3105,24 +3671,30 @@ function CopilotSection() {
             lineHeight: 1.1,
             margin: "0 0 28px",
           }}>
-            The <span style={{ position: "relative", display: "inline-block" }}>
-              precision
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/precision-underline.png"
-                alt=""
+            Because you&apos;re supposed<br />to make it. <span style={{ position: "relative", display: "inline-block" }}>
+              prompt it.
+              <svg
+                viewBox="0 0 300 14"
+                preserveAspectRatio="none"
                 aria-hidden="true"
                 style={{
                   position: "absolute",
-                  left: "-6%",
-                  bottom: "-0.18em",
-                  width: "112%",
-                  height: "auto",
+                  left: "-2%",
+                  width: "104%",
+                  top: "52%",
+                  transform: "translateY(-50%)",
                   pointerEvents: "none",
-                  userSelect: "none",
                 }}
-              />
-            </span> your<br />work deserves.
+              >
+                <path
+                  d="M 4,7 C 40,4.5 80,9.5 130,7 C 180,4.5 230,9 296,7"
+                  stroke="#d4ff01"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </svg>
+            </span>
           </h2>
           {/* Statue (mobile only — floats right after title, text wraps around) */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -3222,9 +3794,9 @@ function PillarsSection() {
   const PILLARS = [
     {
       num: "01",
-      label: "WE CARRY IT",
-      title: "WE CARRY IT",
-      desc: "Anything on your mind. Anything in your stack.",
+      label: "We carry it.",
+      title: "We carry it.",
+      desc: "When you @mention a document or project, that's the Vault. Your context — projects, voice, decisions — stored once, reused forever.",
       bg: "linear-gradient(145deg, #FFE9C7 0%, #FFD29A 55%, #FFB77A 100%)",
       accent: "#8A3A12",
       visual: (
@@ -3233,9 +3805,9 @@ function PillarsSection() {
     },
     {
       num: "02",
-      label: "WE ALIGN IT",
-      title: "WE ALIGN IT",
-      desc: "Messy input gets structure. Unclear gets asked. No hallucination.",
+      label: "We align it.",
+      title: "We align it.",
+      desc: "When the overlay asks you a question, that's the Architect. It catches what's vague, pulls from the Vault, and clarifies before the AI sees a thing.",
       bg: "linear-gradient(145deg, #E9EEFF 0%, #CFD9FF 55%, #9FB1FF 100%)",
       accent: "#2433A8",
       visual: (
@@ -3244,9 +3816,9 @@ function PillarsSection() {
     },
     {
       num: "03",
-      label: "WE STRUCTURE IT",
-      title: "WE STRUCTURE IT",
-      desc: "You speak your intent. We speak AI.",
+      label: "We structure it.",
+      title: "We structure it.",
+      desc: "When Lumia delivers a ready-to-ship prompt to Claude, that's the output. Tailored to each AI tool, every time.",
       bg: "linear-gradient(145deg, #D9F7E4 0%, #A6E9BE 55%, #6FD89A 100%)",
       accent: "#0B6A3D",
       visual: (
@@ -3268,7 +3840,7 @@ function PillarsSection() {
             color: "#0A0A0F",
             margin: 0,
           }}>
-            How<br />Lumia shapes your vision.
+            The 3 pillars.
           </h2>
         </div>
 
@@ -3296,7 +3868,6 @@ function PillarsSection() {
                 paddingTop: 14,
                 paddingLeft: 16,
                 lineHeight: 1.1,
-                textTransform: "lowercase",
               }}>
                 {p.title}
               </h3>
@@ -3308,9 +3879,8 @@ function PillarsSection() {
         </div>
 
         <div style={{ display: "flex", justifyContent: "center", marginTop: 56 }}>
-          <button
-            type="button"
-            onClick={() => setShowDemo(true)}
+          <a
+            href="#waitlist"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -3323,11 +3893,11 @@ function PillarsSection() {
               fontWeight: 600,
               fontSize: 14,
               letterSpacing: "-0.2px",
-              border: "1px solid rgba(10,10,15,0.15)",
+              textDecoration: "none",
               cursor: "pointer",
             }}
           >
-            See how it works
+            Join the waitlist
             <span
               style={{
                 display: "inline-flex",
@@ -3342,7 +3912,7 @@ function PillarsSection() {
             >
               <ArrowRight size={12} strokeWidth={2.5} />
             </span>
-          </button>
+          </a>
         </div>
       </div>
 
@@ -3463,15 +4033,15 @@ export default function Home() {
       <div style={{ minHeight: "100vh", overflowX: "hidden" }}>
         <LiquidGlassNavbar onSignIn={() => setShowAuthModal(true)} />
         <HeroSection />
-        <CopilotSection />
+        <HeroDemoVideoSection />
         <PillarsSection />
+        <CopilotSection />
         <FourCardsSection />
-        <ForWhoSection />
         <div className="dark-zone">
           <div className="noise-overlay" aria-hidden="true" />
           <FounderSection />
+          <FAQSection />
           <PricingSection />
-          <LaunchVideoSection />
           <Footer />
         </div>
       </div>
