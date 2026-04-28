@@ -8,8 +8,7 @@ function getStripe() {
   return new Stripe(key);
 }
 
-export async function POST(request: NextRequest) {
-  const { email } = await request.json();
+export async function POST(_request: NextRequest) {
   const priceId = process.env.STRIPE_PRICE_ID;
 
   if (!priceId || !priceId.startsWith("price_")) {
@@ -27,7 +26,6 @@ export async function POST(request: NextRequest) {
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "payment",
-      customer_email: email,
       success_url: `${appUrl}/?success=true`,
       cancel_url: `${appUrl}/`,
     });

@@ -1112,21 +1112,14 @@ function WaitlistForm({ variant = "hero" }: { variant?: "hero" | "pricing" }) {
 
 // ─── PricingPaidForm ──────────────────────────────────────────────────────────
 function PricingPaidForm() {
-  const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
+  const handleClick = async () => {
     setStatus("loading");
     setErrorMessage("");
     try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const response = await fetch("/api/checkout", { method: "POST" });
       const data = await response.json();
       if (data.url) {
         window.location.href = data.url;
@@ -1141,18 +1134,11 @@ function PricingPaidForm() {
 
   return (
     <div style={{ width: "100%" }}>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <input
-          type="email" required value={email} onChange={e => setEmail(e.target.value)}
-          placeholder="your@email.com"
-          style={{ width: "100%", padding: "13px 18px", borderRadius: 14, border: "1.5px solid rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.1)", color: "#fff", fontSize: 14, fontFamily: "DM Sans, sans-serif", outline: "none" }}
-        />
-        <button type="submit" disabled={status === "loading"}
-          className="btn-spring"
-          style={{ width: "100%", padding: "14px 24px", borderRadius: 14, background: "#fff", color: "#0F0A1E", border: "none", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-          {status === "loading" ? <Loader2 size={16} className="animate-spin" /> : <>Become a founding member <ArrowRight size={15} /></>}
-        </button>
-      </form>
+      <button onClick={handleClick} disabled={status === "loading"}
+        className="btn-spring"
+        style={{ width: "100%", padding: "14px 24px", borderRadius: 14, background: "#fff", color: "#0F0A1E", border: "none", cursor: "pointer", fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+        {status === "loading" ? <Loader2 size={16} className="animate-spin" /> : <>Become a founding member <ArrowRight size={15} /></>}
+      </button>
       {status === "error" && (
         <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#FCA5A5", fontSize: 13, marginTop: 8 }}>
           <AlertCircle size={14} /> {errorMessage}
@@ -1509,7 +1495,7 @@ function HeroSection() {
 
             {/* CTAs */}
             <div className="hero-cta-row" style={{ display: "flex", flexWrap: "wrap", gap: 28, animation: "fadeUp 0.7s 0.25s ease both", alignItems: "center", marginTop: "clamp(120px, 18vh, 260px)" }}>
-              <a href="#waitlist" style={{
+              <a href="/LumiaAI-Installer.dmg" download style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 14,
@@ -1523,7 +1509,7 @@ function HeroSection() {
                 textDecoration: "none",
                 letterSpacing: "-0.2px",
               }}>
-                Join the waitlist
+                Try the beta v1
                 <ArrowRight size={18} strokeWidth={2.25} />
               </a>
             </div>
@@ -1547,7 +1533,7 @@ function HeroSection() {
               }}
             >
               <span className="hero-founder-link__text">
-                Or skip the line — become a founding member ($99 lifetime)
+                Or lock in lifetime access — become a founding member ($99)
               </span>
               <ArrowRight size={13} strokeWidth={2.25} className="hero-founder-link__arrow" />
             </a>
@@ -1738,7 +1724,7 @@ function HeroSection() {
 
               {/* CTA row */}
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 24, flexWrap: "wrap" }}>
-                <a href="#waitlist" className="btn-spring" style={{
+                <a href="/LumiaAI-Installer.dmg" download className="btn-spring" style={{
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 8,
@@ -1754,7 +1740,7 @@ function HeroSection() {
                   letterSpacing: "-0.2px",
                 }}>
                   <ArrowRight size={14} />
-                  Join the waitlist
+                  Try the beta v1
                 </a>
                 <span style={{ fontSize: 12, color: "rgba(255,255,255,0.40)", fontFamily: "DM Sans, sans-serif" }}>
                   macOS 13+ · Free to try · No extension needed
@@ -2757,14 +2743,15 @@ function FounderSection() {
 
 // ─── Pricing Section ──────────────────────────────────────────────────────────
 function PricingSection() {
-  const waitlistFeatures = [
-    "First access when the public beta opens",
-    "Founder updates, straight from me",
-    "No card, no commitment",
+  const betaFeatures = [
+    "The full overlay, on every AI you use",
+    "100+ built-in skills, auto-detected",
+    "Vault-powered context injection",
+    "Free during the v1 beta",
   ];
   const founderFeatures = [
-    "Instant access to the MVP today",
-    "Unlimited prompts for life",
+    "Everything in the beta — for life",
+    "Unlimited prompts, forever",
     "Unlimited Vault",
     "Every future feature included",
     "Feature vote — your top 3 ship first",
@@ -2801,7 +2788,7 @@ function PricingSection() {
             color: "#0A0A0F",
             margin: "0 0 14px",
           }}>
-            MVP stage. Two ways in.
+            Beta v1 is live. Two ways in.
           </h2>
           <p style={{
             fontFamily: "DM Sans, sans-serif",
@@ -2810,14 +2797,14 @@ function PricingSection() {
             color: "rgba(10,10,15,0.60)",
             margin: 0,
           }}>
-            To use the MVP today, become a Founder. Everyone else — join the waitlist.
+            Try the v1 beta free today — or lock in lifetime access as a founder.
           </p>
         </div>
 
         {/* 2-column plan grid */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: 16, alignItems: "stretch" }}>
 
-          {/* Waitlist — light card (secondary) */}
+          {/* Beta v1 — light card (secondary) */}
           <div id="waitlist" style={{
             background: "#F5F2EC",
             borderRadius: 24,
@@ -2832,20 +2819,21 @@ function PricingSection() {
               background: "rgba(10,10,15,0.06)",
               borderRadius: 999, padding: "4px 10px", marginBottom: 16,
               fontFamily: "DM Sans, sans-serif", width: "fit-content",
-            }}>Waitlist</div>
+            }}>Beta v1</div>
 
             <h3 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 20, color: "#0A0A0F", margin: "0 0 12px", letterSpacing: "-0.3px" }}>
-              Following along?
+              Just want to try it?
             </h3>
 
             <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 18 }}>
               <span style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: 44, letterSpacing: "-2px", lineHeight: 1, color: "#0A0A0F" }}>Free</span>
+              <span style={{ fontSize: 14, color: "rgba(10,10,15,0.50)", fontFamily: "DM Sans, sans-serif", fontWeight: 500 }}>during beta</span>
             </div>
 
             <div style={{ height: 1, background: "rgba(10,10,15,0.10)", marginBottom: 18 }} />
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 22, flex: 1 }}>
-              {waitlistFeatures.map((f, fi) => (
+              {betaFeatures.map((f, fi) => (
                 <div key={fi} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                   <div style={{ width: 16, height: 16, borderRadius: "50%", background: "rgba(10,10,15,0.10)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
                     <svg width="8" height="8" viewBox="0 0 9 9" fill="none">
@@ -2857,10 +2845,23 @@ function PricingSection() {
               ))}
             </div>
 
-            <WaitlistForm variant="pricing" />
+            <a
+              href="/LumiaAI-Installer.dmg"
+              download
+              className="btn-spring"
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                width: "100%", padding: "13px 20px", borderRadius: 14,
+                background: "#0A0A0F", color: "#fff", textDecoration: "none",
+                fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15,
+                letterSpacing: "-0.2px",
+              }}
+            >
+              Try the beta v1 <ArrowRight size={15} />
+            </a>
 
             <p style={{ fontSize: 12, fontFamily: "DM Sans, sans-serif", textAlign: "center", marginTop: 10, marginBottom: 0, color: "rgba(10,10,15,0.50)" }}>
-              We&apos;ll email you when the public beta opens.
+              macOS 13+ · Direct download · No card needed
             </p>
           </div>
 
@@ -2914,10 +2915,23 @@ function PricingSection() {
               ))}
             </div>
 
-            <PricingPaidForm />
+            <a
+              href="/LumiaAI-Installer.dmg"
+              download
+              className="btn-spring"
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                width: "100%", padding: "14px 24px", borderRadius: 14,
+                background: "#fff", color: "#0F0A1E", textDecoration: "none",
+                fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 700, fontSize: 15,
+                letterSpacing: "-0.2px",
+              }}
+            >
+              Try the beta v1 <ArrowRight size={15} />
+            </a>
 
             <p style={{ fontSize: 12, fontFamily: "DM Sans, sans-serif", textAlign: "center", marginTop: 10, marginBottom: 0, fontWeight: 600, color: "#D4FF3A" }}>
-              MVP price — increases at public launch.
+              Founder pricing locks in once Stripe goes live.
             </p>
           </div>
         </div>
@@ -3880,7 +3894,8 @@ function PillarsSection() {
 
         <div style={{ display: "flex", justifyContent: "center", marginTop: 56 }}>
           <a
-            href="#waitlist"
+            href="/LumiaAI-Installer.dmg"
+            download
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -3897,7 +3912,7 @@ function PillarsSection() {
               cursor: "pointer",
             }}
           >
-            Join the waitlist
+            Try the beta v1
             <span
               style={{
                 display: "inline-flex",

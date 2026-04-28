@@ -53,7 +53,8 @@ export default function LiquidGlassNavbar({ onSignIn }: LiquidGlassNavbarProps) 
 
         {/* CTA */}
         <a
-          href="#waitlist"
+          href="/LumiaAI-Installer.dmg"
+          download
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -70,7 +71,7 @@ export default function LiquidGlassNavbar({ onSignIn }: LiquidGlassNavbarProps) 
             whiteSpace: "nowrap",
           }}
         >
-          Join waitlist
+          Try the beta
           <span style={{
             display: "inline-flex",
             alignItems: "center",
